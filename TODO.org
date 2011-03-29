@@ -1,0 +1,7 @@
+[ ] better editor (eval of current line, region, keystroke) => codemirror?
+[ ] DSL to synth/pattern/duration/sampler creation and live editing
+[ ] socket.io to allow other people to jam together, each one with an editor
+[ ] more instruments like matrix on top of vivace
+[ ] OSC devices with osc-web
+[ ] visual live coding too using processing.js/raphael.js
+[ ] documentation
