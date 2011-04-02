@@ -5,3 +5,6 @@
 [ ] OSC devices with osc-web
 [ ] visual live coding too using processing.js/raphael.js
 [ ] documentation
+
+- integration with soundcloud http://matrix.senecac.on.ca/~sweerdenburg/Projects/popcorn/Soundcloud/players/soundcloud/popcorn.soundcloud.html
+- chat http://akquinet.github.com/jquery-toastmessage-plugin/demo/demo.html
