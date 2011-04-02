@@ -48,10 +48,12 @@ html, body {
     height: 30px;
 }
 
-.ui-button-text-only .ui-button-text { display: none; };
+.ui-button-text-only .ui-button-text { 
+    display: none; 
+}
 
-.ui-slider-horizontal {
-    width: 200px;
+#slider1 {
+    width: 100px;
 }
 
 #status {
