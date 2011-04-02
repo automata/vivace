@@ -50,6 +50,11 @@ html, body {
 
 .ui-button-text-only .ui-button-text { display: none; };
 
+#slider1 {
+    width:150px; 
+    margin:15px;
+}
+
 #status {
     height: 50px; 
     position: absolute;
