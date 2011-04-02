@@ -50,9 +50,8 @@ html, body {
 
 .ui-button-text-only .ui-button-text { display: none; };
 
-#slider1 {
-    width:150px; 
-    margin:15px;
+.ui-slider-horizontal {
+    width: 200px;
 }
 
 #status {
