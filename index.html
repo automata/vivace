@@ -1,0 +1,44 @@
+<html>
+  <head>
+    <title> vivace </title>
+    <style>
+      
+    </style>
+
+    <link rel="stylesheet" href="./css/codemirror.css">
+    <link rel="stylesheet" href="./css/default.css">
+    <script src="./js/codemirror.js"></script>
+    <script src="./js/javascript.js"></script>
+    <script src="./js/Audiolet.min.js"></script>
+    <script src="./js/audiofile.js"></script>
+    <script src="./js/vivace.js"></script>
+
+  </head>
+  <body>
+
+<script>
+</script>
+
+    <div id="editor">
+      <textarea id="code" name="code">
+[1,2,1,2]
+      </textarea>
+    </div>
+
+    <script>
+      editor = CodeMirror.fromTextArea(document.getElementById("code"), {
+      lineNumbers: true,
+      matchBrackets: true,
+      onChange: function () { 
+         run_code(); 
+      }
+      });
+
+  run_code = function() {
+    vivaceEval(editor.getValue());
+  }
+
+    </script>
+  
+</body>
+</html>
