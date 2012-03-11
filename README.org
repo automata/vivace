@@ -15,7 +15,7 @@
 
 * Introduction
 
-*Livecoding* (see http://toplap.org) is an alternative way to compose and interpret music in real-time. 
+[[http://toplap.org/][Livecoding]] is an alternative way to compose and interpret music in real-time. 
 The performer/composer plays on a laptop and shows your screen to the public, 
 making them part of the performance and even understanding what the musician 
 is really doing to generate that weird sounds. Livecoders commonly use general 
@@ -28,8 +28,8 @@ using the new [[https://dvcs.w3.org/hg/audio/raw-file/tip/webaudio/specification
 
 Vivace is built on top of these projects, but all the dependencies are included, so don't worry...
 
-- Audiolet: http://github.com/oampo/Audiolet
-- Codemirror: http://codemirror.net
+- [[http://github.com/oampo/Audiolet][Audiolet]]
+- [[http://codemirror.net][Codemirror]]
 
 * Installation
 
