@@ -1,5 +1,3 @@
-* Vivace
-
     #+BEGIN_SRC sh
    _            .       _
   u            @88>    u
