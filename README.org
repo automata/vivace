@@ -1,8 +1,37 @@
 * Vivace
 
+#+begin_src sh
+                             ()
+                          () |                               _            .       _
+                   _      |  |                              u            @88>    u
+                  |       |.'                              88Nu.   u.    %8P    88Nu.   u.
+                  |       '                               '88888.o888c    .    '88888.o888c       u           .        .u
+     __          ()   \                                    ^8888  8888  .@88u   ^8888  8888    us888u.   .udR88N    ud8888.
+   ('__`>           .  \  | /                               8888  8888 '`888E`   8888  8888 .@88 "8888" <888'888k :888'8888.
+   // -(         ,   `. \ |                                 8888  8888   888E    8888  8888 9888  9888  9888 'Y"  d888 '88%"
+   /:_ /        /   ___________                             8888  8888   888E    8888  8888 9888  9888  9888      8888.+"
+  / /_;\       /____\__________)____________               .8888b.888P   888E   .8888b.888P 9888  9888  9888      8888L 
+ **/ ) \\,-_  /                       \\  \ `.              ^Y8888*""    888&    ^Y8888*""  9888  9888  ?8888u../ '8888c. .+
+   | |  \\(\\J                        \\  \  |=-.             `Y"        R888"     `Y"      "888*""888"  "8888P'   "88888%
+   |  \_J,)|~                         \\  \  ;  |                         ""                 ^Y"   ^Y'     "P'       "YP'
+    \._/' `|_______________,------------+-+-'   `--.   .--.           ________       
+     `.___.  \     ||| /                | |        |   \ /           \    __  \
+    |_..__.'. \    |||/                 | |         `---\'            \  \__\  \          
+      ||  || \_\__ |||                  `.|              `---.         \        \________
+      ||  ||  \_-'=|||                   ||                  `---------=\________\-------'
+ -----++--++-------++--------------------++--------Ool
+#+end_src
+
 * Introduction
 
-Live coding for Web.
+Livecoding is an alternative way to compose and interpret music in real-time. 
+The performer/composer plays on a laptop and shows your screen to the public, 
+making them part of the performance and even understanding what the musician 
+is really doing to generate that weird sounds. Livecoders commonly use general 
+domain languages or creates their own computer music languages. 
+
+Vivace is an attempt to create a Livecoding language that runs in the Open Web 
+using the new Web Audio and Audio Data APIs. 
 
 * Prerequisites
 
@@ -11,9 +40,6 @@ Vivace is built on top of these projects, but all the dependencies are included,
 - [[http://nodejs.org][node.js]]
 - [[http://socket.io][socket.io]]
 - [[https://github.com/oampo/Audiolet][Audiolet]]
-- jQuery
-- jQuery UI
-- mootools
 
 * Installation
 
@@ -23,4 +49,4 @@ $ git clone git://github.com/automata/vivace.git
 
 * Using
 
-For now, just open the file *experiments/matrix.html* on [[http://gitfirefox.com][Firefox 4]].
+For now, just open the file *index.html* on [[http://gitfirefox.com][Firefox 4]].
