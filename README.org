@@ -15,7 +15,7 @@
 
 * Introduction
 
-Livecoding is an alternative way to compose and interpret music in real-time. 
+[[http://toplap.org][Livecoding]] is an alternative way to compose and interpret music in real-time. 
 The performer/composer plays on a laptop and shows your screen to the public, 
 making them part of the performance and even understanding what the musician 
 is really doing to generate that weird sounds. Livecoders commonly use general 
