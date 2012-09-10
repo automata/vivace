@@ -21,22 +21,37 @@ making them part of the performance and even understanding what the musician
 is really doing to generate that weird sounds. Livecoders commonly use general 
 domain languages or creates their own computer music languages. 
 
-*Vivace* is an attempt to create a Livecoding language that runs in the Open Web 
-using the new [[https://dvcs.w3.org/hg/audio/raw-file/tip/webaudio/specification.html][Web Audio]] and [[https://wiki.mozilla.org/Audio_Data_API][Audio Data API]]s. 
+*Vivace* is a Livecoding language that runs on Web using the new [[https://dvcs.w3.org/hg/audio/raw-file/tip/webaudio/specification.html][Web Audio API]].
 
-* Prerequisites
+For now, just Chrome implements Web Audio API, so you have to run vivace on it.
 
-Vivace is built on top of these projects, but all the dependencies are included, so don't worry...
+* Installation & How to Use
 
-- [[http://github.com/oampo/Audiolet][Audiolet]]
-- [[http://codemirror.net][Codemirror]]
-
-* Installation
+Clone this  repos:
 
 #+BEGIN_SRC sh
 $ git clone git://github.com/automata/vivace.git
 #+END_SRC
 
-* Using
+Copy some audio (wav, mp3, ogg) or video (mp4, webm, ogv) to *samples/*:
 
-For now, just open the file *index.html* on [[http://gitfirefox.com][Firefox 4]].
+#+BEGIN_SRC sh
+$ cp *.wav vivace/samples/
+#+END_SRC
+
+And edit file vivace_exec.js, line 192, to map variable names to your files:
+
+#+BEGIN_SRC sh
+  var files = [{name: 'a', fileName: 'kick.wav', type: 'audio'},
+               {name: 'b', fileName: 'foo.mp4', type: 'video'}]
+#+END_SRC
+
+Copy or link vivace to your local Web server (e.g. Apache) hosting directory:
+
+#+BEGIN_SRC sh
+$ ln -s PATH_TO/vivace /var/www/vivace
+#+END_SRC
+
+Hit Chrome with http://localhost/vivace and press CTRL-E to eval.
+
+Have fun!

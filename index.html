@@ -1,44 +1,89 @@
 <html>
   <head>
     <title> vivace </title>
+    <script src="popcorn.min.js"></script>
+    <script src="vivace.js"></script>
+    <script src="vivace_exec.js"></script>
+
     <style>
-      
+      body {
+        margin: 0;
+        padding: 0;
+        background: #000;
+      }
+
+      #code {
+      width: 100%;
+      height: 100%;
+      color: transparent;
+      text-shadow: #000 0px 0px 4px;
+      background-color: transparent;
+      position: absolute; left: 0px; top: 0px;
+      padding: 24px;
+      padding-top: 42px;
+      padding-bottom: 42px;
+      line-height: 1.1em;
+      font-family: monospace;
+      font-size: 18px;
+      font-weight: bold;
+      visibility: visible;
+      z-index: 1000;
+      /* transition between transparent and semi-transparent black on hover */
+      transition: color  1500ms;
+      -webkit-transition: color  1500ms;
+      -o-transition: color  500ms;
+      -moz-transition: color ox-shadow 500ms;
+      -ms-transition: color  500ms;
+      outline: none;
+      border: none;
+      }
+
+      #code:hover {
+      color: #fff;
+      /*background-color:rgba(0,0,0,.1);*/
+      }
+
+      #banner {
+      position: absolute;
+      right: 0px;
+      bottom: 0px;
+      padding: 24px;
+      font-family: monospace;
+      font-size: 18px;
+      font-weight: bold;
+      color: transparent;
+      text-shadow: #555 0px 0px 2px;
+      background-color: transparent;
+      z-index: 1001;
+      transition: color  1500ms;
+      -webkit-transition: color  1500ms;
+      -o-transition: color  500ms;
+      -moz-transition: color ox-shadow 500ms;
+      -ms-transition: color  500ms;
+      }
+
+      #banner:hover {
+      color: #000;
+      }
+
+      video {
+        width: 100%;
+        height: 100%;
+      }
     </style>
 
-    <link rel="stylesheet" href="./css/codemirror.css">
-    <link rel="stylesheet" href="./css/default.css">
-    <script src="./js/codemirror.js"></script>
-    <script src="./js/javascript.js"></script>
-    <script src="./js/Audiolet.min.js"></script>
-    <script src="./js/audiofile.js"></script>
-    <script src="./js/vivace.js"></script>
-
   </head>
+
   <body>
 
-<script>
-</script>
+   <textarea id="code" spellcheck="false">
+v.pos = [2,3,1]
+v.pos = {1/2}
+   </textarea>
 
-    <div id="editor">
-      <textarea id="code" name="code">
-[1,2,1,2]
-      </textarea>
-    </div>
+   <div id="banner" onclick="run();">vivace</div>
 
-    <script>
-      editor = CodeMirror.fromTextArea(document.getElementById("code"), {
-      lineNumbers: true,
-      matchBrackets: true,
-      onChange: function () { 
-         run_code(); 
-      }
-      });
+   <script> init(); </script>
 
-  run_code = function() {
-    vivaceEval(editor.getValue());
-  }
-
-    </script>
-  
-</body>
+  </body>
 </html>
