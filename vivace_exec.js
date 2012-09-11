@@ -170,6 +170,7 @@ function tick () {
         voices[voiceName].durId += 1;
         voices[voiceName].posId += 1;
         events[event].nextBeat = (voices[voiceName].dur[voices[voiceName].durId % voices[voiceName].dur.length] * semiBreve) + beats;
+        document.getElementById(voiceName).style.zIndex="900";
       }
     }
   }
@@ -226,6 +227,10 @@ function run () {
                   delete events[e];
                   voices[voiceName].dur=undefined;
                   voices[voiceName].durId=0;
+                  if (voices[voiceName].sigType=="video"){
+                        document.getElementById(voiceName).style.zIndex="0";
+                        voices[voiceName].sigPop.pause();
+                  }
               }
           }
       }
