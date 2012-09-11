@@ -2,9 +2,18 @@
 
 // este primeiro campo eh jogado fora, pode anotar qualquer coisa aqui...
 
-/////////////////
+///////////////// 1
 
 // percussoes, carminha
 v.pos = [21,30]
 v.pos = {1/2}
+////////////////// 2
+b.pos = [2] // posicao no arquivo em segundos
 
+b.gdur= [.1] // duracao no arquivo em segundos
+
+b.pos = {1/2,1/2,1/4,1/4,1/4,1/4} // sequencia de ataques ciclicos em fracoes da batida (1)
+/////
+b.pos = [2]
+b.gdur= [.5,.5]
+b.pos = {1/4,1/4}
