@@ -194,7 +194,7 @@ function init () {
                //{name: 'c', fileName: 'wtfpopcorn.webm', type: 'video'},
                {name: 'v', fileName: 'avenida1.mp4', type: 'video'},
                {name: 'va', fileName: 'avenida2.mp4', type: 'video'},
-               //{name: 'c', fileName: 'organ-echo-chords.wav', type: 'audio'},
+               {name: 'c', fileName: 'organ-echo-chords.wav', type: 'audio'},
                {name: 'd', fileName: 'snare.wav', type: 'audio'},
                {name: 'e', fileName: 'hihat.wav', type: 'audio'}];
 
