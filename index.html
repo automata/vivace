@@ -5,6 +5,10 @@
     <script src="vivace.js"></script>
     <script src="vivace_exec.js"></script>
 
+    <script src="/channel/bcsocket.js"></script>
+    <script src="/share/share.js"></script>
+    <script src="/share/textarea.js"></script>
+
     <style>
       body {
         margin: 0;
@@ -83,7 +87,20 @@ v.pos = {1/2}
 
    <div id="banner" onclick="run();">vivace</div>
 
-   <script> init(); </script>
+   <script> init(); 
+
+     var elem = document.getElementById('code');
+     
+     sharejs.open('hello', 'text',  function(error, doc) {
+     if (error) {
+     console.log(error);
+     } else {
+     elem.disabled = false;
+     doc.attach_textarea(elem);
+     }
+     });
+
+   </script>
 
   </body>
 </html>
