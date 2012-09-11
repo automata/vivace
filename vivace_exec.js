@@ -16,8 +16,10 @@ function exec (input) {
   
 
   // go to all definitions again and update voices details
+  var voiceNames=[]
   for (var i=0; i<definitions.length; i=i+1) {
     var voiceName = definitions[i].name.val;
+    voiceNames[voiceName]=true;
 
     // signal
     if (definitions[i].attr.val === 'sig') {
@@ -84,7 +86,7 @@ function exec (input) {
       }
     }
   }
-  return voices;
+  return [voices,voiceNames];
 }
 
 function loadAudioFile(voiceName) {
@@ -210,32 +212,35 @@ function init () {
   }
 }
 
-// // it is a hack to load all the audio files first
-// var test = "a.sig = audio('kick.wav') \nb.sig = audio('dj.wav') \nc.sig = video('bunny.webm')";
-// voices = exec(test);
-
-// for (voiceName in voices) {
-//   // load audio buffer (async) and store at voices[voiceName].buffer
-//   if (voices[voiceName].sigType === 'audio') {
-//     loadAudioFile(voiceName);
-//   } else if (voices[voiceName].sigType === 'video') {
-//     loadVideoFile(voiceName);
-//   }
-// }
-
-// parse & exec ///////////////////////
-
 var lastVoices = null;
 
 function run () {
   var code = document.getElementById('code');
-  var currentVoices = exec(code.value);
+  var texec=exec(code.value);
+  var currentVoices = texec[0];
+  var activeVoices = texec[1];
+  for (voiceName in lastVoices){
+      if (!activeVoices[voiceName]){
+          for (e in events) {
+              if(events[e]['voiceName']==voiceName) {
+                  delete events[e];
+                  voices[voiceName].dur=undefined;
+                  voices[voiceName].durId=0;
+              }
+          }
+      }
+  }
 
   for (voiceName in currentVoices) {
     if (lastVoices != null) {
       // let's update durations
+                  console.log(voiceName, currentVoices, lastVoices);
       if (currentVoices[voiceName].dur != lastVoices[voiceName].dur) {
-        voices[voiceName].dur = currentVoices[voiceName].dur;
+                  console.log(voiceName + "dd");
+          if (activeVoices[voiceName]){
+                  console.log(voiceName + "ee");
+                voices[voiceName].dur = currentVoices[voiceName].dur;
+          }
       }
       // let's update buffer positions
       if (currentVoices[voiceName].pos != lastVoices[voiceName].pos) {

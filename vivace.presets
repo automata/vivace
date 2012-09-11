@@ -17,3 +17,19 @@ b.pos = {1/2,1/2,1/4,1/4,1/4,1/4} // sequencia de ataques ciclicos em fracoes da
 b.pos = [2]
 b.gdur= [.5,.5]
 b.pos = {1/4,1/4}
+///////////////
+v.pos = [2,3,1]
+v.pos = {1/2}
+
+b.pos=[0]
+b.gdur=[1]
+b.pos={1/2}
+
+a.pos=[0]
+a.gdur=[.1]
+a.pos={1/8}
+
+
+d.pos=[0]
+d.gdur=[.1]
+d.pos={1/4}
