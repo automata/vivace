@@ -245,6 +245,15 @@ function run () {
       if (currentVoices[voiceName].gdur != lastVoices[voiceName].gdur) {
         voices[voiceName].gdur = currentVoices[voiceName].gdur;
       }      
+console.log(voices[voiceName].dur);
+      if (!voices[voiceName].durId && (voices[voiceName].dur!=undefined)) {
+        // for every updated voice, put that on event queue
+        events.push({'voiceName': voiceName, 'nextBeat': (voices[voiceName].dur[0] * semiBreve) + beats});
+        voices[voiceName].durId = 0;
+        voices[voiceName].posId = 0;
+        voices[voiceName].gdurId = 0;
+      }
+
     } else {
       // so it is the first time we are executing...
       if (!currentVoices[voiceName].dur) {
@@ -279,7 +288,7 @@ document.onkeyup=function(e){
 }
 document.onkeydown=function(e){
 	if(e.which == 17) isCtrl=true;
-	if(e.which == 69 && isCtrl == true) {
+	if(e.which == 88 && isCtrl == true) {
 	  run();
 		return false;
 	}
