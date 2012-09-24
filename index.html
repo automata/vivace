@@ -1,58 +1,72 @@
-<!DOCTYPE html>
+<!doctype html>
 <html>
   <head>
-    <meta charset='utf-8'>
+    <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="chrome=1">
-
-    <link rel="stylesheet" type="text/css" href="stylesheets/stylesheet.css" media="screen" />
-    <link rel="stylesheet" type="text/css" href="stylesheets/pygment_trac.css" media="screen" />
-    <link rel="stylesheet" type="text/css" href="stylesheets/print.css" media="print" />
-
     <title>vivace by automata</title>
+
+    <link rel="stylesheet" href="stylesheets/styles.css">
+    <link rel="stylesheet" href="stylesheets/pygment_trac.css">
+    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
+    <!--[if lt IE 9]>
+    <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
   </head>
-
   <body>
-
-    <header>
-      <div class="container">
+    <div class="wrapper">
+      <header>
         <h1>vivace</h1>
-        <h2>Live coding language for Web</h2>
+        <p>Live coding language for Web</p>
 
-        <section id="downloads">
-          <a href="https://github.com/automata/vivace/zipball/master" class="btn">Download as .zip</a>
-          <a href="https://github.com/automata/vivace/tarball/master" class="btn">Download as .tar.gz</a>
-          <a href="https://github.com/automata/vivace" class="btn btn-github"><span class="icon"></span>View on GitHub</a>
-        </section>
-      </div>
-    </header>
+        <p class="view"><a href="https://github.com/automata/vivace">View the Project on GitHub <small>automata/vivace</small></a></p>
 
-    <div class="container">
-      <section id="main_content">
+
+        <ul>
+          <li><a href="https://github.com/automata/vivace/zipball/master">Download <strong>ZIP File</strong></a></li>
+          <li><a href="https://github.com/automata/vivace/tarball/master">Download <strong>TAR Ball</strong></a></li>
+          <li><a href="https://github.com/automata/vivace">View On <strong>GitHub</strong></a></li>
+        </ul>
+      </header>
+      <section>
         <h1>Introduction</h1>
 
 <p><a href="http://toplap.org">Live coding</a> is an alternative way to compose and
-interpret music (or other media) in real-time.  The performer/composer
+play music (or other media) in real-time.  The performer/composer
 plays on a computer device and shows your screen to the public, making
-them part of the performance and even understanding what the musician
-is really doing to generate that weird sounds. Live coders commonly
-use general domain languages or creates their own computer music
-languages.</p>
+them part of the performance and at the same time demystifying what
+the musician is really doing to generate that weird sounds. Live
+coders commonly use general domain languages or create their own
+computer music languages.</p>
 
-<p><em>Vivace</em> is a live coding language that runs on Web using the <a href="https://dvcs.w3.org/hg/audio/raw-file/tip/webaudio/specification.html">Web Audio API</a>.</p>
+<p><em>Vivace</em> is a live coding language that runs on Web using the <a href="https://dvcs.w3.org/hg/audio/raw-file/tip/webaudio/specification.html">Web
+ Audio
+ API</a>
+ for process audio and the HTML5 video tag to play videos. The
+ language parser is built using the awesome <a href="http://jison.org">Jison</a>.</p>
 
 <p>For now, just Chrome and Safari implements Web Audio API, so you have
 to run vivace on it.</p>
 
-<p><a href="./vivace_off.html">Try vivace right now clicking here!</a></p>
+<p><a href="http://vivacelang.herokuapp.com">Try vivace right now clicking
+here!</a>. You can even play together
+with others, just share this URL <a href="">http://vivacelang.herokuapp.com</a>
+with them and try typing and evaluating (ctrl+x).</p>
 
 <h1>The language</h1>
 
-<p>...</p>
+<p>The language is not complete. We have a <a href="https://github.com/automata/vivace/wiki/Language-spec">draft specification
+here</a>. Feel
+free to suggest your own commands/syntax/grammar to us!</p>
+
+<p>For now you can basically use vivace as a "sampler language". You can
+specify which audio or video file you want to play and hack some of
+its parameters on-the-fly.</p>
 
 <h1>Running your own vivace</h1>
 
-<p>You can use vivace just loading <a href="./vivace_off.html">this demo page</a>. But if you want to
-run your own vivace on your computer/server, follow these next steps.</p>
+<p>You can use vivace just loading <a href="http://vivacelang.herokuapp.com">this demo
+app</a>. But if you want to run your own
+vivace on your computer/server, follow these next steps.</p>
 
 <p>Clone this repos:</p>
 
@@ -80,7 +94,8 @@ $ npm install
 <pre><code>$ node server.js
 </code></pre>
 
-<p>Open http://localhost:8080 on your Chrome or Safari browser.</p>
+<p>Open <a href="">http://localhost:5000</a> on your Chrome or Safari browser. You
+can even share this URL with others and live code together.</p>
 
 <h1>Using your own audio/video files</h1>
 
@@ -95,8 +110,12 @@ $ npm install
              {name: 'b', fileName: 'foo.mp4', type: 'video'}]
 </code></pre>
       </section>
+      <footer>
+        <p>This project is maintained by <a href="https://github.com/automata">automata</a></p>
+        <p><small>Hosted on GitHub Pages &mdash; Theme by <a href="https://github.com/orderedlist">orderedlist</a></small></p>
+      </footer>
     </div>
-
+    <script src="javascripts/scale.fix.js"></script>
     
   </body>
 </html>
