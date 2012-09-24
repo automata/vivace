@@ -8,5 +8,8 @@
     "express": "3.x",
     "share": "*"
   }
-  "engine": "node >= 0.6.18"
+  "engines": {
+    "node": "0.6.18",
+    "npm":  "1.1.21"
+  }
 }
