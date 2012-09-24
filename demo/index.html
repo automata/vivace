@@ -1,0 +1,121 @@
+<html>
+  <head>
+    <title> vivace </title>
+    <script src="popcorn.min.js"></script>
+    <script src="vivace.js"></script>
+    <script src="vivace_exec.js"></script>
+
+    <style>
+      body {
+        margin: 0;
+        padding: 0;
+        background: #000;
+      }
+
+      #code {
+      width: 100%;
+      height: 100%;
+      color: transparent;
+      background-color: transparent;
+      position: absolute; left: 0px; top: 0px;
+      padding: 24px;
+      padding-top: 42px;
+      padding-bottom: 42px;
+      line-height: 1.1em;
+      font-family: monospace;
+      font-size: 18px;
+      font-weight: bold;
+      visibility: visible;
+      z-index: 1000;
+      /* transition between transparent and semi-transparent black on hover */
+      transition: color  1500ms;
+      -webkit-transition: color  1500ms;
+      -o-transition: color  500ms;
+      -moz-transition: color ox-shadow 500ms;
+      -ms-transition: color  500ms;
+      outline: none;
+      border: none;
+      }
+
+      #code:hover {
+      color: #fff;
+      text-shadow: #000 0px 0px 4px;
+
+      /*background-color:rgba(0,0,0,.1);*/
+      }
+
+      #banner {
+      position: absolute;
+      right: 0px;
+      bottom: 0px;
+      padding: 24px;
+      font-family: monospace;
+      font-size: 18px;
+      font-weight: bold;
+      color: transparent;
+      text-shadow: #555 0px 0px 2px;
+      background-color: transparent;
+      z-index: 1001;
+      transition: color  1500ms;
+      -webkit-transition: color  1500ms;
+      -o-transition: color  500ms;
+      -moz-transition: color ox-shadow 500ms;
+      -ms-transition: color  500ms;
+      }
+
+      #banner:hover {
+      color: #000;
+      }
+
+      video {
+        width: 100%;
+        height: 100%;
+        position: absolute;
+        document.getElementById(voiceName).style.zIndex="800";
+      }
+    </style>
+
+  </head>
+
+  <body>
+
+   <textarea id="code" spellcheck="false">
+// vivace 0.0.4
+// ~~~~~~~~~~
+// edit the code below and type ctrl+x
+// 
+// video from https://www.youtube.com/watch?v=ySMtB5nWxPs
+// by Mike & Josh Shorts 
+
+// video positions in seconds:
+eyes.pos = [23,12,40,60]
+
+// durations in ratios of tempo
+eyes.pos = {1/2, 1}
+
+// audio file positions in seconds:
+a.pos = [0]
+// durations of audio grains in seconds:
+a.gdur = [.01]
+// durations in ratios of tempo
+a.pos = {1/2}
+
+b.pos = [5, 0]
+b.gdur = [.012, .01]
+b.pos = {1/8, 1/16, 1/16, 1/16, 1/16, 1/32, 1/32, 1/32, 1/32}
+
+c.pos = [0]
+c.gdur = [.01]
+c.pos = {1/4}
+
+// you got the idea right? have fun ;-)
+
+// more info at http://automata.github.com/vivace
+   </textarea>
+
+   <div id="banner" onclick="run();">vivace</div>
+
+   <script> init(); </script>
+
+  </body>
+</html>
