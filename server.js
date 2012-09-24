@@ -7,6 +7,6 @@ var options = {db: {type: 'none'}};
 sharejs.attach(app, options);
 
 app.use("/", express.static(__dirname + '/'));
-
-app.listen(80);
+var port = process.env.PORT || 5000;
+app.listen(port);
 console.log('Server running at http://127.0.0.1');
