@@ -1,7 +1,7 @@
 //var parser = require("./vivace").parser;
 
 // where are our audio files?
-var audioFilesDir = './samples/';
+var audioFilesDir = './media/';
 
 // store all the voices (main symbol table)
 var voices = {};
@@ -112,7 +112,7 @@ function loadVideoFile(voiceName) {
   vid = document.createElement('video');
   vid.src = audioFilesDir + voices[voiceName].sig;
   vid.id = voiceName;
-  vid.setAttribute('controls', true);
+  //vid.setAttribute('controls', true);
   //vid.setAttribute('autoplay',true);
   document.getElementsByTagName('body')[0].appendChild(vid);
   voices[voiceName].sigPop = Popcorn('#'+voiceName);
@@ -194,12 +194,9 @@ var masterClock = setInterval(tick, timeInterval);
 function init () {
   var files = [{name: 'a', fileName: 'kick.wav', type: 'audio'},
                {name: 'b', fileName: 'dj.wav', type: 'audio'},
-               //{name: 'c', fileName: 'wtfpopcorn.webm', type: 'video'},
-               {name: 'v', fileName: 'avenida1.mp4', type: 'video'},
-               {name: 'va', fileName: 'avenida2.mp4', type: 'video'},
-               {name: 'c', fileName: 'organ-echo-chords.wav', type: 'audio'},
-               {name: 'd', fileName: 'snare.wav', type: 'audio'},
-               {name: 'e', fileName: 'hihat.wav', type: 'audio'}];
+               {name: 'c', fileName: 'snare.wav', type: 'audio'},
+               {name: 'd', fileName: 'hihat.wav', type: 'audio'},
+               {name: 'eyes', fileName: 'eyes.mp4', type: 'video'}];
 
   for (file in files) {
     // create a dict to each voice
@@ -290,7 +287,7 @@ console.log(voices[voiceName].dur);
   lastVoices = voices;
 }
 
-// key events: CTRL + e
+// key events: CTRL + x
 
 var isCtrl = false;
 document.onkeyup=function(e){
