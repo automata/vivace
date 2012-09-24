@@ -25,7 +25,9 @@ h1 {
 }
 
 h2 {
-  color:#393939;
+  color:#fff;
+  padding: 10px;
+  text-align: center;
 }
 
 h3, h4, h5, h6 {
