@@ -8,5 +8,5 @@ sharejs.attach(app, options);
 
 app.use("/", express.static(__dirname + '/'));
 
-app.listen(8080);
+app.listen(80);
 console.log('Server running at http://127.0.0.1');
