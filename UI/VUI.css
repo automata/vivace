@@ -1,17 +1,21 @@
-.control{
+.interface{
 	border: solid black 1px;
-	position: absolute;
-    padding: 50px;
-    text-align: center;
+	cursor: pointer;
+	text-align: center;
     font-size: 12px;
     font-family: Arial;
     font-weight: bold;
+}
+
+.control{
+	position: absolute;
+    padding: 50px;
     background: #EEE;
-    cursor: pointer;
 }
 
 .slider{
-	 -webkit-border-bottom-left-radius: 10px;
+	-moz-border-bottom-left-radius: 10px;
+	-webkit-border-bottom-left-radius: 10px;
     border-bottom-left-radius: 10px;
 }
 

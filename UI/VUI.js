@@ -1,98 +1,95 @@
 (function(){
-	
-	VUI = null;
-	window.VUI = VUI;
-	window.VUInterface = null;
 
-	VUI = {
-			Consts: {
-				CONTROL: 'control',
-				VISU: 'visu',
-				SLIDER: 'control slider',				
-				KNOB: 'control knob',
-				CONSOLE: 'graphs console',
-				MIXER: 'control mixer'
-			}, 
-
-			checkConsts: function(t){
-				if(typeof t === 'String'){
-					var b = false;
-					for(c in this.Consts){
-						if(k == c){
-							b = true;
-							break;	
-						};
+	V = function(){
+		var checkConsts = function(t){
+			if(typeof t === 'string'){
+				var b = false;
+				for(var c in VUI.Consts){
+					c.toLowerCase();
+					if(t == VUI.Consts[c]){
+						b = true;
+						break;	
 					};
-					return b;
-				}
-				else{
-					return false;
-				}
-			},
-
-			checkName: function(n){
-				if(typeof n === 'String'){
-					return true;
-				}
-				else{
-					return false;
-				}
-			},
-
-			checkFunc: function(f){
-				if(typeof f === 'Function'){
-					return true;
-				}
-				else{
-					return false;
-				}
-			},
-
-			/*
-			 * Adicione uma função geradora ao VUI
-			 * <pre>
-			 * 	VUI.add('name', 'type', function(){
-			 * 		//A função que gera o algoritmo de áudio;
-			 *  });
-			 * </pre>
-			 * 
-			 * @return an uglyObject
-			 * @see VUI.uglyObject
-			 */
-			add: function(n, t, f){
-				(function(v){
-					if(this.generators === undefined || this.generators === null){
-						v.generators = {};
-					}
-				}(this));
-
-				if(this.checkName(n) && this.checkConsts(t) && this.checkFunc(f)){
-					this.generators[n] = {
-							type: t,
-							funcGen: f
-					};
-					return this.generators[n];	
-				}
-				else if(this.checkName(n) && this.checkConsts(t) && !this.checkFunc(f)){
-					this.generators[n] = {
-							type: t,
-							funcGen: function(){}
-					};
-					return this.generators[n];	
-				}
-				else if(this.checkName(n) && !this.checkConsts(t) && !this.checkFunc(f)){
-					this.generators[n] = {
-							type: 'erroronset',
-							funcGen: function(){}
-					};
-					return this.generators[n];	
-				}
-				else{
-					throw new Error("You setted a"+(typeof this)+" with invalid arguments" );
-				}
+				};
+				return b;
 			}
+			else{
+				return false;
+			}
+		};
+
+		var checkName = function(n){
+			if(typeof n == 'string'){
+				return true;
+			}
+			else{
+				return false;
+			}
+		};
+
+		var checkFunc = function(f){
+			if(typeof f === 'function'){
+				return true;
+			}
+			else{
+				return false;
+			}
+		};
+		
+		/*
+		 * Adicione uma função geradora ao VUI (ou $V);
+		 * <pre>
+		 * 	VUI.add('name', 'type', function(){
+		 * 		//A função que gera o algoritmo de áudio;
+		 *  });
+		 * </pre>
+		 * 
+		 * @param n the name of object of type t
+		 * @param t the type of object of name n
+		 * @param f the audio function 
+		 */
+		this.add = function(n, t, f){
+			(function(v){
+				if(v.generators === undefined || v.generators === null){
+					v.generators = {};
+				}
+			}(VUI));
+
+			if(checkName(n) && checkConsts(t) && checkFunc(f)){
+				VUI.generators[t] = {
+						name: n,
+						funcGen: f
+				};
+			}
+			else if(checkName(n) && checkConsts(t) && !checkFunc(f)){
+				VUI.generators[t] = {
+						name: n,
+						funcGen: function(){}
+				};	
+			}
+			else if(checkName(n) && !checkConsts(t) && !checkFunc(f)){
+				VUI.generators['NON_TYPE'] = {
+						name: n,
+						funcGen: function(){}
+				};
+			}
+			else if(!checkName(n)){
+				console.log("Please give at least the name");
+			}
+		};
 	};
 
+	var VUI = new V();
+	VUI.Consts = {
+			INTERFACE: 'interface',
+			CONTROL: 'control',
+			VISU: 'visu',
+			SLIDER: 'slider',				
+			KNOB: 'knob',
+			CONSOLE: 'console',
+			MIXER: 'mixer'
+	};
+		
 	/*
 	 * create an new Vivace User Interface
 	 * 
@@ -108,41 +105,19 @@
 	 *  })
 	 * </pre>
 	 */
-	window.VUInterface = VUInterface;
-	VUInterface = function(n, t, f){
-		try{
-			this.machine = VUI.add(n, t, f);
-		}
-		catch(e){
-			console.log(e);
-		};
-
-
-		this.makeControlUI = function(cssContainer){
-
-			var $identifier = $('<p/>').html(this.machine[n].type);
-			var $control = $('<div/>').attr('id',n+'_'+this.machine[n].type);
-
-			console.log('searching in consts: ');
-			$.each(VUI.Consts, function(i, e){
-				console.log(e);
-				if(t.search(e)){
-					console.log('FOUND: '+e);
-					console.log('Adding class '+e+' to '+$control.attr('id'));
-					$control.addClass(e);
-				}
-			});
-
-			$identifier.appendTo($(cssContainer));
-			$control.appendTo($(cssContainer));
-			return $control;
-
-		};
+	 
+	var VUIObj = function(n, t, f){
+	
+		VUI.add(n, t, f);
+	
+		var o = VUI.generators[t];
+		var $interface = $('<div/>').attr('id','VUI_'+t+'_'+o.name).addClass(VUI.Consts.INTERFACE).html(t+'_'+n);
+		return $interface;
 	};
 
-	function VUIControl(){
-		VUIControl.call(n, VUI.Consts.CONTROL, f);
-	}
+	var VUIControl = function(n, f){
+		VUInterface(n, VUI.Consts.CONTROL, f);
+	};
 
 	/*
 	 * Many de muitos; muitos controles, muitas visualizacoes;
@@ -168,4 +143,6 @@
 		VUIMany.call(n, VUI.Consts.MIXER, f);
 	};
 
+	window.VUI = VUI;
+	window.$V = VUIObj;
 }());

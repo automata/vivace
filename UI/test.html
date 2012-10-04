@@ -9,12 +9,12 @@
 	<body>
 		<div id='VUIcontainer'></div>
 		<script type="text/javascript">
-			if(VUI === undefined){
+			if($V === undefined){
 				$('#VUIcontainer').html('Error: VUI not load correctly');
 			}
 			else{
-				var v = VUInterface('generic', 'none', function(){return true})
-				vui.makeControlUI('#VUIcontainer')	
+				var $v = $V('generic', VUI.Consts.INTERFACE, function(){return true});
+				$('#VUIcontainer').append($v);
 			}
 			
 		</script>
