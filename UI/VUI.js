@@ -1,63 +1,40 @@
 (function(){
+	
+     
 	var VUI = {
 			Consts: {
-					CONTROL: 'control',
-					VISU: 'graphs',
-					SLIDER: Consts.CONTROL+' slider',
-					KNOB: Consts.CONTROL+' knob',
-					CONSOLE: Consts.GRAPHS+' console',
-					MANY:Consts.CONTROL+' many',
-					MIXER: Consts.MANY+': control'
-
+				CONTROL: 'control',
+				VISU: 'visu',
+				SLIDER: 'control slider',				
+				KNOB: 'control knob',
+				CONSOLE: 'graphs console',
+				MIXER: 'control many _mixer'
 			}, 
 
-			uglyObject: function(){
-				var a = c(arguments);
-				
-				$.each(a, function(i, e){
-					if(e.ok){
-						VUI.generators['_nAn_'] = //Retorne um nome generico
-						{
-								type: o.raw,	//Mesmo que o argumento inicial
-								f: null			//retorne uma função nula, vc pode adicionar depois
-						}
-					};
-				});
-				
-
-				var c = function(){
-					return $.map(arguments, function(e, i){
-						if(isNan(e)){
-							if(i=== 0){
-								throw Error("Empty arguments; you need add at least not null one");
-							}
-							dbug.log(typeof e+' argument found: '+e);
-						}
-						else if(typeof e === 'String'){
-							return checkConsts(e);
-						}
-						else if (typeof e === 'Function'){
-							return {primitive: 'Function', ok: true, raw: e};
-						}
-						
-					});
-				}
-
-				
+			check: function(n, t, f){
 				var checkConsts = function(k){
 					var b = false;
-					var t = null;
 					for(c in VUI.Consts){
-						if(k === c){
-							t = 'String';
-								b = true;
+						if(k == c){
+							b = true;
 							break;	
 						};
+
+						return b;
+					};
+
+					if(typeof n !== 'String' || typeof t !== 'String' || typeof t !== 'Function'){
+						throw new Error('invalid argument');
 					}
-					return {primitive: t, ok: b, raw: k};
-				};
-				
-				return o;
+					else{
+						if(checkConsts(t)){
+							return true;
+						}
+						else{
+							return false;
+						}
+					}	
+				}
 			},
 
 			/*
@@ -71,22 +48,20 @@
 			 * @return an uglyObject
 			 * @see VUI.uglyObject
 			 */
-			add: function(){
+			add: function(n, t, f){
 				if(VUI.generators === undefined || VUI.generators === null){
 					VUI.generators = {};
 				}
 
-				var o = null;
-				switch(arguments.lenght){
-				case 0: throw Error("Empty arguments; you need add at least one"); break;
-					case 1: o = uglyObject(arguments[0]);
-					case 2: o = uglyObject(arguments[0], arguments[1]);
-					case 3: o = uglyObject(arguments[0], arguments[1], arguments[2]);
-				}
-				return o;
+				VUI.generators[n] = {
+						type: t,
+						funcGen: f
+				};
+
+				return VUI.generators[n]
 			}
 	};
-
+	
 	/*
 	 * create an new Vivace User Interface
 	 * 
@@ -109,13 +84,34 @@
 		catch(e){
 			console.log(e);
 		};
+
+		this.makeControlUI = function(cssContainer){
+
+			var $identifier = $('<p/>').html(t+': '+n);
+			var $control = $('<div/>').attr('id', n);
+
+			dbug.log('searching in consts: ');
+			$.each(VUI.Consts, function(i, e){
+				dbug.log(e);
+				if(t.search(e)){
+					dbug.log('FOUND: '+e);
+					dbug.log('Adding class '+e+' to '+$control.attr('id'));
+					$control.addClass(e);
+				}
+			});
+
+			$identifier.appendTo($(cssContainer));
+			$control.appendTo($(cssContainer));
+			return $control;
+
+		};
 	}
 
 	subClass(VUIControl, VUInterface);
 	function VUIControl(){
 		VUIControl.call(n, VUI.Consts.CONTROL, f);
 	}
-	
+
 	/*
 	 * Many de muitos; muitos controles, muitas visualizacoes;
 	 * em suma muitos controles eh um mixer com muitos knobs e sliders;
@@ -146,4 +142,4 @@
 		VUIMany.call(n, VUI.Consts.MIXER, f);
 	};
 
-});
+}());
