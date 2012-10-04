@@ -1,39 +1,50 @@
 (function(){
 	
-     
-	var VUI = {
+	VUI = null;
+	window.VUI = VUI;
+	window.VUInterface = null;
+
+	VUI = {
 			Consts: {
 				CONTROL: 'control',
 				VISU: 'visu',
 				SLIDER: 'control slider',				
 				KNOB: 'control knob',
 				CONSOLE: 'graphs console',
-				MIXER: 'control many _mixer'
+				MIXER: 'control mixer'
 			}, 
 
-			check: function(n, t, f){
-				var checkConsts = function(k){
+			checkConsts: function(t){
+				if(typeof t === 'String'){
 					var b = false;
-					for(c in VUI.Consts){
+					for(c in this.Consts){
 						if(k == c){
 							b = true;
 							break;	
 						};
-
-						return b;
 					};
+					return b;
+				}
+				else{
+					return false;
+				}
+			},
 
-					if(typeof n !== 'String' || typeof t !== 'String' || typeof t !== 'Function'){
-						throw new Error('invalid argument');
-					}
-					else{
-						if(checkConsts(t)){
-							return true;
-						}
-						else{
-							return false;
-						}
-					}	
+			checkName: function(n){
+				if(typeof n === 'String'){
+					return true;
+				}
+				else{
+					return false;
+				}
+			},
+
+			checkFunc: function(f){
+				if(typeof f === 'Function'){
+					return true;
+				}
+				else{
+					return false;
 				}
 			},
 
@@ -49,19 +60,39 @@
 			 * @see VUI.uglyObject
 			 */
 			add: function(n, t, f){
-				if(VUI.generators === undefined || VUI.generators === null){
-					VUI.generators = {};
+				(function(v){
+					if(this.generators === undefined || this.generators === null){
+						v.generators = {};
+					}
+				}(this));
+
+				if(this.checkName(n) && this.checkConsts(t) && this.checkFunc(f)){
+					this.generators[n] = {
+							type: t,
+							funcGen: f
+					};
+					return this.generators[n];	
 				}
-
-				VUI.generators[n] = {
-						type: t,
-						funcGen: f
-				};
-
-				return VUI.generators[n]
+				else if(this.checkName(n) && this.checkConsts(t) && !this.checkFunc(f)){
+					this.generators[n] = {
+							type: t,
+							funcGen: function(){}
+					};
+					return this.generators[n];	
+				}
+				else if(this.checkName(n) && !this.checkConsts(t) && !this.checkFunc(f)){
+					this.generators[n] = {
+							type: 'erroronset',
+							funcGen: function(){}
+					};
+					return this.generators[n];	
+				}
+				else{
+					throw new Error("You setted a"+(typeof this)+" with invalid arguments" );
+				}
 			}
 	};
-	
+
 	/*
 	 * create an new Vivace User Interface
 	 * 
@@ -77,7 +108,8 @@
 	 *  })
 	 * </pre>
 	 */
-	function VUInterface(n, t, f){
+	window.VUInterface = VUInterface;
+	VUInterface = function(n, t, f){
 		try{
 			this.machine = VUI.add(n, t, f);
 		}
@@ -85,17 +117,18 @@
 			console.log(e);
 		};
 
+
 		this.makeControlUI = function(cssContainer){
 
-			var $identifier = $('<p/>').html(t+': '+n);
-			var $control = $('<div/>').attr('id', n);
+			var $identifier = $('<p/>').html(this.machine[n].type);
+			var $control = $('<div/>').attr('id',n+'_'+this.machine[n].type);
 
-			dbug.log('searching in consts: ');
+			console.log('searching in consts: ');
 			$.each(VUI.Consts, function(i, e){
-				dbug.log(e);
+				console.log(e);
 				if(t.search(e)){
-					dbug.log('FOUND: '+e);
-					dbug.log('Adding class '+e+' to '+$control.attr('id'));
+					console.log('FOUND: '+e);
+					console.log('Adding class '+e+' to '+$control.attr('id'));
 					$control.addClass(e);
 				}
 			});
@@ -105,9 +138,8 @@
 			return $control;
 
 		};
-	}
+	};
 
-	subClass(VUIControl, VUInterface);
 	function VUIControl(){
 		VUIControl.call(n, VUI.Consts.CONTROL, f);
 	}
@@ -117,27 +149,21 @@
 	 * em suma muitos controles eh um mixer com muitos knobs e sliders;
 	 * muitas visualicoes eh um console, com todas as luzinhas subindo
 	 */
-	subClass(VUIMany, VUInterface);
-	function VUIMany(n, f){
-		VUInterface.call(n, VUI.Consts.MANY, f);
+	VUIMany = function(n, f){
+		VUInterface(n, VUI.Consts.MANY, f);
 	}
 
-	subClass(VUIVisu, VUInterface);
 	function VUIVisualizer(){
 		VUInterface.call(n, VUI.Consts.VISU, f);
 	}
 
-	subClass(VUISlider, VUIControl);
 	function VUISlider(){
 		VUIControl.call(n, VUI.Consts.SLIDER, f);
 	};
 
-	subClass(VUIKnob, VUIControl);
 	function VUIKnob(){
 		VUIControl.call(n, VUI.Consts.KNOB, f);
 	}
-
-	subClass(VUIMixer, VUIMany);
 	function VUIMixer(){
 		VUIMany.call(n, VUI.Consts.MIXER, f);
 	};

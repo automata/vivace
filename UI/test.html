@@ -9,8 +9,14 @@
 	<body>
 		<div id='VUIcontainer'></div>
 		<script type="text/javascript">
-			var vui = new VUInterface('generic', 'none', function(){return true})
-			vui.makeControlUI('#VUIcontainer')
+			if(VUI === undefined){
+				$('#VUIcontainer').html('Error: VUI not load correctly');
+			}
+			else{
+				var v = VUInterface('generic', 'none', function(){return true})
+				vui.makeControlUI('#VUIcontainer')	
+			}
+			
 		</script>
 	</body>
 </html>
