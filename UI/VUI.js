@@ -84,9 +84,12 @@
 			INTERFACE: 'interface',
 			CONTROL: 'control',
 			VISU: 'visu',
-			SLIDER: 'slider',				
+			SLIDER: 'slider',	
+			HORIZONTAL: 'horizontal',
+			VERTICAL: 'vertical',
 			KNOB: 'knob',
 			CONSOLE: 'console',
+			CHANGER: 'changer',
 			MIXER: 'mixer'
 	};
 		
@@ -107,35 +110,55 @@
 	 */
 	 
 	var VUIObj = function(n, t, f){
-	
 		VUI.add(n, t, f);
-	
-		var o = VUI.generators[t];
-		var $interface = $('<div/>').attr('id','VUI_'+t+'_'+o.name).addClass(VUI.Consts.INTERFACE).html(t+'_'+n);
+		
+		if(t === VUI.Consts.INTERFACE){	
+			this.element = VUInterface(n);
+			return this.element;
+		}
+		else if(t === VUI.Consts.CONTROL){
+			this.element = VUIControl(n);
+			return this.element;
+		}
+		else if(t === VUI.Consts.SLIDER){
+			this.element = VUISlider(n, f);
+			return this.element;
+		}
+	};
+
+
+	var VUInterface = function(n){
+		var $interface = $('<div/>').attr('id','VUInterface_'+n).addClass(VUI.Consts.INTERFACE).html('interface_'+n);
 		return $interface;
 	};
-
-	var VUIControl = function(n, f){
-		VUInterface(n, VUI.Consts.CONTROL, f);
+	
+	var VUIControl = function(n){
+		var o = VUI.generators['control'];
+		var $control = $('<div/>').attr('id','VUIControl_'+o.name)
+			.addClass(VUI.Consts.INTERFACE)
+			.addClass(VUI.Consts.CONTROL)
+			.html('control_'+n);
+		return $control;
 	};
 
-	/*
-	 * Many de muitos; muitos controles, muitas visualizacoes;
-	 * em suma muitos controles eh um mixer com muitos knobs e sliders;
-	 * muitas visualicoes eh um console, com todas as luzinhas subindo
-	 */
-	VUIMany = function(n, f){
-		VUInterface(n, VUI.Consts.MANY, f);
-	}
-
-	function VUIVisualizer(){
-		VUInterface.call(n, VUI.Consts.VISU, f);
-	}
-
-	function VUISlider(){
-		VUIControl.call(n, VUI.Consts.SLIDER, f);
+	var VUISlider = function(n, f){
+		var o = VUI.generators['slider'];
+		var $slider = $('<div/>').attr('id','VUISlider_'+o.name)
+			.addClass(VUI.Consts.INTERFACE)
+			.addClass(VUI.Consts.SLIDER)
+			.addClass(VUI.Consts.VERTICAL)
+			.html('slider_'+n);
+		var $sliderControl = $('<div/>').attr('id','VUISlider_'+o.name+'_'+VUI.Consts.CHANGER)
+			.addClass(VUI.Consts.INTERFACE)
+			.addClass(VUI.Consts.SLIDER)
+			.addClass(VUI.Consts.VERTICAL)
+			.addClass(VUI.Consts.CHANGER)
+			.html('changer_'+n);
+		
+		$slider.append($sliderControl);
+		return $slider;
 	};
-
+	
 	function VUIKnob(){
 		VUIControl.call(n, VUI.Consts.KNOB, f);
 	}

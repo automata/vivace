@@ -13,7 +13,16 @@
 				$('#VUIcontainer').html('Error: VUI not load correctly');
 			}
 			else{
-				var $v = $V('generic', VUI.Consts.INTERFACE, function(){return true});
+				//$V(name, type, audioFunc)
+				var $v = $V('generic', 'interface');
+				var $c = $V('machine','control');
+				var $l = $V('L', 'slider', function(){return true});
+				var $r = $V('R', 'slider', function(){return true});
+				
+				$l.appendTo($c)
+				$r.appendTo($c)
+				$c.appendTo($v);
+				
 				$('#VUIcontainer').append($v);
 			}
 			
