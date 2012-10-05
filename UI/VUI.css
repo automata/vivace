@@ -1,0 +1,48 @@
+.interface{
+	border: solid black 1px;
+	text-align: center;
+    font-size: 12px;
+    font-family: Arial;
+    font-weight: bold;
+    margin: 1em 1em 1em 1em;
+    -webkit-border-radius: 10px;
+    -moz-border-radius: 10px;
+}
+
+.control{
+    padding: 50px;
+    background: #EEE;
+}
+
+.slider{
+	background-color: black;
+	-webkit-text-fill-color: green;
+	clear:both;
+}
+
+.vertical{
+	float: rigth;
+}
+
+.slider.vertical{
+	width:20px;
+	height: 100px;
+}
+
+.slider.horizontal{
+	width: 100px;
+    height: 20px;
+}
+
+
+.slider.vertical.changer{
+	position: absolute;
+	background-color: yellow;
+	-webkit-text-fill-color: black;
+}
+
+
+.slider.horizontal.changer{
+	background-color: yellow;
+	-webkit-text-fill-color: black;
+}
