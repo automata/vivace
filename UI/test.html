@@ -1,0 +1,32 @@
+<html>
+	<head>
+		<title>Test VUI</title>
+		<link type="text/css" rel="stylesheet" href='VUI.css'></link>
+		<script src='http://code.jquery.com/jquery-1.8.2.min.js'></script>
+		<script src="http://ajax.googleapis.com/ajax/libs/jqueryui/1.8/jquery-ui.min.js"></script>
+		<script src='http://localhost:8080/VUI.js'></script>
+		<script type="text/javascript" id='subclass'></script>
+	</head>
+	<body>
+		<div id='VUIcontainer'></div>
+		<script type="text/javascript">
+			if($V === undefined){
+				$('#VUIcontainer').html('Error: VUI not load correctly');
+			}
+			else{
+				//$V(name, type, audioFunc)
+				var $v = $V('generic', 'interface');
+				var $c = $V('machine','control');
+				var $l = $V('L', 'slider vertical', function(){return true});
+				var $r = $V('R', 'slider vertical', function(){return true});
+				
+				$l.appendTo($c)
+				$r.appendTo($c)
+				$c.appendTo($v);
+				
+				$('#VUIcontainer').append($v);
+			}
+			
+		</script>
+	</body>
+</html>
