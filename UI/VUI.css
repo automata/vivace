@@ -4,45 +4,42 @@
     font-size: 12px;
     font-family: Arial;
     font-weight: bold;
-    margin: 1em 1em 1em 1em;
-    -webkit-border-radius: 10px;
-    -moz-border-radius: 10px;
+    margin: 0.5em 0.5em 0.5em 0.5em;
+    -webkit-border-radius: 2em;
+    -moz-border-radius: 2em;
 }
 
 .control{
-    padding: 50px;
-    background: #EEE;
+    background-color: #EEE;
 }
 
 .slider{
 	background-color: black;
-	-webkit-text-fill-color: green;
-	clear:both;
+	-webkit-text-fill-color: #00AA00;
+	display:inline;
 }
 
 .vertical{
-	float: rigth;
+	float:left;
+}
+
+.changer{
+	background-color: yellow;	
+}
+.changer:hover{
+	background-color: red;	
 }
 
 .slider.vertical{
-	width:20px;
-	height: 100px;
+	width:1.5em;
+	height: 10em;
 }
 
-.slider.horizontal{
-	width: 100px;
-    height: 20px;
+.interface.control.slider.vertical.changer{
+	position:relative;
+	width:1.5em;
+	height:1em;
+	margin: 0em 0em 0em -0.1em;
+	top:7.5em; /* from 75 to -15?*/
 }
 
-
-.slider.vertical.changer{
-	position: absolute;
-	background-color: yellow;
-	-webkit-text-fill-color: black;
-}
-
-
-.slider.horizontal.changer{
-	background-color: yellow;
-	-webkit-text-fill-color: black;
-}

@@ -1,17 +1,43 @@
 (function(){
 
+	/*http://stackoverflow.com/questions/1789945/javascript-string-contains*/
+	String.prototype.contains = function(it) { return this.indexOf(it) != -1; };
+
 	V = function(){
-		var checkConsts = function(t){
-			if(typeof t === 'string'){
+
+		var checkConsts = function(t, alreadyChecked){
+
+			regExprString = function(string){
 				var b = false;
 				for(var c in VUI.Consts){
-					c.toLowerCase();
-					if(t == VUI.Consts[c]){
-						b = true;
-						break;	
-					};
-				};
+					//TODO improvement to check many names, 
+					//and slice them by regexpr with
+					//strings contained in VUI.Consts
+					var r = new RegExp(VUI.Consts[c]);
+					if(r.test(t)){
+						// return itself only if have other valid constant
+						var newString = alreadyChecked?t.split(VUI.Consts[c]):t.split(VUI.Consts[c]+' ');
+						b = checkConsts(newString[1], true);
+						break;
+					}
+				}
 				return b;
+
+			};
+
+			checkt = function(string){
+				if(string === ''){
+					return alreadyChecked;
+				}
+				else{
+					var bbb = regExprString(string);
+
+					return bbb;
+				}
+			};
+
+			if(typeof t === 'string'){
+				return checkt(t);
 			}
 			else{
 				return false;
@@ -35,7 +61,7 @@
 				return false;
 			}
 		};
-		
+
 		/*
 		 * Adicione uma função geradora ao VUI (ou $V);
 		 * <pre>
@@ -55,21 +81,21 @@
 				}
 			}(VUI));
 
-			if(checkName(n) && checkConsts(t) && checkFunc(f)){
-				VUI.generators[t] = {
-						name: n,
+			if(checkName(n) && checkConsts(t, false) && checkFunc(f)){
+				VUI.generators[n] = {
+						type: t,
 						funcGen: f
 				};
 			}
-			else if(checkName(n) && checkConsts(t) && !checkFunc(f)){
-				VUI.generators[t] = {
-						name: n,
+			else if(checkName(n) && checkConsts(t, false) && !checkFunc(f)){
+				VUI.generators[n] = {
+						type: t,
 						funcGen: function(){}
 				};	
 			}
-			else if(checkName(n) && !checkConsts(t) && !checkFunc(f)){
-				VUI.generators['NON_TYPE'] = {
-						name: n,
+			else if(checkName(n) && !checkConsts(t, false) && !checkFunc(f)){
+				VUI.generators[n] = {
+						type: 'NON_TYPE',
 						funcGen: function(){}
 				};
 			}
@@ -92,7 +118,7 @@
 			CHANGER: 'changer',
 			MIXER: 'mixer'
 	};
-		
+
 	/*
 	 * create an new Vivace User Interface
 	 * 
@@ -108,10 +134,10 @@
 	 *  })
 	 * </pre>
 	 */
-	 
+
 	var VUIObj = function(n, t, f){
 		VUI.add(n, t, f);
-		
+
 		if(t === VUI.Consts.INTERFACE){	
 			this.element = VUInterface(n);
 			return this.element;
@@ -120,8 +146,8 @@
 			this.element = VUIControl(n);
 			return this.element;
 		}
-		else if(t === VUI.Consts.SLIDER){
-			this.element = VUISlider(n, f);
+		else if(t === VUI.Consts.SLIDER+' '+VUI.Consts.VERTICAL){
+			this.element = VUISliderV(n, f);
 			return this.element;
 		}
 	};
@@ -131,34 +157,42 @@
 		var $interface = $('<div/>').attr('id','VUInterface_'+n).addClass(VUI.Consts.INTERFACE).html('interface_'+n);
 		return $interface;
 	};
-	
+
 	var VUIControl = function(n){
-		var o = VUI.generators['control'];
-		var $control = $('<div/>').attr('id','VUIControl_'+o.name)
-			.addClass(VUI.Consts.INTERFACE)
-			.addClass(VUI.Consts.CONTROL)
-			.html('control_'+n);
+		var $control = $('<div/>').attr('id','VUIControl_'+n)
+		.addClass(VUI.Consts.INTERFACE)
+		.addClass(VUI.Consts.CONTROL)
+		.html('control_'+n);
 		return $control;
 	};
 
-	var VUISlider = function(n, f){
-		var o = VUI.generators['slider'];
-		var $slider = $('<div/>').attr('id','VUISlider_'+o.name)
-			.addClass(VUI.Consts.INTERFACE)
-			.addClass(VUI.Consts.SLIDER)
-			.addClass(VUI.Consts.VERTICAL)
-			.html('slider_'+n);
-		var $sliderControl = $('<div/>').attr('id','VUISlider_'+o.name+'_'+VUI.Consts.CHANGER)
-			.addClass(VUI.Consts.INTERFACE)
-			.addClass(VUI.Consts.SLIDER)
-			.addClass(VUI.Consts.VERTICAL)
-			.addClass(VUI.Consts.CHANGER)
-			.html('changer_'+n);
-		
+	var VUISliderV = function(n, f){
+		var o = VUI.generators[n];
+		var $slider = $('<div/>').attr('id','VUISliderV_'+n+'_'+o.type)
+		.addClass(VUI.Consts.INTERFACE)
+		.addClass(VUI.Consts.CONTROL)
+		.addClass(VUI.Consts.SLIDER)
+		.addClass(VUI.Consts.VERTICAL)
+		.html(n);
+		var $sliderControl = $('<div/>').attr('id','VUISlider_'+n+'_'+o.type+'_'+VUI.Consts.CHANGER)
+		.addClass(VUI.Consts.INTERFACE)
+		.addClass(VUI.Consts.CONTROL)
+		.addClass(VUI.Consts.SLIDER)
+		.addClass(VUI.Consts.VERTICAL)
+		.addClass(VUI.Consts.CHANGER)
+		.html(function(){
+			return $(this).css('top');	
+		});
+
+		$sliderControl.click(function(){
+			var y = $(this).css('top');
+			console.log('changer_'+n+'(y): '+y);
+		});
+
 		$slider.append($sliderControl);
 		return $slider;
 	};
-	
+
 	function VUIKnob(){
 		VUIControl.call(n, VUI.Consts.KNOB, f);
 	}
