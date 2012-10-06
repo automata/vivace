@@ -1,0 +1,45 @@
+.interface{
+	border: solid black 1px;
+	text-align: center;
+    font-size: 12px;
+    font-family: Arial;
+    font-weight: bold;
+    margin: 0.5em 0.5em 0.5em 0.5em;
+    -webkit-border-radius: 2em;
+    -moz-border-radius: 2em;
+}
+
+.control{
+    background-color: #EEE;
+}
+
+.slider{
+	background-color: black;
+	-webkit-text-fill-color: #00AA00;
+	display:inline;
+}
+
+.vertical{
+	float:left;
+}
+
+.changer{
+	background-color: yellow;	
+}
+.changer:hover{
+	background-color: red;	
+}
+
+.slider.vertical{
+	width:1.5em;
+	height: 10em;
+}
+
+.interface.control.slider.vertical.changer{
+	position:relative;
+	width:1.5em;
+	height:1em;
+	margin: 0em 0em 0em -0.1em;
+	top:7.5em; /* from 75 to -15?*/
+}
+
