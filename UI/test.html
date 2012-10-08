@@ -15,16 +15,29 @@
 			}
 			else{
 				//$V(name, type, audioFunc)
-				var $v = $V('generic', 'interface');
 				var $c = $V('machine','control');
-				var $l = $V('L', 'slider vertical', function(){return true});
-				var $r = $V('R', 'slider vertical', function(){return true});
 				
-				$l.appendTo($c)
-				$r.appendTo($c)
-				$c.appendTo($v);
 				
-				$('#VUIcontainer').append($v);
+				var $m = $V({
+					name: 'mixer',
+					channels: ['l', 'r', 'ls', 'rs', 'c']
+				}, 'slider vertical', 
+					function(handler){
+					return handler.result
+				})
+				
+				var $m2 = $V({
+					name: 'eq',
+					channels: ['high', 'medium', 'bass']
+				}, 'slider vertical', 
+					function(handler){
+					return handler.result
+				})
+				
+				
+				$m.appendTo($c);
+				$m2.appendTo($c);
+				$('#VUIcontainer').append($c);
 			}
 			
 		</script>

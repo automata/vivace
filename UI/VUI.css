@@ -4,9 +4,10 @@
     font-size: 12px;
     font-family: Arial;
     font-weight: bold;
-    margin: 0.5em 0.5em 0.5em 0.5em;
-    -webkit-border-radius: 2em;
-    -moz-border-radius: 2em;
+    margin: 0.7em 0.7em 0.7em 0.7em;
+    padding: 0.1em 0.1em 0.1em 0.1em;
+    float: left;
+    
 }
 
 .control{
@@ -19,12 +20,14 @@
 	display:inline;
 }
 
-.vertical{
-	float:left;
+.horizontal{
+	clear: both;
 }
 
 .changer{
-	background-color: yellow;	
+	background-color: yellow;
+	-webkit-border-radius: 2em;
+    -moz-border-radius: 2em;	
 }
 .changer:hover{
 	background-color: red;	

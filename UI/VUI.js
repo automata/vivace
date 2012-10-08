@@ -62,6 +62,16 @@
 			}
 		};
 
+		var checkObj = function(n){
+			//Se for um objeto, verifique as chaves corretas
+			if(n.hasOwnProperty('name') && n.hasOwnProperty('channels')){
+				return true;
+			}
+			else{
+				return false;
+			}
+		};
+
 		/*
 		 * Adicione uma função geradora ao VUI (ou $V);
 		 * <pre>
@@ -75,33 +85,73 @@
 		 * @param f the audio function 
 		 */
 		this.add = function(n, t, f){
-			(function(v){
-				if(v.generators === undefined || v.generators === null){
-					v.generators = {};
-				}
-			}(VUI));
+			if(VUI.generators === undefined || VUI.generators === null){
+				VUI.generators = {};
+			};
 
-			if(checkName(n) && checkConsts(t, false) && checkFunc(f)){
-				VUI.generators[n] = {
-						type: t,
-						funcGen: f
-				};
+			if(t === undefined) t=null;
+			if(f === undefined) f=null;
+
+			var adderS = function(n, t, b, f){
+				if(checkName(n) && checkConsts(t, b) && checkFunc(f)){
+					VUI.generators[n] = {
+							type: t,
+							handler: f
+					};
+				}
+				else if(checkName(n) && checkConsts(t, b) && !checkFunc(f)){
+					VUI.generators[n] = {
+							type: t,
+							handler: function(){}
+					};	
+				}
+				else if(checkName(n) && !checkConsts(t, b) && !checkFunc(f)){
+					VUI.generators[n] = {
+							type: 'NON_TYPE',
+							handler: function(){}
+					};
+				}
+				else if(!checkName(n)){
+					console.log("Please give at least the name");
+				}
+			};
+
+			var adderO = function(n, t, b, f){
+				if(checkObj(n) && checkConsts(t, b) && checkFunc(f)){
+					VUI.generators[n.name] = {
+							type: t,
+							audioArray: n.channels,
+							handler: f
+					};
+				}
+				else if(checkObj(n) && checkConsts(t, b) && !checkFunc(f)){
+					VUI.generators[n.name] = {
+							type: t,
+							audioArray: n.channels,
+							handler: function(){return false}
+					};	
+				}
+				else if(checkObj(n) && !checkConsts(t, b) && !checkFunc(f)){
+					VUI.generators[n.name] = {
+							type: 'NON_TYPE',
+							audioArray:n.channels,
+							handler: function(){return false}
+					};
+				}
+				else if(!checkObj(n)){
+					console.log("Please give at least the object");
+				}
+
+
+			};
+
+			if(typeof n === 'string'){
+				adderS(n, t, false, f);
 			}
-			else if(checkName(n) && checkConsts(t, false) && !checkFunc(f)){
-				VUI.generators[n] = {
-						type: t,
-						funcGen: function(){}
-				};	
+			else if(typeof n === 'object'){
+				adderO(n, t, false, f);
 			}
-			else if(checkName(n) && !checkConsts(t, false) && !checkFunc(f)){
-				VUI.generators[n] = {
-						type: 'NON_TYPE',
-						funcGen: function(){}
-				};
-			}
-			else if(!checkName(n)){
-				console.log("Please give at least the name");
-			}
+
 		};
 	};
 
@@ -138,17 +188,40 @@
 	var VUIObj = function(n, t, f){
 		VUI.add(n, t, f);
 
-		if(t === VUI.Consts.INTERFACE){	
-			this.element = VUInterface(n);
-			return this.element;
+		var makeUIByString = function(ns, ts, f){
+			if(ts === VUI.Consts.INTERFACE){	
+				this.element = VUInterface(ns);
+				return this.element;
+			}
+			else if(ts === VUI.Consts.CONTROL){
+				this.element = VUIControl(ns);
+				return this.element;
+			}
+			else if(ts === VUI.Consts.SLIDER+' '+VUI.Consts.VERTICAL){
+				this.element = VUISliderV(ns, f);
+				return this.element;
+			}
 		}
-		else if(t === VUI.Consts.CONTROL){
-			this.element = VUIControl(n);
-			return this.element;
+		
+		var makeUIByObj = function(n){
+			var o = VUI.generators[n.name];
+			var a = $.map(n.channels, function(i, e){
+				return makeUIByString(e, o.type, o.handler);
+			});
+			
+			var $a = VUIMixer(n.name);
+			$.each(a, function(i, e){
+				$a.append(e);
+			});
+			return $a;
+			
+		};
+		
+		if(typeof n === 'string'){
+			return makeUIByString(n, t, f);
 		}
-		else if(t === VUI.Consts.SLIDER+' '+VUI.Consts.VERTICAL){
-			this.element = VUISliderV(n, f);
-			return this.element;
+		else{
+			return makeUIByObj(n);
 		}
 	};
 
@@ -167,37 +240,84 @@
 	};
 
 	var VUISliderV = function(n, f){
-		var o = VUI.generators[n];
-		var $slider = $('<div/>').attr('id','VUISliderV_'+n+'_'+o.type)
-		.addClass(VUI.Consts.INTERFACE)
-		.addClass(VUI.Consts.CONTROL)
-		.addClass(VUI.Consts.SLIDER)
-		.addClass(VUI.Consts.VERTICAL)
-		.html(n);
-		var $sliderControl = $('<div/>').attr('id','VUISlider_'+n+'_'+o.type+'_'+VUI.Consts.CHANGER)
-		.addClass(VUI.Consts.INTERFACE)
-		.addClass(VUI.Consts.CONTROL)
-		.addClass(VUI.Consts.SLIDER)
-		.addClass(VUI.Consts.VERTICAL)
-		.addClass(VUI.Consts.CHANGER)
-		.html(function(){
-			return $(this).css('top');	
-		});
 
-		$sliderControl.click(function(){
-			var y = $(this).css('top');
-			console.log('changer_'+n+'(y): '+y);
-		});
-
-		$slider.append($sliderControl);
-		return $slider;
+		var $sl = {
+				struct: {body: $('<div/>'), changer: $('<div/>')},
+				
+				addClasses:function(){
+					$.each(this.struct, function(i, e){
+						e
+						.addClass(VUI.Consts.INTERFACE)
+						.addClass(VUI.Consts.CONTROL)
+						.addClass(VUI.Consts.SLIDER)
+						.addClass(VUI.Consts.VERTICAL);
+						if(i==='changer'){
+							e.addClass(VUI.Consts.CHANGER);
+						};
+					});
+				},
+				
+				addAttrs: function(name, type){
+					$.each(this.struct, function(i, e){
+						if(e.hasClass(VUI.Consts.CHANGER)){
+							e.attr('id','VUISliderV_'+name+'_'+type+'_'+VUI.Consts.CHANGER);
+						}
+						else{
+							e.attr('id','VUISliderV_'+name+'_'+type);
+						}
+					});	
+				},
+				
+				update: function(){
+					this.get$().append(this.struct.changer);
+				},
+				
+				get$: function(){
+					
+					return this.struct.body;
+				},
+				
+				addLetters: function(){
+					this.struct.body.html(n);
+				},
+				
+				upAndDown: function(){
+					var clicked = false;
+					this.struct.changer.click(function(){
+						clicked = true;
+						dbug.log(clicked);
+					}, function(){
+						clicked = false;
+						dbug.log(clicked);
+					});
+					
+					this.struct.changer.mousemove(function(event){
+						if(cliked){
+							var y = event.pageY;
+							console.log(y);
+						}
+					});
+					
+				}
+				
+		};
+		
+		$sl.addClasses();
+		$sl.addAttrs();
+		$sl.addLetters();
+		$sl.update();
+		
+		$sl.upAndDown();
+		
+		return $sl.get$();
 	};
 
 	function VUIKnob(){
 		VUIControl.call(n, VUI.Consts.KNOB, f);
 	}
-	function VUIMixer(){
-		VUIMany.call(n, VUI.Consts.MIXER, f);
+
+	var VUIMixer = function(n){
+		return VUIControl(n);
 	};
 
 	window.VUI = VUI;
