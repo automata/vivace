@@ -34,12 +34,22 @@
 					return handler.result
 				})
 				
+				var $r = $V({
+					name: 'reverb room',
+					channels: ['size', 'delaytime']
+				}, 'slider vertical', 
+					function(handler){
+					return handler.result
+				})
+				
 				
 				$m.appendTo($c);
 				$m2.appendTo($c);
+				$r.appendTo($c)
 				$('#VUIcontainer').append($c);
 			}
 			
 		</script>
+		<p id='instructions'>drag up and down! this is like a mix console, but in web!</p>
 	</body>
 </html>

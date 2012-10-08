@@ -1,7 +1,67 @@
 (function(){
 
-	/*http://stackoverflow.com/questions/1789945/javascript-string-contains*/
-	String.prototype.contains = function(it) { return this.indexOf(it) != -1; };
+	/* http://stackoverflow.com/questions/561844/how-to-move-div-with-the-mouse-using-jquery
+	 * PlugTrade.com - jQuery draggit Function */
+	/* Drag A Div with jQuery */
+	jQuery.fn.draggit = function (el) {
+	    var thisdiv = this;
+	    var thistarget = $(el);
+	    var relX;
+	    var relY;
+	    var targetw = thistarget.width();
+	    var targeth = thistarget.height();
+	    var docw;
+	    var doch;
+
+	    thistarget.css('position','absolute');
+
+
+	    thisdiv.bind('mousedown', function(e){
+	        var pos = $(el).offset();
+	        var srcX = pos.left;
+	        var srcY = pos.top;
+
+	        docw = $('body').width();
+	        doch = $('body').height();
+
+	        relX = e.pageX - srcX;
+	        relY = e.pageY - srcY;
+
+	        ismousedown = true;
+	    });
+
+	    $(document).bind('mousemove',function(e){ 
+	        if(ismousedown)
+	        {
+	            targetw = thistarget.width();
+	            targeth = thistarget.height();
+
+	            var maxX = docw - targetw - 10;
+	            var maxY = doch - targeth - 10;
+
+	            var mouseX = e.pageX;
+	            var mouseY = e.pageY;
+
+	            var diffX = mouseX - relX;
+	            var diffY = mouseY - relY;
+
+	            // check if we are beyond document bounds ...
+	            if(diffX < 0)   diffX = 0;
+	            if(diffY < 0)   diffY = 0;
+	            if(diffX > maxX) diffX = maxX;
+	            if(diffY > maxY) diffY = maxY;
+
+	            $(el).css('top', (diffY)+'px');
+	            $(el).css('left', (diffX)+'px');
+	        }
+	    });
+
+	    $(window).bind('mouseup', function(e){
+	        ismousedown = false;
+	    });
+
+	    return this;
+	}; // end jQuery draggit function //
 
 	V = function(){
 
@@ -166,7 +226,8 @@
 			KNOB: 'knob',
 			CONSOLE: 'console',
 			CHANGER: 'changer',
-			MIXER: 'mixer'
+			MIXER: 'mixer',
+			VALUE: 'value'
 	};
 
 	/*
@@ -198,14 +259,14 @@
 				return this.element;
 			}
 			else if(ts === VUI.Consts.SLIDER+' '+VUI.Consts.VERTICAL){
-				this.element = VUISliderV(ns, f);
+				this.element = VUISliderV(ns,ts,f);
 				return this.element;
 			}
 		}
 		
 		var makeUIByObj = function(n){
 			var o = VUI.generators[n.name];
-			var a = $.map(n.channels, function(i, e){
+			var a = $.map(n.channels, function(e, i){
 				return makeUIByString(e, o.type, o.handler);
 			});
 			
@@ -227,7 +288,8 @@
 
 
 	var VUInterface = function(n){
-		var $interface = $('<div/>').attr('id','VUInterface_'+n).addClass(VUI.Consts.INTERFACE).html('interface_'+n);
+		var $interface = $('<div/>').attr('id','VUInterface_'+n).addClass(VUI.Consts.INTERFACE);
+		$('<p/>').html('interface_'+n).appendTo($interface);
 		return $interface;
 	};
 
@@ -235,11 +297,12 @@
 		var $control = $('<div/>').attr('id','VUIControl_'+n)
 		.addClass(VUI.Consts.INTERFACE)
 		.addClass(VUI.Consts.CONTROL)
-		.html('control_'+n);
+		
+		var $p = $('<p/>').html('control_'+n).appendTo($control)
 		return $control;
 	};
 
-	var VUISliderV = function(n, f){
+	var VUISliderV = function(n, t, f){
 
 		var $sl = {
 				struct: {body: $('<div/>'), changer: $('<div/>')},
@@ -278,24 +341,16 @@
 				},
 				
 				addLetters: function(){
-					this.struct.body.html(n);
+					$('<p/>').html(n).appendTo(this.struct.body).addClass(VUI.Consts.VALUE);
 				},
 				
+				clicked: false,
+				
 				upAndDown: function(){
-					var clicked = false;
-					this.struct.changer.click(function(){
-						clicked = true;
-						dbug.log(clicked);
-					}, function(){
-						clicked = false;
-						dbug.log(clicked);
-					});
-					
-					this.struct.changer.mousemove(function(event){
-						if(cliked){
-							var y = event.pageY;
-							console.log(y);
-						}
+					this.struct.changer.draggable({
+						axis:"y",
+						containment: "parent",
+					// TODO ...then update the numbers
 					});
 					
 				}
@@ -303,11 +358,10 @@
 		};
 		
 		$sl.addClasses();
-		$sl.addAttrs();
+		$sl.addAttrs(n, t);
 		$sl.addLetters();
-		$sl.update();
-		
 		$sl.upAndDown();
+		$sl.update();
 		
 		return $sl.get$();
 	};
@@ -317,7 +371,7 @@
 	}
 
 	var VUIMixer = function(n){
-		return VUIControl(n);
+		return VUIControl(n)
 	};
 
 	window.VUI = VUI;
