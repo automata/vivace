@@ -1,15 +1,15 @@
 //TODO VIVACE USER INTERFACE AUDIO CONTROL
 
 as classes do módulo VUI.js:
+V
 	-Pense em um mixer:
 		-tem muitos controles:
-			-do tipo sliders (que sobem e descem, podendo aumentar ou diminuir o volume de áudio)
 			-do tipo knobs (que giram, bons para equalização rapida ou pan [em situações estereofônicas 2.0])
 			-cotroles de panorama em situações estereofonicas multi-canal 
 		-tem muitas luzes e coisas que balançam:
 			-São os  visualizadores de dB (na verdade da voltagem, ou de bit...?)
 			-visualizadores de panorama
-		-tem o console, que é a mesa de som, que controla tudo o que esta acima
+		
 	
 
-Agora pense que ele pode ter uma mini janelinha no vivace
+Agora pense que ele pode ter uma mini janelinha abrindo no vivace ou em uma pagina paralela

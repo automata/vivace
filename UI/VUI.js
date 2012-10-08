@@ -1,73 +1,11 @@
 (function(){
 
-	/* http://stackoverflow.com/questions/561844/how-to-move-div-with-the-mouse-using-jquery
-	 * PlugTrade.com - jQuery draggit Function */
-	/* Drag A Div with jQuery */
-	jQuery.fn.draggit = function (el) {
-	    var thisdiv = this;
-	    var thistarget = $(el);
-	    var relX;
-	    var relY;
-	    var targetw = thistarget.width();
-	    var targeth = thistarget.height();
-	    var docw;
-	    var doch;
-
-	    thistarget.css('position','absolute');
-
-
-	    thisdiv.bind('mousedown', function(e){
-	        var pos = $(el).offset();
-	        var srcX = pos.left;
-	        var srcY = pos.top;
-
-	        docw = $('body').width();
-	        doch = $('body').height();
-
-	        relX = e.pageX - srcX;
-	        relY = e.pageY - srcY;
-
-	        ismousedown = true;
-	    });
-
-	    $(document).bind('mousemove',function(e){ 
-	        if(ismousedown)
-	        {
-	            targetw = thistarget.width();
-	            targeth = thistarget.height();
-
-	            var maxX = docw - targetw - 10;
-	            var maxY = doch - targeth - 10;
-
-	            var mouseX = e.pageX;
-	            var mouseY = e.pageY;
-
-	            var diffX = mouseX - relX;
-	            var diffY = mouseY - relY;
-
-	            // check if we are beyond document bounds ...
-	            if(diffX < 0)   diffX = 0;
-	            if(diffY < 0)   diffY = 0;
-	            if(diffX > maxX) diffX = maxX;
-	            if(diffY > maxY) diffY = maxY;
-
-	            $(el).css('top', (diffY)+'px');
-	            $(el).css('left', (diffX)+'px');
-	        }
-	    });
-
-	    $(window).bind('mouseup', function(e){
-	        ismousedown = false;
-	    });
-
-	    return this;
-	}; // end jQuery draggit function //
 
 	V = function(){
 
 		var checkConsts = function(t, alreadyChecked){
 
-			regExprString = function(string){
+			var regExprString = function(string){
 				var b = false;
 				for(var c in VUI.Consts){
 					//TODO improvement to check many names, 
@@ -85,7 +23,7 @@
 
 			};
 
-			checkt = function(string){
+			var checkt = function(string){
 				if(string === ''){
 					return alreadyChecked;
 				}
@@ -215,7 +153,28 @@
 		};
 	};
 
+	/*
+	 * Create a new VUI
+	 */
 	var VUI = new V();
+
+	/*
+	 * Initialize the webkitAudioContext
+	 */
+	VUI.init = function(c){
+		if(c === undefined || c === null){
+			try {
+				VUI.audioContext = new webkitAudioContext();
+			}
+			catch(e) {
+				$('<p/>').html('Web Audio API is not supported in this browser').appendTo('body');
+			}
+		}
+	};
+
+
+
+	//Consts for some UI types
 	VUI.Consts = {
 			INTERFACE: 'interface',
 			CONTROL: 'control',
@@ -227,7 +186,8 @@
 			CONSOLE: 'console',
 			CHANGER: 'changer',
 			MIXER: 'mixer',
-			VALUE: 'value'
+			IDENTIFIER: 'ident',
+			RESULT: 'result'
 	};
 
 	/*
@@ -263,28 +223,28 @@
 				return this.element;
 			}
 		}
-		
+
 		var makeUIByObj = function(n){
 			var o = VUI.generators[n.name];
 			var a = $.map(n.channels, function(e, i){
 				return makeUIByString(e, o.type, o.handler);
 			});
-			
+
 			var $a = VUIMixer(n.name);
 			$.each(a, function(i, e){
 				$a.append(e);
 			});
 			return $a;
-			
+
 		};
-		
+
 		if(typeof n === 'string'){
 			return makeUIByString(n, t, f);
 		}
 		else{
 			return makeUIByObj(n);
 		}
-	};
+	};	
 
 
 	var VUInterface = function(n){
@@ -297,7 +257,7 @@
 		var $control = $('<div/>').attr('id','VUIControl_'+n)
 		.addClass(VUI.Consts.INTERFACE)
 		.addClass(VUI.Consts.CONTROL)
-		
+
 		var $p = $('<p/>').html('control_'+n).appendTo($control)
 		return $control;
 	};
@@ -306,63 +266,76 @@
 
 		var $sl = {
 				struct: {body: $('<div/>'), changer: $('<div/>')},
-				
+
+
 				addClasses:function(){
 					$.each(this.struct, function(i, e){
-						e
-						.addClass(VUI.Consts.INTERFACE)
-						.addClass(VUI.Consts.CONTROL)
-						.addClass(VUI.Consts.SLIDER)
-						.addClass(VUI.Consts.VERTICAL);
+						if(i!=='result'){
+							e
+							.addClass(VUI.Consts.INTERFACE)
+							.addClass(VUI.Consts.CONTROL)
+							.addClass(VUI.Consts.SLIDER)
+							.addClass(VUI.Consts.VERTICAL);
+						}
 						if(i==='changer'){
 							e.addClass(VUI.Consts.CHANGER);
-						};
+						}
 					});
+
 				},
-				
+
 				addAttrs: function(name, type){
 					$.each(this.struct, function(i, e){
 						if(e.hasClass(VUI.Consts.CHANGER)){
-							e.attr('id','VUISliderV_'+name+'_'+type+'_'+VUI.Consts.CHANGER);
+							e.attr('id','VUISliderV_'+name+'_'+VUI.Consts.CHANGER);
 						}
 						else{
 							e.attr('id','VUISliderV_'+name+'_'+type);
 						}
 					});	
 				},
-				
+
 				update: function(){
 					this.get$().append(this.struct.changer);
 				},
-				
+
 				get$: function(){
-					
 					return this.struct.body;
 				},
-				
+
 				addLetters: function(){
-					$('<p/>').html(n).appendTo(this.struct.body).addClass(VUI.Consts.VALUE);
+					$('<p/>').html(n).appendTo(this.struct.body).addClass(VUI.Consts.IDENTIFIER);
+					var id1 = '#VUISliderV_'+n+'_'+VUI.Consts.CHANGER;
+					var id2 = 'VUISliderV_'+n+'_'+VUI.Consts.RESULT;
+					var r = $(id1).css('top');
+					$('<p/>').html(r).appendTo(this.struct.body).attr('id', id2).addClass(VUI.Consts.RESULT);
 				},
 				
-				clicked: false,
 				
 				upAndDown: function(){
 					this.struct.changer.draggable({
 						axis:"y",
 						containment: "parent",
-					// TODO ...then update the numbers
+						drag:function(){
+							var y = $('#VUISliderV_'+n+'_'+VUI.Consts.CHANGER).css('top');
+							var norm = function(input){
+								input = input.split("px")[0];
+								input = parseInt(input);
+								return input;
+							};
+							$('#VUISliderV_'+n+'_'+VUI.Consts.RESULT).html(norm(y));
+						},
 					});
-					
 				}
-				
+
 		};
-		
+
 		$sl.addClasses();
 		$sl.addAttrs(n, t);
 		$sl.addLetters();
 		$sl.upAndDown();
 		$sl.update();
-		
+
 		return $sl.get$();
 	};
 

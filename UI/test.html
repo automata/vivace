@@ -10,6 +10,7 @@
 	<body>
 		<div id='VUIcontainer'></div>
 		<script type="text/javascript">
+			//First create some UI, without audioContext
 			if($V === undefined){
 				$('#VUIcontainer').html('Error: VUI not load correctly');
 			}
@@ -22,23 +23,23 @@
 					name: 'mixer',
 					channels: ['l', 'r', 'ls', 'rs', 'c']
 				}, 'slider vertical', 
-					function(handler){
-					return handler.result
+					function(context){
+					return context
 				})
 				
 				var $m2 = $V({
 					name: 'eq',
 					channels: ['high', 'medium', 'bass']
 				}, 'slider vertical', 
-					function(handler){
-					return handler.result
+					function(context){
+					return context
 				})
 				
 				var $r = $V({
 					name: 'reverb room',
 					channels: ['size', 'delaytime']
 				}, 'slider vertical', 
-					function(handler){
+					function(context){
 					return handler.result
 				})
 				
