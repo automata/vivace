@@ -43,10 +43,7 @@
 					return handler.result
 				})
 				
-				
-				$m.appendTo($c);
-				$m2.appendTo($c);
-				$r.appendTo($c)
+				$c.connect($m, $m2, $r);
 				$('#VUIcontainer').append($c);
 			}
 			

@@ -250,18 +250,29 @@
 	var VUInterface = function(n){
 		var $interface = $('<div/>').attr('id','VUInterface_'+n).addClass(VUI.Consts.INTERFACE);
 		$('<p/>').html('interface_'+n).appendTo($interface);
+
 		return $interface;
 	};
 
 	var VUIControl = function(n){
-		var $control = $('<div/>').attr('id','VUIControl_'+n)
+		this.$control = $('<div/>').attr('id','VUIControl_'+n)
 		.addClass(VUI.Consts.INTERFACE)
-		.addClass(VUI.Consts.CONTROL)
+		.addClass(VUI.Consts.CONTROL);
 
-		var $p = $('<p/>').html('control_'+n).appendTo($control)
+		$('<p/>').html('control_'+n).appendTo($control);
+
+
 		return $control;
 	};
 
+	jQuery.fn.connect = function(){ 
+		var $this = $(this);
+		if(arguments !== undefined || arguments !== null){
+			$.each(arguments, function(i, e){
+				e.appendTo($this);
+			});
+		}
+	};
 	var VUISliderV = function(n, t, f){
 
 		var $sl = {
@@ -308,10 +319,10 @@
 					var id1 = '#VUISliderV_'+n+'_'+VUI.Consts.CHANGER;
 					var id2 = 'VUISliderV_'+n+'_'+VUI.Consts.RESULT;
 					var r = $(id1).css('top');
-					$('<p/>').html(r).appendTo(this.struct.body).attr('id', id2).addClass(VUI.Consts.RESULT);
+					//$('<p/>').html(r).appendTo(this.struct.body).attr('id', id2).addClass(VUI.Consts.RESULT);
 				},
-				
-				
+
+
 				upAndDown: function(){
 					this.struct.changer.draggable({
 						axis:"y",
@@ -319,30 +330,30 @@
 						drag:function(){
 							var y = $('#VUISliderV_'+n+'_'+VUI.Consts.CHANGER).css('top');
 							console.log('in:'+y);
-							
+
 							// Some func to get correct params in css
 							var norm = function(input, r, a, b){			
 								input = input.split("px")[0];
 								input = parseInt(input);
-								
+
 								range = r(a, b);
 								r = range[1] - range[0];
 								input /= r;
 								return 1-input;
 							};
-							
+
 							//adjust each value
 							var adjust = function(a, b){
 								return $.map(a, function(e, i){
 									return e - b[i];
 								});
 							};
-							
-							
+
+
 							var css = [3, 107];
 							var factor = [1.9719363891487371, -1.009163883108025406];
-							
-							
+
+
 							y = norm(y, adjust, css, factor);
 							$('#VUISliderV_'+n+'_'+VUI.Consts.RESULT).html(y);
 							console.log('out: '+y);
@@ -357,7 +368,6 @@
 		$sl.addLetters();
 		$sl.upAndDown();
 		$sl.update();
-
 		return $sl.get$();
 	};
 
@@ -366,7 +376,8 @@
 	}
 
 	var VUIMixer = function(n){
-		return VUIControl(n)
+		return VUIControl(n);
+
 	};
 
 	window.VUI = VUI;
