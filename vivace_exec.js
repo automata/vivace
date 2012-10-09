@@ -182,10 +182,10 @@ var events = [];
 var beats = 0;
 var bpm = 120; // 120 seminimas per minute
 var minimalUnity = bpm * 4; // we tick at each 960 seminimas (or, 1 semifusa) 
-// change 8:semifusa 4:fusa 2:colcheia 1:seminima as the minor unity
+//change 8:semifusa 4:fusa 2:colcheia 1:seminima as the minor unity
 var timeInterval = 60 / minimalUnity * 1000; // so, at each 62.5 ms we tick 
 var semiBreve = 32; // one semibreve is equal to 64 semifusas (hemidemisemiquaver) (or 32 fusas)
-// change 64:semifusa 32:fusa 16:colcheia 8:seminima
+//change 64:semifusa 32:fusa 16:colcheia 8:seminima
 var masterClock = setInterval(tick, timeInterval);
 
 //init ///////////////////////////////
@@ -214,77 +214,90 @@ var lastVoices = null;
 
 function run () {
 	var code = document.getElementById('code');
-	var texec=exec(code.value);
-	var currentVoices = texec[0];
-	var activeVoices = texec[1];
-	for (voiceName in lastVoices){
-		if (!activeVoices[voiceName]){
-			for (e in events) {
-				if(events[e]['voiceName']==voiceName) {
-					delete events[e];
-					voices[voiceName].dur=undefined;
-					voices[voiceName].durId=0;
-					if (voices[voiceName].sigType=="video"){
-						document.getElementById(voiceName).style.zIndex="0";
-						voices[voiceName].sigPop.pause();
+
+	if(code.value === undefined || code.value === null || code.value === ""){
+		$('<p/>').html('You didn\'t put code in vivace. Please set')
+	}
+	else{
+		apply(code);
+	}
+
+	var appply = function(c){
+		console.log('code to be parsed: '+c.value);
+		var texec=exec(c.value);
+		console.log('javascript: '+texec);
+		var currentVoices = texec[0];
+		var activeVoices = texec[1];
+		for (voiceName in lastVoices){
+			if (!activeVoices[voiceName]){
+				for (e in events) {
+					if(events[e]['voiceName']==voiceName) {
+						delete events[e];
+						voices[voiceName].dur=undefined;
+						voices[voiceName].durId=0;
+						if (voices[voiceName].sigType=="video"){
+							document.getElementById(voiceName).style.zIndex="0";
+							voices[voiceName].sigPop.pause();
+						}
 					}
 				}
 			}
 		}
-	}
 
-	for (voiceName in currentVoices) {
-		if (lastVoices != null) {
-			// let's update durations
-			console.log(voiceName, currentVoices, lastVoices);
-			if (currentVoices[voiceName].dur != lastVoices[voiceName].dur) {
-				console.log(voiceName + "dd");
-				if (activeVoices[voiceName]){
-					console.log(voiceName + "ee");
+		for (voiceName in currentVoices) {
+			if (lastVoices != null) {
+				// let's update durations
+				console.log(voiceName, currentVoices, lastVoices);
+				if (currentVoices[voiceName].dur != lastVoices[voiceName].dur) {
+					console.log(voiceName + "dd");
+					if (activeVoices[voiceName]){
+						console.log(voiceName + "ee");
+						voices[voiceName].dur = currentVoices[voiceName].dur;
+					}
+				}
+				// let's update buffer positions
+				if (currentVoices[voiceName].pos != lastVoices[voiceName].pos) {
+					voices[voiceName].pos = currentVoices[voiceName].pos;
+				}
+				// let's update grain durations
+				if (currentVoices[voiceName].gdur != lastVoices[voiceName].gdur) {
+					voices[voiceName].gdur = currentVoices[voiceName].gdur;
+				}      
+				console.log(voices[voiceName].dur);
+				if (!voices[voiceName].durId && (voices[voiceName].dur!=undefined)) {
+					// for every updated voice, put that on event queue
+					events.push({'voiceName': voiceName, 'nextBeat': (voices[voiceName].dur[0] * semiBreve) + beats});
+					voices[voiceName].durId = 0;
+					voices[voiceName].posId = 0;
+					voices[voiceName].gdurId = 0;
+				}
+
+			} else {
+				// so it is the first time we are executing...
+				if (!currentVoices[voiceName].dur) {
 					voices[voiceName].dur = currentVoices[voiceName].dur;
 				}
-			}
-			// let's update buffer positions
-			if (currentVoices[voiceName].pos != lastVoices[voiceName].pos) {
-				voices[voiceName].pos = currentVoices[voiceName].pos;
-			}
-			// let's update grain durations
-			if (currentVoices[voiceName].gdur != lastVoices[voiceName].gdur) {
-				voices[voiceName].gdur = currentVoices[voiceName].gdur;
-			}      
-			console.log(voices[voiceName].dur);
-			if (!voices[voiceName].durId && (voices[voiceName].dur!=undefined)) {
-				// for every updated voice, put that on event queue
-				events.push({'voiceName': voiceName, 'nextBeat': (voices[voiceName].dur[0] * semiBreve) + beats});
-				voices[voiceName].durId = 0;
-				voices[voiceName].posId = 0;
-				voices[voiceName].gdurId = 0;
-			}
+				if (!currentVoices[voiceName].pos) {
+					voices[voiceName].pos = currentVoices[voiceName].pos;
+				}
+				if (!currentVoices[voiceName].dur) {
+					voices[voiceName].gdur = currentVoices[voiceName].gdur;
+				}
 
-		} else {
-			// so it is the first time we are executing...
-			if (!currentVoices[voiceName].dur) {
-				voices[voiceName].dur = currentVoices[voiceName].dur;
-			}
-			if (!currentVoices[voiceName].pos) {
-				voices[voiceName].pos = currentVoices[voiceName].pos;
-			}
-			if (!currentVoices[voiceName].dur) {
-				voices[voiceName].gdur = currentVoices[voiceName].gdur;
-			}
-
-			if (voices[voiceName].dur) {
-				// for every updated voice, put that on event queue
-				events.push({'voiceName': voiceName, 'nextBeat': (voices[voiceName].dur[0] * semiBreve) + beats});
-				voices[voiceName].durId = 0;
-				voices[voiceName].posId = 0;
-				voices[voiceName].gdurId = 0;
+				if (voices[voiceName].dur) {
+					// for every updated voice, put that on event queue
+					events.push({'voiceName': voiceName, 'nextBeat': (voices[voiceName].dur[0] * semiBreve) + beats});
+					voices[voiceName].durId = 0;
+					voices[voiceName].posId = 0;
+					voices[voiceName].gdurId = 0;
+				}
 			}
 		}
+
+		// store the last voice to compare at the next one
+		lastVoices = voices;
 	}
 
-	// store the last voice to compare at the next one
-	lastVoices = voices;
 }
 
 //TODO FOUND thred about problem in MacOSX
@@ -297,39 +310,89 @@ var onkeyup=function(e){
 document.onkeydown=function(e){
 	//MACOSX version (Snow Leopard)
 	//what's the code for cmd+x (run) and cmd+.(stop) [like supercollider and PD]
+	var isCmd = false;
 	if(e.which == 91) 
 		isCmd=true;
 
 	if(e.which == 88 && isCmd) { //x
-		run();
 		console.log('cmd+x pressed, running new vivace code:');
-		var c = document.getElementById('code').value;
-		console.log(c);
+		run();
 		return false;
 	}
 };
 
-function setupVivaceBanner(c){
-	var $banner = $('#banner');
-	var $coders = $('#coders');
-	$banner.html('vivace');
-	$coders.html('team');
-	$coders.hide();	
+function setupVivaceBanner(c, t, p){
+	var $banner = $('#banner').html('vivace');
+	var $menu = $('#menu').hide();
+	var $team = $('#team').html('team').addClass('ban');
+	var $help = $('#helper').html('help').addClass('ban');
+	var $contribute = $('#contribute').html('contribute').addClass('ban');
+	//menu
+	$banner.click(function(){
+		var menuVisible = $('#menu').is(':visible');
+		if(!menuVisible){
+			$menu.show('200');
+		}
+		else{
+			$menu.hide('200');
+		}
+	});
 
+
+	//team
 	$.each(c, function(i, e){
-		var $li = $('<li/>');
-		var $a = $('<a/>').html(i).attr('id', 'coder_'+i).attr('href', e);
+		var $li = $('<li/>').addClass('ban').hide();
+		var $a = $('<a/>').html(i).attr('id', 'coder_'+i).attr('href', e).addClass('ban');
 		$a.appendTo($li);
-		$li.appendTo($coders);
+		$li.appendTo($team);
 	});
-};
+	
+	$team.click(function(){
+		var teamVisible = $('#team').children().is(':visible');
+		if(!teamVisible){
+			$('#team').children().show('200');
+		}
+		else{
+			$('#team').children().hide('200');
+		}
+	})
 
-function vivaceHideShow(){
-	$('#banner').click(function(){ 
-		$('#coders').show();
+	//help
+	$.each(t, function(i, e){
+		$('<li/>')
+		.html(e.name)
+		.addClass('ban')
+		.appendTo($help)
+		.hide();
 	});
-	$('#coders').click(function(){
-		$(this).hide();
+
+	$help.click(function(){
+		var topicsVisible = $(this).children().is(':visible');
+		if(!topicsVisible){
+			$(this).children().show('200');
+		}
+		else{
+			$(this).children().hide('200');
+		}
+	});
+	
+	//contribute
+	$.each(p, function(i, e){
+		$('<li/>')
+		.html(e.name)
+		.addClass('ban')
+		.appendTo($contribute)
+		.hide();
+	});
+
+	$contribute.click(function(){
+		var topicsVisible = $(this).children().is(':visible');
+		if(!topicsVisible){
+			$(this).children().show('200');
+		}
+		else{
+			$(this).children().hide('200');
+		}
 	});
 };
 
@@ -338,6 +401,13 @@ function startBanner(){
 		aut0mata: 'https://github.com/automata',
 		gabiThume: 'https://github.com/GabiThume',
 		jahpd: 'https://github.com/jahpd'
-	});
+	},[
+       {name: 'using vivace'},
+       {name: 'enabled variables'}
+    ],[
+    	{name: 'pull code', topic: 'fork one of the projects in github.com/xxx/vivace'},
+    	{name: 'test code', topic: 'fork one of the projects in github.com/xxx/vivace'},
+    	{name: 'submit currencies', topic: {bitcoin: 'nono', paypal:'nono'}}
+	]);
 }
 

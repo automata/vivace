@@ -32,7 +32,7 @@ body {
 }
 
 .ban:hover {
-	color: #FFF;
+	color: #AAA;
 }
 
 #code {
@@ -69,10 +69,18 @@ body {
 	/*background-color:rgba(0,0,0,.1);*/
 }
 
-#banner,#coders {
+#banner {
 	position: absolute;
 	right: 0px;
 	bottom: 0px;
+	padding: 24px;
+	z-index: 1001;
+}
+
+#menu{
+	position: absolute;
+	right: 0px;
+	bottom: 10px;
 	padding: 24px;
 	z-index: 1001;
 }
@@ -82,7 +90,7 @@ video {
 	height: 100%;
 	position: absolute;
 }
-document.getElementById(voiceName).style.zIndex="800";
+
 </style>
 
 </head>
@@ -116,27 +124,36 @@ c.pos = {1/4}
 
 // more info at http://automata.github.com/vivace
    </textarea>
-
-	<div id="banner" class="ban" onclick="vivaceHideShow();"></div>
-	<ul id='coders' class='ban';"></ul>
+  	<div id='menu'>
+		<ul id='team'></ul>
+		<ul id="helper"></ul>
+		<ul id="contribute"></ul>
+	</div>
+	<div id="banner" class="ban"></div>
+	
+	
+		
+	</div>
+	
 	<!-- <div id="banner" onclick="run();">vivace</div> -->
-
+	<script type="text/javascript">init();</script>
+	<script type="text/javascript">startBanner();</script>
+	
 	<script> 
-   	 startBanner();
-   	 init();
-
      var elem = document.getElementById('code');
      
      sharejs.open('default', 'text', function(error, doc) {
-     if (error) {
-     console.log(error);
-     } else {
-     elem.disabled = false;
-     doc.attach_textarea(elem);
-     }
+    	 if (error) {
+     		console.log(error);
+     	} else {
+     		elem.disabled = false;
+     		console.log(typeof doc);
+     		console.log(doc)
+     		doc.attach_textarea(elem);
+     	}
      });
 
    </script>
-
+   
 </body>
 </html>
