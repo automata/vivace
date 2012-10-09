@@ -211,11 +211,11 @@
 
 		var makeUIByString = function(ns, ts, f){
 			if(ts === VUI.Consts.INTERFACE){	
-				this.element = VUInterface(ns);
+				this.element = VUInterface(ns)
 				return this.element;
 			}
 			else if(ts === VUI.Consts.CONTROL){
-				this.element = VUIControl(ns);
+				this.element = VUIControl(ns).draggable();
 				return this.element;
 			}
 			else if(ts === VUI.Consts.SLIDER+' '+VUI.Consts.VERTICAL){
@@ -318,12 +318,34 @@
 						containment: "parent",
 						drag:function(){
 							var y = $('#VUISliderV_'+n+'_'+VUI.Consts.CHANGER).css('top');
-							var norm = function(input){
+							console.log('in:'+y);
+							
+							// Some func to get correct params in css
+							var norm = function(input, r, a, b){			
 								input = input.split("px")[0];
 								input = parseInt(input);
-								return input;
+								
+								range = r(a, b);
+								r = range[1] - range[0];
+								input /= r;
+								return 1-input;
 							};
-							$('#VUISliderV_'+n+'_'+VUI.Consts.RESULT).html(norm(y));
+							
+							//adjust each value
+							var adjust = function(a, b){
+								return $.map(a, function(e, i){
+									return e - b[i];
+								});
+							};
+							
+							
+							var css = [3, 107];
+							var factor = [1.9719363891487371, -1.009163883108025406];
+							
+							
+							y = norm(y, adjust, css, factor);
+							$('#VUISliderV_'+n+'_'+VUI.Consts.RESULT).html(y);
+							console.log('out: '+y);
 						},
 					});
 				}

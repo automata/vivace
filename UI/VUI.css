@@ -10,16 +10,15 @@
     -webkit-border-radius: 0.75em;
     -moz-border-radius: 0.75em;
     border-radius: 0.75em;
-    
+    background-color: white;  
 }
 
 .control{
-    background-color: #EEE;
+	-webkit-text-fill-color: #000;
 }
 
 .slider{
-	background-color: black;
-	-webkit-text-fill-color: #00AA00;
+	-webkit-text-fill-color: #999;
 	display:inline;
 }
 
@@ -28,13 +27,12 @@
 }
 
 .changer{
-	background-color: yellow;
 	-webkit-border-radius: 2em;
     -moz-border-radius: 2em;	
     border-radius: 0.75em;
 }
 .changer:hover{
-	background-color: red;	
+	background-color: #BBB;	
 }
 
 .slider.vertical{
@@ -59,14 +57,14 @@
 	position:fixed;
 	font-size: 9px;
 	margin: 14em 0em 0em 0.5em;
-	-webkit-text-fill-color: #00AA00;
+	-webkit-text-fill-color: #BBB;
 }
 
 
 
 #instructions{
 	font-size: 15px;
-	background-color: #AAAAAA;
+	background-color: #CCC;
 	margin: 1em 1em 1em 1em;
 }
 	
