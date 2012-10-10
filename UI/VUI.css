@@ -1,20 +1,35 @@
+body{
+	background-color: black;
+}
 .interface{
-	border: solid black 1px;
 	text-align: center;
     font-size: 12px;
     font-family: Arial;
     font-weight: bold;
+    
     margin: 0.7em 0.7em 0.7em 0.7em;
     padding: 0.1em 0.1em 0.1em 0.1em;
+    
     float: left;
+    
+    border: solid white 1px;
     -webkit-border-radius: 0.75em;
     -moz-border-radius: 0.75em;
     border-radius: 0.75em;
-    background-color: white;  
+    -webkit-box-shadow: 1px 1px 1px #AAA
+    
+    color: transparent;
+	text-shadow: #555 1px 1px 1px;
+	background-color: transparent;
+	transition: color 1500ms;
+	-webkit-transition: color 1500ms;
+	-o-transition: color 500ms;
+	-moz-transition: color ox-shadow 500ms;
+	-ms-transition: color 500ms;
 }
 
 .control{
-	-webkit-text-fill-color: #000;
+	text-shadow: #FFF 0px 0px 3px;
 }
 
 .slider{
@@ -60,12 +75,8 @@
 	-webkit-text-fill-color: #BBB;
 }
 
-
-
 #instructions{
 	font-size: 15px;
-	background-color: #CCC;
+	background-color: #FFF;
 	margin: 1em 1em 1em 1em;
-}
-	
 }

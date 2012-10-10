@@ -94,19 +94,22 @@
 				if(checkName(n) && checkConsts(t, b) && checkFunc(f)){
 					VUI.generators[n] = {
 							type: t,
-							handler: f
+							handler: f, 			// must call a function(audioNode, handler)
+							audioNode: null
 					};
 				}
 				else if(checkName(n) && checkConsts(t, b) && !checkFunc(f)){
 					VUI.generators[n] = {
 							type: t,
-							handler: function(){}
+							handler: function(){},	// must call a function(audioNode, handler)
+							audioNode: null
 					};	
 				}
 				else if(checkName(n) && !checkConsts(t, b) && !checkFunc(f)){
 					VUI.generators[n] = {
 							type: 'NON_TYPE',
-							handler: function(){}
+							handler: function(){},	// must call a function(audioNode, handler)
+							audioNode: null
 					};
 				}
 				else if(!checkName(n)){
@@ -119,21 +122,24 @@
 					VUI.generators[n.name] = {
 							type: t,
 							audioArray: n.channels,
-							handler: f
+							handler: f,
+							audioNode: null							// must call a function(audioNode, handler)
 					};
 				}
 				else if(checkObj(n) && checkConsts(t, b) && !checkFunc(f)){
 					VUI.generators[n.name] = {
 							type: t,
 							audioArray: n.channels,
-							handler: function(){return false}
+							handler: function(node){return node},	// must call a function(audioNode, handler)
+							audioNode: null
 					};	
 				}
 				else if(checkObj(n) && !checkConsts(t, b) && !checkFunc(f)){
 					VUI.generators[n.name] = {
 							type: 'NON_TYPE',
 							audioArray:n.channels,
-							handler: function(){return false}
+							handler: function(){return false},		// must call a function(audioNode, handler)
+							audioNode: null
 					};
 				}
 				else if(!checkObj(n)){
@@ -161,16 +167,139 @@
 	/*
 	 * Initialize the webkitAudioContext
 	 */
-	VUI.init = function(c){
+	VUI.initAudio = function(c){
 		if(c === undefined || c === null){
 			try {
 				VUI.audioContext = new webkitAudioContext();
 			}
 			catch(e) {
-				$('<p/>').html('Web Audio API is not supported in this browser').appendTo('body');
+				var msg = 'Web Audio API is not supported in this browser; try in Chrome or Safari';
+				$('<p/>').html(msg)
+				.appendTo('body');
+				console.log(msg);
 			}
 		}
 	};
+
+	VUI.initUI = function(c, srcNode){
+		initAudio(c);
+		if(VUI.audioContext){
+			//For each existent UI, create a new audio node
+			$.each(VUI.generators, function(name, object){
+				VUI.setAudioNode(name);
+				VUI.connectAudioNode(n, srcNode, destNode);
+			});
+		}
+		else{
+			console.log('ERROR');
+		}
+	};
+
+	VUI.loadSrcExample = function(url){
+		VUI.audioSourceExample = {
+			url: url,
+			buffer: null,
+			loaded: false,
+			meta:['example', 'VUI', 'webkitAudioAPI']
+		};
+		
+		VUI.loadSrc(url, VUI.audioSrcExample);
+	};
+	
+	/*
+	 * @param url the url where audio file is stored
+	 * @param VUIbuff the object to store metadata
+	 */
+	VUI.loadSrc = function(url, VUIbuff){
+		if(VUI.audioContext){
+			var request = new XMLHttpRequest();
+			request.open('GET', url, true);
+			request.responseType = 'arraybuffer';
+
+			// Decode asynchronously
+			request.onload = function() {
+				VUI.audioContext.decodeAudioData(request.response, function(buffer) {
+					VUIbuff.url = url;
+					VUIbuff.buffer = buffer;
+					VUIbuff.loaded = true;
+				}, onError);
+			};
+
+			request.send();
+			console.log('audio node '+' created for '+o.name);
+		}
+		else{
+			console.log('webkitAudioContext not initialized yet. Waiting for you...');
+		}	
+	};
+	
+	VUI.playSrc = function(VUIbuff, outNode){
+		if(VUI.audioContext){
+			var src = VUI.audioContext.createBufferSource();
+			src.buffer = VUIbuff.buffer;
+			src.connect(outNode);
+			source.noteOn(0);
+		}
+		else{
+			console.log('webkitAudioContext not initialized yet. Waiting for you...');
+		}	
+	};
+
+
+	VUI.setAudioNode = function(n, valType){
+		if(VUI.audioContext){
+			//Catch the UI by name
+			if(valType === 'gain'){
+				VUI.generators[n].audioNode = VUI.audioContext.createGainNode();
+			}
+
+			console.log('audio node '+' created for '+o.name);
+		}
+		else{
+			console.log('webkitAudioContext not initialized yet. Waiting for you...');
+		}	
+	}
+
+	/*
+	 * Create an input<=>output audioNode
+	 * @param n the VUI name to be the intermediate audio node
+	 * @param srcNode the audio node source
+	 * @param destNode the audio node source
+	 */
+	VUI.connectAudioNode = function(n, inNode, outNode){
+		if(VUI.audioContext){
+			//Catch the UI by name
+			var o = VUI.generators[n];
+			if(o.audioNode){
+				inNode.connect(o.audioNode);
+				o.audioNode.connect(outNode);
+			}
+			else{
+				console.log('audioNode not setted yet for '+o.name);	
+			}
+
+		}
+		else{
+			console.log('webkitAudioContext not initialized yet. Waiting for you...');
+		}
+	};
+
+	VUI.setAudioNodeValue = function(n, v){
+		if(VUI.audioContext){
+			//Catch the UI by name
+			var node = VUI.generators[n].audioNode;
+			if(node){
+				node.gain.value = v;
+			}
+			else{
+				console.log('audioNode not setted yet for '+o.name);	
+			}
+
+		}
+		else{
+			console.log('webkitAudioContext not initialized yet. Waiting for you...');
+		}
+	} ;
 
 
 
