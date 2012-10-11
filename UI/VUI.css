@@ -1,24 +1,20 @@
-body{
+body {
 	background-color: black;
 }
-.interface{
+
+.interface {
 	text-align: center;
-    font-size: 12px;
-    font-family: Arial;
-    font-weight: bold;
-    
-    margin: 0.7em 0.7em 0.7em 0.7em;
-    padding: 0.1em 0.1em 0.1em 0.1em;
-    
-    float: left;
-    
-    border: solid white 1px;
-    -webkit-border-radius: 0.75em;
-    -moz-border-radius: 0.75em;
-    border-radius: 0.75em;
-    -webkit-box-shadow: 1px 1px 1px #AAA
-    
-    color: transparent;
+	font-size: 12px;
+	font-family: Arial;
+	font-weight: bold;
+	margin: 0.7em 0.7em 0.7em 0.7em;
+	padding: 0.1em 0.1em 0.1em 0.1em;
+	float: left;
+	border: solid white 1px;
+	-webkit-border-radius: 0.75em;
+	-moz-border-radius: 0.75em;
+	border-radius: 0.75em;
+	-webkit-box-shadow: 1px 1px 1px #AAA color:  transparent;
 	text-shadow: #555 1px 1px 1px;
 	background-color: transparent;
 	transition: color 1500ms;
@@ -28,54 +24,66 @@ body{
 	-ms-transition: color 500ms;
 }
 
-.control{
+.control {
 	text-shadow: #FFF 0px 0px 3px;
 }
 
-.slider{
+.slider {
 	-webkit-text-fill-color: #999;
-	display:inline;
+	display: inline;
 }
 
-.horizontal{
+.knob {
+	-webkit-border-radius: 10em;
+	-moz-border-radius: 10em;
+	border-radius: 0.75em;
+	-webkit-transform: rotate(0deg);
+	-moz-transform: rotate(0deg);
+	-ms-transform: rotate(0deg);
+	-o-transform: rotate(0deg);
+	transform: rotate(0deg);
+}
+
+.horizontal {
 	clear: both;
 }
 
-.changer{
+.changer {
 	-webkit-border-radius: 2em;
-    -moz-border-radius: 2em;	
-    border-radius: 0.75em;
-}
-.changer:hover{
-	background-color: #BBB;	
+	-moz-border-radius: 2em;
+	border-radius: 0.75em;
 }
 
-.slider.vertical{
-	width:1.5em;
+.changer:hover {
+	background-color: #BBB;
+}
+
+.slider.vertical {
+	width: 1.5em;
 	height: 10em;
 }
 
-.interface.control.slider.vertical.changer{
-	position:relative;
-	width:1.5em;
-	height:1em;
+.interface.control.slider.vertical.changer {
+	position: relative;
+	width: 1.5em;
+	height: 1em;
 	margin: 0em 0em 0em -0.2em;
-	top:7.5em; /* from 75 to -15?*/
+	top: 7.5em; /* from 75 to -15?*/
 }
 
-.ident{
+.ident {
 	font-size: 9px;
 	margin: -1.5em 0em 0em -0.2em;
 }
 
-.result{
-	position:fixed;
+.result {
+	position: fixed;
 	font-size: 9px;
 	margin: 14em 0em 0em 0.5em;
 	-webkit-text-fill-color: #BBB;
 }
 
-#instructions{
+#instructions {
 	font-size: 15px;
 	background-color: #FFF;
 	margin: 1em 1em 1em 1em;

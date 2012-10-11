@@ -197,15 +197,15 @@
 
 	VUI.loadSrcExample = function(url){
 		VUI.audioSourceExample = {
-			url: url,
-			buffer: null,
-			loaded: false,
-			meta:['example', 'VUI', 'webkitAudioAPI']
+				url: url,
+				buffer: null,
+				loaded: false,
+				meta:['example', 'VUI', 'webkitAudioAPI']
 		};
-		
+
 		VUI.loadSrc(url, VUI.audioSrcExample);
 	};
-	
+
 	/*
 	 * @param url the url where audio file is stored
 	 * @param VUIbuff the object to store metadata
@@ -232,7 +232,7 @@
 			console.log('webkitAudioContext not initialized yet. Waiting for you...');
 		}	
 	};
-	
+
 	VUI.playSrc = function(VUIbuff, outNode){
 		if(VUI.audioContext){
 			var src = VUI.audioContext.createBufferSource();
@@ -402,20 +402,26 @@
 			});
 		}
 	};
-	var VUISliderV = function(n, t, f){
 
-		var $sl = {
+	var VUIControlWidget = function(n, t, f){
+		this.name = n;
+		this.type = t;
+		this.func = f;
+
+		var ui = {
 				struct: {body: $('<div/>'), changer: $('<div/>')},
-
-
 				addClasses:function(){
 					$.each(this.struct, function(i, e){
 						if(i!=='result'){
-							e
-							.addClass(VUI.Consts.INTERFACE)
-							.addClass(VUI.Consts.CONTROL)
-							.addClass(VUI.Consts.SLIDER)
-							.addClass(VUI.Consts.VERTICAL);
+							e.addClass(VUI.Consts.INTERFACE)
+							.addClass(VUI.Consts.CONTROL);
+							if(this.type.contains('slider')){
+								e.addClass(VUI.Consts.SLIDER)
+								.addClass(VUI.Consts.VERTICAL);
+							}
+							if(this.type.contains('knob')){
+								e.addClass(VUI.Consts.KNOB);
+							}
 						}
 						if(i==='changer'){
 							e.addClass(VUI.Consts.CHANGER);
@@ -423,19 +429,27 @@
 					});
 
 				},
-
-				addAttrs: function(name, type){
+				addAttrs: function(){
 					$.each(this.struct, function(i, e){
+						var id = '';
+						if(e.hasClass('slider')){
+							id = 'VUISliderV_'+this.name+'_';
+						}
+						else if(e.hasClass('knob')){
+							id = 'VUIKnob_'+this.name+'_';
+						}
+
 						if(e.hasClass(VUI.Consts.CHANGER)){
-							e.attr('id','VUISliderV_'+name+'_'+VUI.Consts.CHANGER);
+							id+=VUI.Consts.CHANGER;
 						}
 						else{
-							e.attr('id','VUISliderV_'+name+'_'+type);
+							id+=this.type;
 						}
+						e.attr('id', id);
 					});	
 				},
 
-				update: function(){
+				build: function(){
 					this.get$().append(this.struct.changer);
 				},
 
@@ -444,67 +458,100 @@
 				},
 
 				addLetters: function(){
-					$('<p/>').html(n).appendTo(this.struct.body).addClass(VUI.Consts.IDENTIFIER);
-					var id1 = '#VUISliderV_'+n+'_'+VUI.Consts.CHANGER;
-					var id2 = 'VUISliderV_'+n+'_'+VUI.Consts.RESULT;
+					$('<p/>').html(this.name).appendTo(this.struct.body).addClass(VUI.Consts.IDENTIFIER);
+					var id1 = '#VUISliderV_'+this.name+'_'+VUI.Consts.CHANGER;
+					var id2 = 'VUISliderV_'+this.name+'_'+VUI.Consts.RESULT;
 					var r = $(id1).css('top');
 					//$('<p/>').html(r).appendTo(this.struct.body).attr('id', id2).addClass(VUI.Consts.RESULT);
 				},
 
 
-				upAndDown: function(){
+				upAndDown: function(draggerHandler){
 					this.struct.changer.draggable({
 						axis:"y",
 						containment: "parent",
-						drag:function(){
-							var y = $('#VUISliderV_'+n+'_'+VUI.Consts.CHANGER).css('top');
-							console.log('in:'+y);
-
-							// Some func to get correct params in css
-							var norm = function(input, r, a, b){			
-								input = input.split("px")[0];
-								input = parseInt(input);
-
-								range = r(a, b);
-								r = range[1] - range[0];
-								input /= r;
-								return 1-input;
-							};
-
-							//adjust each value
-							var adjust = function(a, b){
-								return $.map(a, function(e, i){
-									return e - b[i];
-								});
-							};
-
-
-							var css = [3, 107];
-							var factor = [1.9719363891487371, -1.009163883108025406];
-
-
-							y = norm(y, adjust, css, factor);
-							$('#VUISliderV_'+n+'_'+VUI.Consts.RESULT).html(y);
-							console.log('out: '+y);
-						},
+						drag:draggerHandler
 					});
-				}
+				},
 
+				rotation: function(rotationHandler){
+					
+				}
 		};
 
+		return ui;
+	};
+	
+	// Some func to get correct params in css
+	var normSlider = function(input, o){			
+		input = input.split("px")[0];
+
+		//to diminish decimal places
+		input = Math.round(parseInt(input));
+		//the range offset
+		rangeRaw = r(o.offset);
+		r = range[1] - range[0];
+
+		input /= r;
+		input = 1-input;
+
+		if(input<o.toBe[0]){
+			return 0;
+		}
+		if(input>o.toBe[1]){
+			return 1;
+		}
+		else{
+			return input;
+		}
+	};
+	
+	var applyRotation = function($knob, deg){
+		$knob.css({
+	        '-webkit-transform': 'rotate('+deg+'deg)',
+	        '-moz-transform': 'rotate('+deg+'deg)',
+	        '-ms-transform': 'rotate('+deg+'deg)',
+	        '-o-transform': 'rotate('+deg+'deg)',
+	        'transform': 'rotate('+deg+'deg)'
+	    });
+
+	}
+
+	var VUISliderV = function(n, t, f){
+
+		var widget = VUIControlWidget(n, t, f);
+
+		//Create a handler to do things like up and down the slider (changing volume, frequency, what'ever)
+		var handler = function(){
+			var y = $('#VUISliderV_'+widget.name +'_'+VUI.Consts.CHANGER).css('top');
+			console.log('in:'+y);
+			y = normSlider(y,{offset: [3, 107], toBe: [0, 1]});
+			$('#VUISliderV_'+n+'_'+VUI.Consts.RESULT).html(y);
+			console.log('out: '+y);
+		};
+
+		widget.addClasses();
+		widget.addAttrs(n, t);
+		widget.addLetters();
+		widget.rotation(handler);
+		widget.update();
+		return widget.get$();
+	};
+
+	var VUIKnob = function(n, t, f){
+		var widget = VUIControlWidget(n, t, f);
+		
+		//Create a handler to do things like up and down the slider (changing volume, frequency, what'ever)
+		var handler = null
 		$sl.addClasses();
 		$sl.addAttrs(n, t);
 		$sl.addLetters();
-		$sl.upAndDown();
+		$sl.addRotate();
 		$sl.update();
 		return $sl.get$();
-	};
-
-	function VUIKnob(){
-		VUIControl.call(n, VUI.Consts.KNOB, f);
 	}
 
-	var VUIMixer = function(n){
+	var VUIMixer = function(n, t, f){
 		return VUIControl(n);
 
 	};
