@@ -1,16 +1,34 @@
 (function(){
 
+	//////////////////////////////////////////////
+	// V
+	//////////////////////////////////////////////
 
+	/**
+	 * V é a função que cuida das operações mais básicas do Vivace UI
+	 * @see VUI
+	 * @see VUIObj
+	 * @returns {V}
+	 */
 	V = function(){
 
+		/**
+		 * checkConsts verifica se o tipo de UI requerida é válida
+		 * @see VUI.Consts
+		 * @param t o tipo de UI
+		 * @param alreadyChecked é um valor auxiliar booleano para verificação recursiva
+		 */
 		var checkConsts = function(t, alreadyChecked){
 
+			/*
+			 * verifica as constantes por expressão regular
+			 * é fornecido uma simples string, com várias constantes
+			 * válidas em VUI.Consts separadas por espaço
+			 * Não utilizar dentro 
+			 */
 			var regExprString = function(string){
 				var b = false;
 				for(var c in VUI.Consts){
-					//TODO improvement to check many names, 
-					//and slice them by regexpr with
-					//strings contained in VUI.Consts
 					var r = new RegExp(VUI.Consts[c]);
 					if(r.test(t)){
 						// return itself only if have other valid constant
@@ -20,28 +38,25 @@
 					}
 				}
 				return b;
-
 			};
 
-			var checkt = function(string){
-				if(string === ''){
-					return alreadyChecked;
-				}
-				else{
-					var bbb = regExprString(string);
-
-					return bbb;
-				}
-			};
-
-			if(typeof t === 'string'){
-				return checkt(t);
+			//
+			if(typeof string !== 'string' || string === undefined || string === null){
+				console.log('V: value not valid');
+				return false;
+			}
+			if(string === ''){
+				return alreadyChecked;
 			}
 			else{
-				return false;
+				return regExprString(string);
 			}
 		};
 
+		/**
+		 * Checa o nome da UI, que deve ser uma simples string
+		 * @param n o nome da UI
+		 */
 		var checkName = function(n){
 			if(typeof n == 'string'){
 				return true;
@@ -51,6 +66,10 @@
 			}
 		};
 
+		/**
+		 * Checa a função anônima da UI, 
+		 * @param f a função de áudio da UI
+		 */
 		var checkFunc = function(f){
 			if(typeof f === 'function'){
 				return true;
@@ -60,18 +79,38 @@
 			}
 		};
 
+		/**
+		 * Ao invés de fornecermos um simples nome, podemos fornecer
+		 * um objeto com dados, onde é necessário propriedades como nome
+		 * e a quantidade de canais
+		 * @param n o objeto com propriedades 'name' e 'channels'
+		 */
 		var checkObj = function(n){
 			//Se for um objeto, verifique as chaves corretas
 			if(n.hasOwnProperty('name') && n.hasOwnProperty('channels')){
 				return true;
 			}
 			else{
+				if(!n.hasOwnProperty('name')){
+					console.log('V: object do not have property name');
+				}
+				if(!n.hasOwnProperty('channels')){
+					console.log('V: object do not have property channels');
+				}
 				return false;
 			}
 		};
 
-		/*
-		 * Adicione uma função geradora ao VUI (ou $V);
+		/**
+		 * Adicione uma função geradora de áudio ao VUI (ou $V);
+		 * é a única função que podemos chamar externamente
+		 * <ul>
+		 * uma função geradora é identificada pelo:
+		 * <li>nome (como por exemplo, 'mixer', 'equalizador', 'panner', etc)</li>
+		 * <li>tipo (slider, knob, visualizador)</li>
+		 * <li>função de áudio (a função customizada de áudio)
+		 * </ul>
+		 * -
 		 * <pre>
 		 * 	VUI.add('name', 'type', function(){
 		 * 		//A função que gera o algoritmo de áudio;
@@ -82,87 +121,96 @@
 		 * @param t the type of object of name n
 		 * @param f the audio function 
 		 */
-		this.add = function(n, t, f){
-			if(VUI.generators === undefined || VUI.generators === null){
-				VUI.generators = {};
-			};
+		this.make = function(n, t, f){
 
-			if(t === undefined) t=null;
-			if(f === undefined) f=null;
+			/*
+			 * se n passado acima for uma string; cria um objeto a partir disso
+			 */
+			var s = function(n, t, b, f){
+				var _o = {};
 
-			var adderS = function(n, t, b, f){
 				if(checkName(n) && checkConsts(t, b) && checkFunc(f)){
-					VUI.generators[n] = {
+					_o[n] = {
 							type: t,
-							handler: f, 			// must call a function(audioNode, handler)
-							audioNode: null
-					};
+							handler: f	// must call a function(audioNode)
+					};			
 				}
 				else if(checkName(n) && checkConsts(t, b) && !checkFunc(f)){
-					VUI.generators[n] = {
+					_o[n] = {
 							type: t,
-							handler: function(){},	// must call a function(audioNode, handler)
-							audioNode: null
-					};	
+							handler: function(audioNode){}	// must call a function(audioNode)
+					};		
 				}
 				else if(checkName(n) && !checkConsts(t, b) && !checkFunc(f)){
-					VUI.generators[n] = {
-							type: 'NON_TYPE',
-							handler: function(){},	// must call a function(audioNode, handler)
-							audioNode: null
-					};
+					_o[n] = {
+							type: VUI.Consts.INTERFACE,
+							handler: function(audioNode){}	// must call a function(audioNode)
+					};	
 				}
 				else if(!checkName(n)){
 					console.log("Please give at least the name");
+					return null;
 				}
+
+				o[n].audioNode =  null;
+				return o;
 			};
 
-			var adderO = function(n, t, b, f){
+			/*
+			 * se n passado acima for um objeto; transcreve um objeto a partir disso
+			 */
+			var o = function(n, t, b, f){
+				var _o = {};
+
 				if(checkObj(n) && checkConsts(t, b) && checkFunc(f)){
-					VUI.generators[n.name] = {
+					_o[n.name]= {
 							type: t,
-							audioArray: n.channels,
-							handler: f,
-							audioNode: null							// must call a function(audioNode, handler)
+							childs: {},
+							handler: f
 					};
 				}
 				else if(checkObj(n) && checkConsts(t, b) && !checkFunc(f)){
-					VUI.generators[n.name] = {
+					_o[n]= {
 							type: t,
-							audioArray: n.channels,
-							handler: function(node){return node},	// must call a function(audioNode, handler)
-							audioNode: null
-					};	
+							childs: {},
+							handler: function(audiohandler){}
+					};
 				}
 				else if(checkObj(n) && !checkConsts(t, b) && !checkFunc(f)){
-					VUI.generators[n.name] = {
-							type: 'NON_TYPE',
-							audioArray:n.channels,
-							handler: function(){return false},		// must call a function(audioNode, handler)
-							audioNode: null
-					};
+					_o[n]= {
+							type: VUI.Consts.INTERFACE,
+							childs: {},
+							handler: function(audiohandler){}
+					}
 				}
 				else if(!checkObj(n)){
 					console.log("Please give at least the object");
+					return null;
 				}
 
-
+				o[n].audioNode =  null;
+				return _o;
 			};
 
 			if(typeof n === 'string'){
-				adderS(n, t, false, f);
+				return s(n, t, false, f);
 			}
 			else if(typeof n === 'object'){
-				adderO(n, t, false, f);
+				return o(n, t, false, f);
 			}
 
 		};
 	};
 
+	//////////////////////////////////////////////
+	// VUI
+	//////////////////////////////////////////////
+
 	/*
 	 * Create a new VUI
 	 */
 	var VUI = new V();
+	VUI.generators = {};
 
 	/*
 	 * Initialize the webkitAudioContext
@@ -182,7 +230,7 @@
 	};
 
 	VUI.initUI = function(c, srcNode){
-		initAudio(c);
+		this.initAudio(c);
 		if(VUI.audioContext){
 			//For each existent UI, create a new audio node
 			$.each(VUI.generators, function(name, object){
@@ -238,7 +286,7 @@
 			var src = VUI.audioContext.createBufferSource();
 			src.buffer = VUIbuff.buffer;
 			src.connect(outNode);
-			source.noteOn(0);
+			src.noteOn(0);
 		}
 		else{
 			console.log('webkitAudioContext not initialized yet. Waiting for you...');
@@ -303,7 +351,10 @@
 
 
 
-	//Consts for some UI types
+	/**
+	 * Consts for some UI types
+	 * @see {V.checkConsts}
+	 */
 	VUI.Consts = {
 			INTERFACE: 'interface',
 			CONTROL: 'control',
@@ -316,16 +367,18 @@
 			CHANGER: 'changer',
 			MIXER: 'mixer',
 			IDENTIFIER: 'ident',
-			RESULT: 'result'
+			RESULT: 'result',
+			VOLUME: 'volume',
+			BANDPASS: 'bandpass',
+			FX: 'fx'
 	};
 
-	/*
-	 * create an new Vivace User Interface
-	 * 
-	 * @param n o nome da interface
-	 * @param t o tipo (controle, visual, etc...)
-	 * @see VUI.Consts para verificar os tipos
-	 * @param f a função geradora de áudio
+	//////////////////////////////////////////////
+	// VUIObj
+	//////////////////////////////////////////////
+
+	/**
+	 * Cria uma nova UI de áudio
 	 * 
 	 * <pre> 
 	 *  var controlType = VUI.Consts.CONSTANTE
@@ -333,14 +386,20 @@
 	 *  	//A função que gera o algoritmo de áudio;
 	 *  })
 	 * </pre>
+	 * 
+	 * @param n o nome da interface
+	 * @param t o tipo (controle, visual, etc...)
+	 * @see VUI.Consts para verificar os tipos
+	 * @param f a função geradora de áudio
 	 */
 
 	var VUIObj = function(n, t, f){
-		VUI.add(n, t, f);
 
-		var makeUIByString = function(ns, ts, f){
+		var makeUIByString = function(ns, ts, fs, g){
+			var o = VUI.make(ns, ts, fs);
+
 			if(ts === VUI.Consts.INTERFACE){	
-				this.element = VUInterface(ns)
+				this.element = VUInterface(ns);
 				return this.element;
 			}
 			else if(ts === VUI.Consts.CONTROL){
@@ -351,18 +410,22 @@
 				this.element = VUISliderV(ns,ts,f);
 				return this.element;
 			}
-		}
+		};
 
 		var makeUIByObj = function(n){
-			var o = VUI.generators[n.name];
+			var o = VUI.make(n.name);
+			o.generators = {};
+
 			var a = $.map(n.channels, function(e, i){
-				return makeUIByString(e, o.type, o.handler);
+				return makeUIByString(e, o.type, o.handler, o.generators);
 			});
 
 			var $a = VUIMixer(n.name);
 			$.each(a, function(i, e){
 				$a.append(e);
 			});
+
+			VUI.add(n, o);
 			return $a;
 
 		};
@@ -374,6 +437,10 @@
 			return makeUIByObj(n);
 		}
 	};	
+
+	VUI.add = function(o){
+		VUI.generators[obj.name] = obj;
+	};
 
 
 	var VUInterface = function(n){
@@ -394,7 +461,24 @@
 		return $control;
 	};
 
-	jQuery.fn.connect = function(){ 
+	/**
+	 * Conecta widgets jQuery (VUI) apenas visualvente
+	 * A ORDEM DOS ARGUMENTOS importa:
+	 * <pre>
+	 * //tree:
+	 * //$a:
+	 * // -$b:
+	 * //  -$c:
+	 * //   -$d
+	 * //$e:
+	 * // -$f:
+	 * //  -$g:
+	 * //   -$h
+	 * $a.connect($b, $c, $d);
+	 * $e.connect($f, $g, $h);
+	 * </pre>
+	 */
+	jQuery.fn.connectUI = function(){ 
 		var $this = $(this);
 		if(arguments !== undefined || arguments !== null){
 			$.each(arguments, function(i, e){
@@ -403,87 +487,139 @@
 		}
 	};
 
+	/*
+	 * Uma Widget generalizada; uma Widget é uma UI manipulável s(slider, knob, etc.)
+	 */
 	var VUIControlWidget = function(n, t, f){
 		this.name = n;
 		this.type = t;
 		this.func = f;
 
-		var ui = {
-				struct: {body: $('<div/>'), changer: $('<div/>')},
-				addClasses:function(){
-					$.each(this.struct, function(i, e){
-						if(i!=='result'){
-							e.addClass(VUI.Consts.INTERFACE)
-							.addClass(VUI.Consts.CONTROL);
-							if(this.type.contains('slider')){
-								e.addClass(VUI.Consts.SLIDER)
-								.addClass(VUI.Consts.VERTICAL);
-							}
-							if(this.type.contains('knob')){
-								e.addClass(VUI.Consts.KNOB);
-							}
-						}
-						if(i==='changer'){
-							e.addClass(VUI.Consts.CHANGER);
-						}
-					});
+		var widget = function(){
+			this.struct = {body: $('<div/>'), changer: $('<div/>')};
+			this.addClasses = function(){
+				$.each(this.struct, function(i, e){
+					e.addClass(VUI.Consts.INTERFACE).addClass(VUI.Consts.CONTROL);
+					if((/slider/).test(this.type)){
+						e.addClass(VUI.Consts.SLIDER).addClass(VUI.Consts.VERTICAL);
+					}
+					if((/knob/).test(this.type)){
+						e.addClass(VUI.Consts.KNOB);
+					}
+					if(i==='changer'){
+						e.addClass(VUI.Consts.CHANGER);
+					}
+				});
 
-				},
-				addAttrs: function(){
-					$.each(this.struct, function(i, e){
-						var id = '';
-						if(e.hasClass('slider')){
-							id = 'VUISliderV_'+this.name+'_';
-						}
-						else if(e.hasClass('knob')){
-							id = 'VUIKnob_'+this.name+'_';
-						}
+			};
+			this.addAttrs = function(){
+				$.each(this.struct, function(i, e){
+					var id = '';
+					if(e.hasClass('slider')){
+						id = 'VUISliderV_'+this.name+'_';
+					}
+					else if(e.hasClass('knob')){
+						id = 'VUIKnob_'+this.name+'_';
+					}
 
-						if(e.hasClass(VUI.Consts.CHANGER)){
-							id+=VUI.Consts.CHANGER;
-						}
-						else{
-							id+=this.type;
-						}
-						e.attr('id', id);
-					});	
-				},
+					if(e.hasClass(VUI.Consts.CHANGER)){
+						id+=VUI.Consts.CHANGER;
+					}
+					else{
+						id+=this.type;
+					}
+					e.attr('id', id);
+				});	
+			};
 
-				build: function(){
-					this.get$().append(this.struct.changer);
-				},
+			this.build = function(){
+				this.struct.body.append(this.struct.changer);
+			};
 
-				get$: function(){
-					return this.struct.body;
-				},
+			this.get$ = function(){
+				return this.struct.body;
+			};
 
-				addLetters: function(){
-					$('<p/>').html(this.name).appendTo(this.struct.body).addClass(VUI.Consts.IDENTIFIER);
-					var id1 = '#VUISliderV_'+this.name+'_'+VUI.Consts.CHANGER;
-					var id2 = 'VUISliderV_'+this.name+'_'+VUI.Consts.RESULT;
-					var r = $(id1).css('top');
-					//$('<p/>').html(r).appendTo(this.struct.body).attr('id', id2).addClass(VUI.Consts.RESULT);
-				},
+			this.addLetters = function(){
+				$('<p/>').html(this.name).appendTo(this.struct.body).addClass(VUI.Consts.IDENTIFIER);
+				var id1 = '#VUISliderV_'+this.name+'_'+VUI.Consts.CHANGER;
+				var id2 = 'VUISliderV_'+this.name+'_'+VUI.Consts.RESULT;
+				var r = $(id1).css('top');
+				//$('<p/>').html(r).appendTo(this.struct.body).attr('id', id2).addClass(VUI.Consts.RESULT);
+			};
+		}
 
+		if((/slider/).test(this.type)){
+			widget.upAndDown = function(draggerHandler){
+				widget.struct.changer.draggable({
+					axis:"y",
+					containment: "parent",
+					drag:draggerHandler
+				});
+			};
+		}
+		if((/knob/).test(this.type)){
+			widget.rotation = function(rotationHandler, widget){
+				//this.struct
+			};
+		}
 
-				upAndDown: function(draggerHandler){
-					this.struct.changer.draggable({
-						axis:"y",
-						containment: "parent",
-						drag:draggerHandler
-					});
-				},
+		return widget;
+	};
 
-				rotation: function(rotationHandler){
-					
-				}
+	///////////////////////////////////
+	// Widgets
+	///////////////////////////////////
+
+	var VUISliderV = function(n, t, f){
+
+		var widget = VUIControlWidget(n, t, f);
+
+		//Create a handler to do things like up and down the slider (changing volume, frequency, what'ever)
+		var handler = function(){
+			var y = $('#VUISliderV_'+w.name +'_'+VUI.Consts.CHANGER).css('top');
+			console.log('in:'+y);
+			y = this.normSlider(y,{offset: [3, 107], toBe: [0, 1]});
+			$('#VUISliderV_'+n+'_'+VUI.Consts.RESULT).html(y);
+			console.log('out: '+y);
 		};
 
-		return ui;
+		widget.addClasses();
+		widget.addAttrs(n, t);
+		widget.addLetters();
+		widget.rotation(handler);
+		widget.build();
+		return widget.get$();
 	};
-	
+
+	var VUIKnob = function(n, t, f){
+		var widget = VUIControlWidget(n, t, f);
+
+		//TODO Create a handler to do things like up and down the slider (changing volume, frequency, what'ever)
+		//Create a handler to do things like up and down the slider (changing volume, frequency, what'ever)
+		var handler = function(){
+			var $r = $('#VUISliderV_'+widget.name +'_'+VUI.Consts.CHANGER);
+			if($r.css('transform')){
+
+			}
+			if($r.css('-moz-transform')){
+
+			}
+			if($r.css('-webkit-transform')){
+
+			}	
+		};
+
+		widget.addClasses();
+		widget.addAttrs(n, t);
+		widget.addLetters();
+		widget.addRotate(handler);
+		widget.build();
+		return $sl.get$();
+	}
+
 	// Some func to get correct params in css
-	var normSlider = function(input, o){			
+	VUISliderV.normSlider = function(input, o){			
 		input = input.split("px")[0];
 
 		//to diminish decimal places
@@ -505,50 +641,15 @@
 			return input;
 		}
 	};
-	
-	var applyRotation = function($knob, deg){
+
+	VUIKnob.applyRotation = function($knob, deg){
 		$knob.css({
-	        '-webkit-transform': 'rotate('+deg+'deg)',
-	        '-moz-transform': 'rotate('+deg+'deg)',
-	        '-ms-transform': 'rotate('+deg+'deg)',
-	        '-o-transform': 'rotate('+deg+'deg)',
-	        'transform': 'rotate('+deg+'deg)'
-	    });
-
-	}
-
-	var VUISliderV = function(n, t, f){
-
-		var widget = VUIControlWidget(n, t, f);
-
-		//Create a handler to do things like up and down the slider (changing volume, frequency, what'ever)
-		var handler = function(){
-			var y = $('#VUISliderV_'+widget.name +'_'+VUI.Consts.CHANGER).css('top');
-			console.log('in:'+y);
-			y = normSlider(y,{offset: [3, 107], toBe: [0, 1]});
-			$('#VUISliderV_'+n+'_'+VUI.Consts.RESULT).html(y);
-			console.log('out: '+y);
-		};
-
-		widget.addClasses();
-		widget.addAttrs(n, t);
-		widget.addLetters();
-		widget.rotation(handler);
-		widget.update();
-		return widget.get$();
-	};
-
-	var VUIKnob = function(n, t, f){
-		var widget = VUIControlWidget(n, t, f);
-		
-		//Create a handler to do things like up and down the slider (changing volume, frequency, what'ever)
-		var handler = null
-		$sl.addClasses();
-		$sl.addAttrs(n, t);
-		$sl.addLetters();
-		$sl.addRotate();
-		$sl.update();
-		return $sl.get$();
+			'-webkit-transform': 'rotate('+deg+'deg)',
+			'-moz-transform': 'rotate('+deg+'deg)',
+			'-ms-transform': 'rotate('+deg+'deg)',
+			'-o-transform': 'rotate('+deg+'deg)',
+			'transform': 'rotate('+deg+'deg)'
+		});
 	}
 
 	var VUIMixer = function(n, t, f){
