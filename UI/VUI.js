@@ -3,7 +3,7 @@
 	//////////////////////////////////////////////
 	// V
 	//////////////////////////////////////////////
-
+	
 	/**
 	 * V é a função que cuida das operações mais básicas do Vivace UI
 	 * @see VUI
@@ -103,7 +103,6 @@
 
 		/**
 		 * Adicione uma função geradora de áudio ao VUI (ou $V);
-		 * é a única função que podemos chamar externamente
 		 * <ul>
 		 * uma função geradora é identificada pelo:
 		 * <li>nome (como por exemplo, 'mixer', 'equalizador', 'panner', etc)</li>
@@ -163,7 +162,7 @@
 				var _o = {};
 
 				if(checkObj(n) && checkConsts(t, b) && checkFunc(f)){
-					_o[n.name]= {
+					_o[n]= {
 							type: t,
 							childs: {},
 							handler: f
@@ -173,22 +172,22 @@
 					_o[n]= {
 							type: t,
 							childs: {},
-							handler: function(audiohandler){}
+							handler: function(audioNode){}
 					};
 				}
 				else if(checkObj(n) && !checkConsts(t, b) && !checkFunc(f)){
 					_o[n]= {
 							type: VUI.Consts.INTERFACE,
 							childs: {},
-							handler: function(audiohandler){}
-					}
+							handler: function(audioNode){}
+					};
 				}
 				else if(!checkObj(n)){
 					console.log("Please give at least the object");
 					return null;
 				}
 
-				o[n].audioNode =  null;
+				_o[n].audioNode =  null;
 				return _o;
 			};
 
@@ -210,7 +209,7 @@
 	 * Create a new VUI
 	 */
 	var VUI = new V();
-	VUI.generators = {};
+	VUI.interfaces = {};
 
 	/*
 	 * Initialize the webkitAudioContext
@@ -306,7 +305,7 @@
 		else{
 			console.log('webkitAudioContext not initialized yet. Waiting for you...');
 		}	
-	}
+	};
 
 	/*
 	 * Create an input<=>output audioNode
@@ -373,6 +372,66 @@
 			FX: 'fx'
 	};
 
+	VUI.addInterface = function(n){
+		VUI.interfaces[n] = {};
+	};
+	
+	VUI.getInterface = function(n){
+		if(VUI.interfaces.hasOwnProperty(n)){
+			return VUI.interfaces[n];
+		}
+		return false;
+	};
+	
+	VUI.deleteInterface = function(n){
+		if(VUI.interfaces.hasOwnProperty(n)){
+			delete VUI.interfaces[n];
+		}
+	};
+	
+	VUI.addControl2Interface = function(n, iName){
+		if(VUI.interfaces.hasOwnProperty(iName)){
+			VUI.interfaces[iName][n] = {};
+		}
+		else{
+			console.log('Control '+n+' not found in interface '+iName);
+		}
+	};
+	
+	VUI.getControl= function(n, iName){
+		if(VUI.interfaces[iName].hasOwnProperty(n)){
+			return VUI.interfaces[iName][n];
+		}
+		return false;
+	};
+	
+	VUI.deleteControl = function(n, iName){
+		if(VUI.interfaces[iName].hasOwnProperty(n)){
+			delete VUI.interfaces[iName][n];
+		}
+	};
+	
+	VUI.addWidget2Control = function(n, cName, iName){
+		if(VUI.interfaces[iName].hasOwnProperty(cName)){
+			VUI.interfaces[iName][cName][n] = {};
+		}
+		else{
+			console.log('Interface '+iName+' not found');
+		}
+	};
+	
+	VUI.getWidget= function(n, cName, iName){
+		if(VUI.interfaces[iName][cName].hasOwnProperty(n)){
+			return VUI.interfaces[iName][cName][n];
+		}
+		return false;
+	};
+	
+	VUI.deleteWidget = function(n, cName, iName){
+		if(VUI.interfaces[iName][cName].hasOwnProperty(n)){
+			delete VUI.interfaces[iName][cName][n];
+		}
+	};
 	//////////////////////////////////////////////
 	// VUIObj
 	//////////////////////////////////////////////
@@ -397,6 +456,7 @@
 
 		var makeUIByString = function(ns, ts, fs, g){
 			var o = VUI.make(ns, ts, fs);
+			
 
 			if(ts === VUI.Consts.INTERFACE){	
 				this.element = VUInterface(ns);
@@ -438,14 +498,13 @@
 		}
 	};	
 
-	VUI.add = function(o){
-		VUI.generators[obj.name] = obj;
-	};
+	
 
 
 	var VUInterface = function(n){
 		var $interface = $('<div/>').attr('id','VUInterface_'+n).addClass(VUI.Consts.INTERFACE);
 		$('<p/>').html('interface_'+n).appendTo($interface);
+		VUI.addInterface(n, {}, $interface);
 
 		return $interface;
 	};
@@ -543,11 +602,11 @@
 			this.addLetters = function(){
 				$('<p/>').html(this.name).appendTo(this.struct.body).addClass(VUI.Consts.IDENTIFIER);
 				var id1 = '#VUISliderV_'+this.name+'_'+VUI.Consts.CHANGER;
-				var id2 = 'VUISliderV_'+this.name+'_'+VUI.Consts.RESULT;
+				//var id2 = 'VUISliderV_'+this.name+'_'+VUI.Consts.RESULT;
 				var r = $(id1).css('top');
 				//$('<p/>').html(r).appendTo(this.struct.body).attr('id', id2).addClass(VUI.Consts.RESULT);
 			};
-		}
+		};
 
 		if((/slider/).test(this.type)){
 			widget.upAndDown = function(draggerHandler){
@@ -616,7 +675,7 @@
 		widget.addRotate(handler);
 		widget.build();
 		return $sl.get$();
-	}
+	};
 
 	// Some func to get correct params in css
 	VUISliderV.normSlider = function(input, o){			
@@ -650,7 +709,7 @@
 			'-o-transform': 'rotate('+deg+'deg)',
 			'transform': 'rotate('+deg+'deg)'
 		});
-	}
+	};
 
 	var VUIMixer = function(n, t, f){
 		return VUIControl(n);
