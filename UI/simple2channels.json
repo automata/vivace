@@ -1,0 +1,5 @@
+{
+        'name': 'basic_stereo',
+        'channels': ['l', 'r'], 
+        'audioFunction': 'stereo2channels'
+}

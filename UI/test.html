@@ -2,52 +2,68 @@
 	<head>
 		<title>Test VUI</title>
 		<link type="text/css" rel="stylesheet" href='VUI.css'></link>
-		<script src='http://code.jquery.com/jquery-1.8.2.min.js'></script>
-		<script src="http://ajax.googleapis.com/ajax/libs/jqueryui/1.8/jquery-ui.min.js"></script>
-		<script src='http://localhost:8080/VUI.js'></script>
-		<script type="text/javascript" id='subclass'></script>
+		<script type="text/javascript" src="//ajax.googleapis.com/ajax/libs/jquery/1.8.2/jquery.min.js"></script>
+		<script type="text/javascript" src="//ajax.googleapis.com/ajax/libs/jqueryui/1.9.0/jquery-ui.min.js"></script>
+		<script type="text/javascript" src="VUILoader.js"></script>
+		<style type="text/css">
+			#library{
+				boder-width: '1px';
+				border-style:'solid';
+				border-collapse: collapse;
+			}
+		</style>
 	</head>
 	<body>
+		<div id='instructions'>drag the machine! and drag up and down the sliders buttons; this is like a mix console, but in web!</div>
+		<div id='library'>
+			<table>
+				<thead>
+					<tr>
+						<th>The Loaded Librarys</th>
+					</tr>
+				</thead>
+				<tbody>
+				</tbody>
+			</table>
+		</div>
 		<div id='VUIcontainer'></div>
 		<script type="text/javascript">
+			var load = function(){
+				
 			//First create some UI, without audioContext
-			if($V === undefined){
-				$('#VUIcontainer').html('Error: VUI not load correctly');
-			}
-			else{
 				//$V(name, type, audioFunc)
-				var $c = $V('machine','control');
-				
-				
+				var $c = $V('machine', 'control');
+
 				var $m = $V({
-					name: 'mixer',
-					channels: ['l', 'r', 'ls', 'rs', 'c']
-				}, 'slider vertical', 
-					function(context){
+					name : 'mixer',
+					channels : [ 'l', 'r', 'ls', 'rs', 'c' ],
+				//TODO The last class wil be only for VUI, not css;
+				}, 'slider vertical volume', function(audioNode) {
 					return context
 				})
-				
+
 				var $m2 = $V({
-					name: 'eq',
-					channels: ['high', 'medium', 'bass']
-				}, 'slider vertical', 
-					function(context){
+					name : 'eq',
+					channels : [ '200Hz', '250Hz', '310Hz', '400Hz', '500Hz',
+							'630Hz', '800Hz', '1000Hz' ],
+				//TODO The last class wil be only for VUI, not css;
+				}, 'slider vertical bandpass', function(audioNode) {
 					return context
 				})
-				
+
 				var $r = $V({
-					name: 'reverb room',
-					channels: ['size', 'delaytime']
-				}, 'slider vertical', 
-					function(context){
+					name : 'reverb room',
+					audioArray : [ 'size', 'delaytime' ],
+				//TODO The last class wil be only for VUI, not css;
+				}, 'slider vertical fx', function(audioNode) {
 					return handler.result
 				})
-				
+
 				$c.connect($m, $m2, $r);
 				$('#VUIcontainer').append($c);
-			}
-			
+			};
+
 		</script>
-		<p id='instructions'>drag the machine! and drag up and down the sliders buttons; this is like a mix console, but in web!</p>
+		
 	</body>
 </html>

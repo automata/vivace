@@ -3,7 +3,7 @@
 	//////////////////////////////////////////////
 	// V
 	//////////////////////////////////////////////
-	
+
 	/**
 	 * V é a função que cuida das operações mais básicas do Vivace UI
 	 * @see VUI
@@ -346,9 +346,7 @@
 		else{
 			console.log('webkitAudioContext not initialized yet. Waiting for you...');
 		}
-	} ;
-
-
+	};
 
 	/**
 	 * Consts for some UI types
@@ -372,23 +370,6 @@
 			FX: 'fx'
 	};
 
-	VUI.addInterface = function(n){
-		VUI.interfaces[n] = {};
-	};
-	
-	VUI.getInterface = function(n){
-		if(VUI.interfaces.hasOwnProperty(n)){
-			return VUI.interfaces[n];
-		}
-		return false;
-	};
-	
-	VUI.deleteInterface = function(n){
-		if(VUI.interfaces.hasOwnProperty(n)){
-			delete VUI.interfaces[n];
-		}
-	};
-	
 	VUI.addControl2Interface = function(n, iName){
 		if(VUI.interfaces.hasOwnProperty(iName)){
 			VUI.interfaces[iName][n] = {};
@@ -397,20 +378,20 @@
 			console.log('Control '+n+' not found in interface '+iName);
 		}
 	};
-	
+
 	VUI.getControl= function(n, iName){
 		if(VUI.interfaces[iName].hasOwnProperty(n)){
 			return VUI.interfaces[iName][n];
 		}
 		return false;
 	};
-	
+
 	VUI.deleteControl = function(n, iName){
 		if(VUI.interfaces[iName].hasOwnProperty(n)){
 			delete VUI.interfaces[iName][n];
 		}
 	};
-	
+
 	VUI.addWidget2Control = function(n, cName, iName){
 		if(VUI.interfaces[iName].hasOwnProperty(cName)){
 			VUI.interfaces[iName][cName][n] = {};
@@ -419,14 +400,14 @@
 			console.log('Interface '+iName+' not found');
 		}
 	};
-	
+
 	VUI.getWidget= function(n, cName, iName){
 		if(VUI.interfaces[iName][cName].hasOwnProperty(n)){
 			return VUI.interfaces[iName][cName][n];
 		}
 		return false;
 	};
-	
+
 	VUI.deleteWidget = function(n, cName, iName){
 		if(VUI.interfaces[iName][cName].hasOwnProperty(n)){
 			delete VUI.interfaces[iName][cName][n];
@@ -456,8 +437,6 @@
 
 		var makeUIByString = function(ns, ts, fs, g){
 			var o = VUI.make(ns, ts, fs);
-			
-
 			if(ts === VUI.Consts.INTERFACE){	
 				this.element = VUInterface(ns);
 				return this.element;
@@ -491,15 +470,33 @@
 		};
 
 		if(typeof n === 'string'){
-			return makeUIByString(n, t, f);
-		}
-		else{
-			return makeUIByObj(n);
-		}
-	};	
+			var regexp = {
+					'mainmodules': [/interfaces/], 
+					'submodules': [/mixer/, /eq(?!aualizer)/,  /eq(?=aualizer)/, /pan/]
+			};
 
-	
+			var doIt = false;
+			$.each(regexp, function(k, v){
+				$.each(v, function(i, e){
+					if(e.test(n)){
+						if(k==='mainmodules'){
+							doIt = window.VUI.getInterfaces;
+						}
+						if(k==='submodules'){
+							doIt = makeUIByString;
+						}
+					}
+				});
+			});
 
+			if(doIt){
+				return doIt(n, t, f);
+			}
+			else{
+				return makeUIByObj(n);
+			}
+		};	
+	}
 
 	var VUInterface = function(n){
 		var $interface = $('<div/>').attr('id','VUInterface_'+n).addClass(VUI.Consts.INTERFACE);
@@ -626,9 +623,9 @@
 		return widget;
 	};
 
-	///////////////////////////////////
-	// Widgets
-	///////////////////////////////////
+///////////////////////////////////
+//	Widgets
+///////////////////////////////////
 
 	var VUISliderV = function(n, t, f){
 
@@ -677,7 +674,7 @@
 		return $sl.get$();
 	};
 
-	// Some func to get correct params in css
+	//Some func to get correct params in css
 	VUISliderV.normSlider = function(input, o){			
 		input = input.split("px")[0];
 
