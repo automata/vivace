@@ -209,7 +209,6 @@
 	 * Create a new VUI
 	 */
 	var VUI = new V();
-	VUI.interfaces = {};
 
 	/*
 	 * Initialize the webkitAudioContext

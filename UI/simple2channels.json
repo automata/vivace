@@ -1,5 +1,6 @@
 {
-        'name': 'basic_stereo',
-        'channels': ['l', 'r'], 
-        'audioFunction': 'stereo2channels'
+       "name": "basic_stereo",
+       "type": "mixer",
+   	   "UI": "slider vertical volume",
+       "channels": ["l", "r"]     
 }

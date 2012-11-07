@@ -33,25 +33,28 @@
 					url: e, 
 					type: 'GET',
 					dataType: 'script'
-				}).then(function(data){
+				}).error(function(){
+					console.log('error on get script '+e);
+				}).success(function(data){
 					add2body(makeScript(e));
 				}).then(function(){
-					var $tr = $('<tr/>').append($('<td/>').html(e));
-					var $td2 = $('<td/>').html('<source>').click(function(event){
-						// http://www.codebelt.com/jquery/open-new-browser-window-with-jquery-custom-size/
-						var url = $(this).attr("href");
-	                    var windowName = "popUp";//$(this).attr("name");
-	                    var windowSize = windowSizeArray[$(this).attr("rel")];
-	                    window.open(url, windowName, windowSize);
-	                    event.preventDefault();
-					});
-					$tr.append($td2);
-					$('#library tbody').append($tr);
+					//Get the url, and add a table to check library
+					var $a = $('<a/>').attr('href', e).html(e).click(goToRef);
+					$('#thLib').append($('<li/>').append($a));
 				});
 			});	
 		}).promise();
 
 	};
+	
+	var goToRef = function(event){
+		// http://www.codebelt.com/jquery/open-new-browser-window-with-jquery-custom-size/
+		var url = $(this).attr("href");
+        var windowName = "popUp";//$(this).attr("name");
+        var windowSize = windowSizeArray[$(this).attr("rel")];
+        window.open(url, windowName, windowSize);
+        event.preventDefault();
+	}
 
 	var loadModules = function(){
 		//carregue os modulos de audio
@@ -67,31 +70,34 @@
 
 			//Cheque e adicione modulos
 			$.each(m, function(i, e){
-				$.getJSON(e, function(data){
-					window.VUI.addJSONInterface(data.items);
-					console.log('appended audio module: '+window.VUI.audioModules[data.items.name]);
-				}).then(function(data){
-					var $tr = $('<tr/>');
-					var $td1 = $('<td/>').append($('<a/>').html(e).attr('href', e));
-					var $td2 = $('<td/>').html('<source>').click(function(event){
-						// http://www.codebelt.com/jquery/open-new-browser-window-with-jquery-custom-size/
-						var url = $(this).attr("href");
-	                    var windowName = "popUp";//$(this).attr("name");
-	                    var windowSize = windowSizeArray[$(this).attr("rel")];
-	                    window.open(url, windowName, windowSize);
-	                    event.preventDefault();
+				$.ajax({
+					url: e,
+					type: 'GET',
+					dataType: 'json',
+					data: {}
+				}).error(function(){
+					console.log('error on append json '+e);
+				}).success(function(data){
+					console.log(data);
+					//Get the url, and add a table to check library
+					window.VUI.interfaces[data.name] = {};
+					$.each(data, function(i, e){
+						if(i!=='name'){
+							window.VUI.interfaces[data.name][i] = e ;
+						}
 					});
 					
-					$tr.append($td1).append($td2);
-					$('#library tbody').append($tr);
+				}).then(function(){
+					var $a = $('<a/>').attr('href', e).html(e).click(goToRef);
+					$('#thMod').append($('<li/>').append($a));
 				});
 			});
 		}).promise();
 	};
 
 	$.when(loadScripts(), loadModules()).then(function(){
-		console.log('all scripts and modules loaded');
+		console.log('all VUI scripts and modules loaded');
 	});
 
-}('VUI.js', 'VUIapi.js', 'simple2channels.json'));
+}('VUI.js', 'VUIapi.js', 'simple2channels.json', 'LRLsRsC.json'));
 

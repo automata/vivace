@@ -6,25 +6,18 @@
 		<script type="text/javascript" src="//ajax.googleapis.com/ajax/libs/jqueryui/1.9.0/jquery-ui.min.js"></script>
 		<script type="text/javascript" src="VUILoader.js"></script>
 		<style type="text/css">
-			#library{
-				boder-width: '1px';
-				border-style:'solid';
-				border-collapse: collapse;
+			#library table{
+				boder: 'solid'
 			}
 		</style>
 	</head>
 	<body>
 		<div id='instructions'>drag the machine! and drag up and down the sliders buttons; this is like a mix console, but in web!</div>
+		
+		<!-- Se os m—dulos carregarem corretamente, adicione-os na lista -->
 		<div id='library'>
-			<table>
-				<thead>
-					<tr>
-						<th>The Loaded Librarys</th>
-					</tr>
-				</thead>
-				<tbody>
-				</tbody>
-			</table>
+			<ul id="thLib">The Loaded Libraries</ul>
+			<ul id="thMod">The Loaded Modules</ul>
 		</div>
 		<div id='VUIcontainer'></div>
 		<script type="text/javascript">
@@ -33,33 +26,30 @@
 			//First create some UI, without audioContext
 				//$V(name, type, audioFunc)
 				var $c = $V('machine', 'control');
-
-				var $m = $V({
-					name : 'mixer',
-					channels : [ 'l', 'r', 'ls', 'rs', 'c' ],
-				//TODO The last class wil be only for VUI, not css;
-				}, 'slider vertical volume', function(audioNode) {
-					return context
+			
+				//You can create your own control
+				var eq = {
+						name : 'eq',
+						type: 'slider vertical bandpass',
+						channels : [ '200Hz', '250Hz', '310Hz', '400Hz', '500Hz',
+								'630Hz', '800Hz', '1000Hz' ],
+					//TODO The last class wil be only for VUI, not css;
+				}	
+			
+				//or you can create by supplied json in UI folder by name
+				var lr = VUI.interfaces['basic_stereo']; //simple2channels.json
+				
+				//now call $V function, the 3rd argument is the audio function
+				//for each supplied channel
+				var $m = $V(eq, function(audioContext) {
+					return audioContext
 				})
 
-				var $m2 = $V({
-					name : 'eq',
-					channels : [ '200Hz', '250Hz', '310Hz', '400Hz', '500Hz',
-							'630Hz', '800Hz', '1000Hz' ],
-				//TODO The last class wil be only for VUI, not css;
-				}, 'slider vertical bandpass', function(audioNode) {
-					return context
+				var $m2 = $V(lr, , function(audioContext) {
+					return audioContext
 				})
 
-				var $r = $V({
-					name : 'reverb room',
-					audioArray : [ 'size', 'delaytime' ],
-				//TODO The last class wil be only for VUI, not css;
-				}, 'slider vertical fx', function(audioNode) {
-					return handler.result
-				})
-
-				$c.connect($m, $m2, $r);
+				$c.connect($m, $m2);
 				$('#VUIcontainer').append($c);
 			};
 
