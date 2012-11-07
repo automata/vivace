@@ -1,6 +1,7 @@
 {
        "name": "basic_stereo",
        "type": "mixer",
-   	   "UI": "slider vertical volume",
+       "typeControl": "gain",
+       "typeUI": "slider vertical",
        "channels": ["l", "r"]     
 }
