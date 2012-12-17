@@ -1,7 +1,0 @@
-{
-       "name": "basic_stereo",
-       "type": "mixer",
-       "typeControl": "gain",
-       "typeUI": "slider vertical",
-       "channels": ["l", "r"]     
-}

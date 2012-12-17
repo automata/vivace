@@ -28,7 +28,8 @@
 			 */
 			templates: function(array){
 				console.log('loading functions:');
-			
+				createTests(array);
+				
 				$.each(_Test.methods, function(k, o){
 					$.each(o, function(n, func){
 						console.log('\t'+k+'.'+n);
@@ -37,11 +38,17 @@
 				
 				$.each(_Test.results, function(k, o){
 					$.each(o, function(n, func){
-						console.log('\t'+k+'.'+n);
+						console.log('\t'+k);
 					});
 				});
+				
 			},
-					
+			
+			/**
+			 * A hand on 
+			 * @param currentProperty
+			 * @returns
+			 */
 			set: function(currentProperty){
 				_Test.current.property = currentProperty;
 				return _Test.current.property;
@@ -52,40 +59,41 @@
 	var createTests = function(array){
 		//O usu‡rrio passa uma array de templates
 		$.each(array, function(i, templ){
-
+			var currentP = null;
 			//se test: crie fun‹o que testa -> Usu‡rio final
 			//se id ou result: fun‹o que mostra o resultado em um tag HTML estruturado
 			//se list: booleano que lista as propriedades internas do objeto
-			$.each(templ, function(k, property){
-				_Test.results[property] = {};
+			$.each(templ, function(k, v){
+				
 				if(k === 'test'){
-					_Test.methods.testNotNull[property] = function(){ 
+					_Test.results[v] = {};
+					currentP = v;
+					
+					_Test.methods.testNotNull[v] = function(){ 
 						return _Test.objectUnderTest[_Test.current.property] !== null;
 					};
 
-					_Test.methods.testTypeof[property] = function(expected){
+					_Test.methods.testTypeof[v] = function(expected){
 						return typeof _Test.objectUnderTest[_Test.current.property] === expected;
 					};
 					
-					_Test.methods.assertThis[property] = function(expected){
+					_Test.methods.assertThis[v] = function(expected){
 						return  _Test.objectUnderTest[_Test.current.property] === expected;
 					};
 
 					//And put all in one test
-					_Test.methods.assert[property] = function(expected){
+					_Test.methods.assert[v] = function(expected){
 						return _Test.methods.testNull[current.property]() && _Test.methods.assertThis(expected);
 					};
 
 				}
-				if(k === 'id'){
-					_Test.results[property]['id'] = k;
+				else{
+					_Test.results[currentP][k] = v;
 				}
-				if(k === 'result'){
-					_Test.results[property]['ul'] = _Test.results[property]['id']+' > '+k;
-				}
+				
 			});
 		});
-	}
+	};
 
 	window.Test = {
 			
@@ -109,18 +117,20 @@
 				var method = arguments[0];
 				var property = _Test.set(arguments[1]);
 				var expected = arguments[2];
-
+				
 				switch(method){
 				case 'notNull': 
-					if(_Test.methods.testNotNull[property]()){
-						printOK(method, property);
+					var notNull = _Test.methods.testNotNull[property];
+					if(notNull()){
+						print(method, property, 'OK');
 					}
 					else{
-						printError(method, property, 'failed');
+						print(method, property, 'failed');
 					}
 					break;
 				case 'typeof': 
-					if(_Test.methods.testTypeof[property](expected)){
+					var testTypeof = _Test.methods.testNotNull[property];
+					if(testTypeof(expected)){
 						print(method, property, 'OK');
 					}
 					else{
@@ -128,36 +138,47 @@
 					}
 					break;
 				case 'assert': 
-					if(_Test.methods.assert[property](expected)){
+					var assert = _Test.methods.assert[property];
+					if(assert(expected)){
 						print(method, property, 'OK');
 					}
 					else{
 						print(method, property, 'failed')
 					}
 				}
-			},
-
-			print: function(method, property, msg){
-				//send ok message
-				$.each(objectUnderTest[property], function(k, v){
-					$(results[property]['ul']).append($('<li/>').html('test '+method+'=>'+property+': '+msg));
-				});
-				if(msg === 'OK'){
-					//make Green signal
-					$(results[property]['id']).append().css({
-						'border': '1px solid black',
-						'color': '#00FF00'
-					});
-				}
-				else if(msg === 'failed'){
-					//make red signal
-					$(result[property]['id']).css({
-						'border': '1px solid black',
-						'color': '#FF1010'
-					});
-				}
-				
-			}, 
+			} 
+	};
+	
+	/**
+	 * Print in webpage the given tests
+	 * @param method
+	 * @param property
+	 * @param msg
+	 */
+	var print =  function(method, property, msg){
+		//send ok message
+		var result = _Test.results[property];
+		var $ul = $(result.id+' > '+result.result);
+		
+		var m ='test '+method+'->'+property+': '+msg;
+		
+		$ul.append($('<li/>').html(m));
+	
+		if(msg === 'OK'){
+			//make Green signal
+			$ul.css({
+				'border': '1px solid black',
+				'color': '#00FF00'
+			});
+		}
+		else if(msg === 'failed'){
+			//make red signal
+			$ul.css({
+				'border': '1px solid black',
+				'color': '#FF1010'
+			});
+		}
+		
 	}
 
 }());

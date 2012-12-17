@@ -12,12 +12,14 @@
 <body>
 	<!-- Se os m—dulos carregarem corretamente, adicione-os na lista -->
 	<div id='tests'>
+		Testiing VUI
 		<div id="VUIcontext">
-			Testing audio:
 			<ul class="testlist"></ul>
 		</div>
-		<div id="VUIinterfaces">
-			Testing interfaces:
+		<div id="VUIinterface">
+			<ul class="testlist"></ul>
+		</div>
+		<div id="VUIConsts">
 			<ul class="testlist"></ul>
 		</div>
 	</div>
@@ -36,30 +38,17 @@
 		//Init test
 		Test.init(VUI);
 		Test.templates([
-		     {test: 'webkitaudiocontext', id: '#VUIcontext', result: 'ul.testlist'},
-		     {test: 'interfaces', id: '#VUIinterface', result: 'ul.testlist'},
+		     {test: 'webkitaudiocontext', id: '#VUIcontext', result: 'ul'},
+		     {test: 'interfaces', id: '#VUIinterface', result: 'ul'},
+		     {test: 'Consts', id: '#VUIConsts', result: 'ul'}
 		]);
 		
 		Test.test('notNull', 'webkitaudiocontext');
-		Test.test('notNull', 'audiocontext');
+		Test.test('typeof', 'webkitaudiocontext', 'AudioContext');
+		Test.test('notNull', 'interfaces');
 		Test.test('typeof', 'interfaces', 'object');
-		Test.test('assert', 'interfaces', {
-			'mixer': {
-
-				input: 'audio/test.mp3',
-				
-				output: [
-				      {name: "L",type: "gain",amp: 0},
-				      {name: "R", type: "gain",amp: 0}
-				     ],
-				     
-				filter: [
-				         {name: "low", freq: 200, q: 1}, 
-				         {name: "medium", type: "gain",freq: 800, q: 1},
-				 		 {name: "high", type: "gain", freq: 2000, q: 1}
-				 		]
-			}
-		});	
+		Test.test('notNull', 'Consts');
+		Test.test('typeof', 'Consts', 'object');
 	</script>
 </body>
 </html>

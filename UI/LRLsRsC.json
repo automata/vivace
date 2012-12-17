@@ -1,6 +1,0 @@
-{
-       "name": "surround_5.1",
-       "type": "mixer",
-   	   "UI": "slider vertical volume",
-       "channels": ["l", "r", "ls", "rs", "c", "lfe"]     
-}
