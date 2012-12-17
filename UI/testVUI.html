@@ -44,11 +44,17 @@
 		]);
 		
 		Test.test('notNull', 'webkitaudiocontext');
-		Test.test('typeof', 'webkitaudiocontext', 'AudioContext');
+		Test.test('typeof', 'webkitaudiocontext', 'number');
+	
 		Test.test('notNull', 'interfaces');
-		Test.test('typeof', 'interfaces', 'object');
+		Test.test('typeof', 'interfaces', 'numbers');
+		Test.test('hasOwnProperty', 'interfaces', 'mixer');
+		Test.test('hasOwnProperty', 'interfaces', 'chocolate');
+		
 		Test.test('notNull', 'Consts');
 		Test.test('typeof', 'Consts', 'object');
+		Test.test('hasOwnProperty', 'Consts', 'INTERFACE');
+		Test.test('hasOwnProperty', 'Consts', 'CONTROL');
 	</script>
 </body>
 </html>
