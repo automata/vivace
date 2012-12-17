@@ -1,0 +1,15 @@
+{
+	"src": "modules/slider.json",
+	"output": [
+		{
+			"name": "L",
+			"type": "gain",
+			"amp": 0
+		},
+		{
+			"name": "R",
+			"type": "gain",
+			"amp": 0
+		}
+	]
+}

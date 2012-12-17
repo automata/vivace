@@ -1,133 +1,67 @@
 (function(){
 
-	//////////////////////////////////////////////
-	// V
-	//////////////////////////////////////////////
-
 	/**
-	 * V é a função que cuida das operações mais básicas do Vivace UI
-	 * @see VUI
-	 * @see VUIObj
-	 * @returns {V}
+	 * Basic use
+	 * //TODO make the real use of modules
+	 * <code>
+	 * \/\/Init VUI webAudiokit AudioContext
+	 * VUI.init();
+	 * 
+	 * \/\/make interface with modules: a player, a simple stereo mixer and 3 band filter
+	 * var myModule = VUI.define({name: 'mixer'}, ['modules/mymodule1.json', 'modules/mymodule2.json']);
+	 * 
+	 * * \/\/load audio src, with loop or no loop
+	 * myModule.loadBuffer('audio/myURL', 'loop')
+	 *  
+	 * \/\/connect module to another audio node or load src
+	 * myModule.connect(node);
+
+	 * \/\/enable module
+	 * myModule.play();
+	 *
+	 * \/\/change values
+	 * myModule.set('gain', ['L'], 0.25) 	 			\/\/set the gain of channel L of myModule to 0.71 (3 dB);
+	 * myModule.set('gain', ['L', 'R'], 0.71) 			\/\/set the gain of both L and R of myModule to 0.71 (3 dB);
+	 * myModule.set('gain', ['L', 'R'], [1, 0.25])		\/\/set the gain of both L and R according values 
+	 * 
+	 * \/\/stop module
+	 * myModule.stop();
+	 * 
+	 * \/\/kill module
+	 * VUI.kill('mixer')
+	 * </code>
 	 */
-	V = function(){
-
-		this.init = function(){
-			initAudioContext();
-		};
-		
-		/**
-		 * Adicione uma função geradora de áudio ao VUI (ou $V);
-		 * <ul>
-		 * uma função geradora é identificada pelo:
-		 * <li>nome (como por exemplo, 'mixer', 'equalizador', 'panner', etc)</li>
-		 * <li>tipo (slider, knob, visualizador)</li>
-		 * <li>função de áudio (a função customizada de áudio)
-		 * </ul>
-		 * -
-		 * <pre>
-		 * 	VUI.add('name', 'type', function(){
-		 * 		//A função que gera o algoritmo de áudio;
-		 *  });
-		 * </pre>
-		 * 
-		 * @param n the name of object of type t
-		 * @param t the type of object of name n
-		 * @param f the audio function 
-		 */
-		this.initUI = function(name, f, jqEl){
-			setInterface(name, f, jqEl);
-		};
-	};
-
-	//////////////////////////////////////////////
-	// VUI
-	//////////////////////////////////////////////
+	var VUI = {};
 
 	/*
-	 * Create a new VUI
+	 * Initialize the webkitAudioContext
 	 */
-	var VUI = new V();
-
-	VUI.interfaces = {};
-
-	/**
-	 * Consts for some UI types
-	 * @see {V.checkConsts}
-	 */
-	VUI.Consts = {
-			//Group machines
-			INTERFACE: 'interface',
-			CONTROL: 'control',
-			MIXER: 'mixer',
-			EQ_31: 'eq_31_bands',
-			EQ_10: 'eq_10_bands',
-			EQ_3: 'eq_3_bands',
-			
-			//Widgets
-			SLIDER: 'slider',	
-			KNOB: 'knob',
-			VISU: 'visu',
-			
-			//Special identifier to widgets
-			CHANGER: 'changer',
-			
-			//Direction of UI css Graphics
-			HORIZONTAL: 'horizontal',
-			VERTICAL: 'vertical',
-			
-			IDENTIFIER: 'ident',
-			RESULT: 'result',
-			VOLUME: 'volume',
-			BANDPASS: 'bandpass',
-			FX: 'fx'
-	};
-	
-	/**
-	 * Set properly the object's audio nodes by interface name
-	 * @param name the key of interface in VUI.interfaces
-	 * @param func the function handler that will control the audio
-	 */
-	var setInterface = function(name, func, jqEl){
-		if(VUI.audioContext){
-			
-			var intfc = getInterface(name);
-			if(intfc){
-				var makeAudioNodes = function(){
-					return $.Defferred(function(){
-						intfc.audionodes = $.map(chnl, function(e, i){
-							return VUI.audioContext.createGainNode();
-						});
-						console.log('audionodes created');
-					}).promise();
-				};
-				
-				var makeNodeValueSetters = function(){
-					return $.Defferred(function(){
-						intfc.nodeValueSetters = $.map(VUI.interfaces[name].audionodes, function(e, i){
-							return function(v){
-								e.gain.value = v;
-							};	
-						});
-						console.log('setters created');
-					}).promise();
-				};
-				
-				var setJqueryInteface = function(){
-					return $.Deferred(function(){
-						intfc.jqElement = jqEl;
-					}).promisse();
-				}; 
-
-				$.when(makeAudioNodes(), makeNodeValueSetters(), setJqueryInteface()).sucess(function(){
-					console.log('interface '+name+' created ');
-					console.log(getInterface(name));
-				}).error(function(){
-					console.log('error on set interface '+name);
-				});
-			}
+	function initwebkitAudioContext(){
+		try {
+			VUI.webkitaudiocontext= new webkitAudioContext();
+			return true;
+		}
+		catch(e) {
+			alert('Web Audio API is not supported in this browser');
+			return false;
 		}
 	};
+
+
+	/**
+	 * @param handler function that will do some things after VUI initialize basic things
+	 * 
+	 */
+	VUI.init = function(){
+		if(initwebkitAudioContext()){
+			VUI.audiocontextInitialized = true;
+			VUI.interfaces = {};
+		}
+	};
+
+	VUI.make = function(intfc, modules){
+		make(intfc, modules);
+	};	
 
 	/**
 	 * Get all interfaces in VUI.interfaces
@@ -164,39 +98,112 @@
 		return false;
 	};
 
-	/*
-	 * Initialize the webkitAudioContext
-	 */
-	var initAudioContext = function(){
-		try {
-			VUI.audioContext = new webkitAudioContext();
+
+	//////////////////////////////////////////////
+	// VUI (AUDIO CONTEXT)
+	//////////////////////////////////////////////
+
+	VUI.Consts= {
+			//Group machines
+			INTERFACE: 'interface',
+			CONTROL: 'control',
+			MIXER: 'mixer',
+			EQ_31: 'eq_31_bands',
+			EQ_10: 'eq_10_bands',
+			EQ_3: 'eq_3_bands',
+
+			//Widgets
+			SLIDER: 'slider',	
+			KNOB: 'knob',
+			VISU: 'visu',
+
+			//Special identifier to widgets
+			CHANGER: 'changer',
+
+			//Direction of UI css Graphics
+			HORIZONTAL: 'horizontal',
+			VERTICAL: 'vertical',
+
+
+			IDENTIFIER: 'ident',
+			RESULT: 'result',
+			VOLUME: 'volume',
+			FILTER: 'filter',
+			FX: 'fx'
+	};
+
+	VUI.define = function(intfcHandler){
+		VUI.interfaces[intfcHandler.name] = {};
+		if(intfcHandler.hasOwnProperty('input')){
+			VUI.interfaces[intfcHandler.name]['input'] = intfcHandler.input; 
 		}
-		catch(e) {
-			var msg = 'Web Audio API is not supported in this browser; try in Chrome or Safari';
-			$('<p/>').html(msg).appendTo('body').css({
-				'background':'#700',
-				'border-radius': '2% 2% 2% 2%'
-			});
-			console.log(msg);
+		if(intfcHandler.hasOwnProperty('output')){
+			VUI.interfaces[intfcHandler.name]['output'] = parseVUIModule(intfcHandler.output); 
+		}
+		if(intfcHandler.hasOwnProperty('filter')){
+			VUI.interfaces[intfcHandler.name]['filter'] = parseVUIModule(intfcHandler.filter);
+		}
+
+	};
+
+	var widget = function(ui, uid){
+		var $div = $('<div/>').attr('id', uid);
+		var $result = $(ui.result);
+		var $control = $(ui.control).append($(ui.changer));
+		$div.append($control).append($result);
+		return $div;
+	};
+
+	VUI.getWidgetUID = function(intfcName){
+		return VUI.interfaces[intfcName].UI.uid;
+	}
+
+	var widgetObject = function(ui){
+		return {
+			uid: ui.name + randomString(8),
+			widget: widget(ui, uid),
 		}
 	};
 
-	VUI.loadSrcExample = function(url){
-		VUI.audioSourceExample = {
-				url: url,
-				buffer: null,
-				loaded: false,
-				meta:['example', 'VUI', 'webkitAudioAPI']
-		};
+	var parseVUIModule = function(src){
+		var module = {};
+		$.ajax({
+			url: src,
+			type: 'GET', 
+			async: false,
+			contentType: 'application/json',
+			dataType: 'json',
+			success: function(data){
+				//Definir os modulos de saida, filtragem e fx
+				if(data.output){
+					module['output'] = data.output;
+				}
+				if(data.filter){
+					module['filter'] = data.filter;
+				}
+			}
+		}).success(function(data){
+			if(module.output !== null){
+				module['UI'] = data.src;
+			}
+			if(module.filter !== null){
+				module['UI'] = data.src;
+			}
+			console.log(src+' loaded');
+		}).error(function(jqXHR, textStatus, errorThrown){
+			console.log(src+' not loaded: status '+textStatus);
+			console.log(errorThrown);	
+		});
 
-		VUI.loadSrc(url, VUI.audioSrcExample);
+		return module;
 	};
 
 	/*
 	 * @param url the url where audio file is stored
 	 * @param VUIbuff the object to store metadata
 	 */
-	VUI.loadSrc = function(url, VUIbuff){
+	VUI.loadBuffer = function(name, url){
+		var audio = VUI.interfaces[name]['audio'] = {};
 		if(VUI.audioContext){
 			var request = new XMLHttpRequest();
 			request.open('GET', url, true);
@@ -205,9 +212,11 @@
 			// Decode asynchronously
 			request.onload = function() {
 				VUI.audioContext.decodeAudioData(request.response, function(buffer) {
-					VUIbuff.url = url;
-					VUIbuff.buffer = buffer;
-					VUIbuff.loaded = true;
+					audio['url'] = url;
+					audio['src'] = VUI.audioContext.createBufferSource();
+					audio.src['buffer'] = buffer;
+					audio['gainNode'] = VUI.audioContext.createGainNode();
+					audio['loaded'] = true;
 				}, onError);
 			};
 
@@ -219,85 +228,34 @@
 		}	
 	};
 
-	VUI.playSrc = function(VUIbuff, outNode){
-		if(VUI.audioContext){
-			var src = VUI.audioContext.createBufferSource();
-			src.buffer = VUIbuff.buffer;
-			src.connect(outNode);
-			src.noteOn(0);
-		}
-		else{
-			console.log('webkitAudioContext not initialized yet. Waiting for you...');
-		}	
-	};
+	VUI.play = function(name){
+		var audio = VUI.interfaces[name]['audio'];
+		audio.src.connect(audio.gainNode);
+		audio.gainNode.connect(VUI.audioContext.destination)
+		src.noteOn(0);
+	}
 
 
-	/*
-	 * Create an input<=>output audioNode
-	 * @param n the VUI name to be the intermediate audio node
-	 * @param srcNode the audio node source
-	 * @param destNode the audio node source
-	 */
-	VUI.connectAudioNode = function(n, inNode, outNode){
-		if(VUI.audioContext){
-			//Catch the UI by name
-			var o = VUI.generators[n];
-			if(o.audioNode){
-				inNode.connect(o.audioNode);
-				o.audioNode.connect(outNode);
-			}
-			else{
-				console.log('audioNode not setted yet for '+o.name);	
-			}
+//	From http://stackoverflow.com/questions/6860853/generate-random-string-for-div-id
+	function randomString(length) {
+		var chars = '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghiklmnopqrstuvwxyz'.split('');
 
+		if (! length) {
+			length = Math.floor(Math.random() * chars.length);
 		}
-		else{
-			console.log('webkitAudioContext not initialized yet. Waiting for you...');
-		}
-	};
 
-	VUI.addControl2Interface = function(n, iName){
-		if(VUI.interfaces.hasOwnProperty(iName)){
-			VUI.interfaces[iName][n] = {};
+		var str = '';
+		for (var i = 0; i < length; i++) {
+			str += chars[Math.floor(Math.random() * chars.length)];
 		}
-		else{
-			console.log('Control '+n+' not found in interface '+iName);
-		}
-	};
+		return str;
+	}
 
-	VUI.getControl= function(n, iName){
-		if(VUI.interfaces[iName].hasOwnProperty(n)){
-			return VUI.interfaces[iName][n];
-		}
-		return false;
-	};
-
-	VUI.deleteControl = function(n, iName){
-		if(VUI.interfaces[iName].hasOwnProperty(n)){
-			delete VUI.interfaces[iName][n];
-		}
-	};
-
-	VUI.addWidget2Control = function(n, cName, iName){
-		if(VUI.interfaces[iName].hasOwnProperty(cName)){
-			VUI.interfaces[iName][cName][n] = {};
-		}
-		else{
-			console.log('Interface '+iName+' not found');
-		}
-	};
-
-	VUI.getWidget= function(n, cName, iName){
-		if(VUI.interfaces[iName][cName].hasOwnProperty(n)){
-			return VUI.interfaces[iName][cName][n];
-		}
-		return false;
-	};
-
-	VUI.deleteWidget = function(n, cName, iName){
-		if(VUI.interfaces[iName][cName].hasOwnProperty(n)){
-			delete VUI.interfaces[iName][cName][n];
-		}
+//	Array Remove - By John Resig (MIT Licensed)
+	Array.prototype.remove = function(from, to) {
+		var rest = this.slice((to || from) + 1 || this.length);
+		this.length = from < 0 ? this.length + from : from;
+		return this.push.apply(this, rest);
 	};
 
 	window.VUI = VUI;

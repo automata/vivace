@@ -1,0 +1,9 @@
+{
+	"src": "modules/knob.json", 
+	
+	"filter":[
+		{"name": "low","freq": 200,"q": 1}, 
+		{"name": "medium","type": "gain","freq": 800,"q": 1},
+		{"name": "high","type": "gain","freq": 2000,"q": 1}
+	]
+}

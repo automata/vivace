@@ -24,30 +24,40 @@
 		<ul id="thMod">The Loaded Modules
 		</ul>
 	</div>
-	<div id='VUIcontainer'></div>
 	<script type="text/javascript">
-		$(document).ready(function(){
-			//First init audio context;
-			$V('init');
-			
-			//create some interfaces, one inside another
-			//main
+		$.when($V('init')).then(function() {
+			//create some interfaces, one inside anothers
 			var $control = $V('interface');
-			
+
 			//you can create by supplied json in UI folder by name
 			var lr = VUI.interfaces['basic_stereo']; //simple2channels.json
-				
+			
+			//or you can create on fly 
+			var eq = {
+			   name: 'basic_stereo',
+		       type: 'eq',
+ 		       typeControl: 'gain',
+		       typeUI: 'slider vertical',
+		       channels: ["500Hz", "800Hz", "1kHz", "5kHz"]     
+			};
+			
 			//now call $V function, the 3rd argument is the audio function
 			//for each supplied channel
 			var $m = $V(lr, function(audioContext) {
 				return audioContext
 			})
+			
+			var $eq = $V(eq, function(audioContext) {
+				return audioContext
+			})
 
-			//Connect them
-			$control.connect($control, $m);
-			$('#VUIcontainer').append($c);
+			//Connect them to main; you can put a lot of them 
+			$control.connectUI($m, $eq);
+			$control.show();
+		})
+		.fail(function(){
+			console.log('ERROR VUI');
 		});
 	</script>
-
 </body>
 </html>

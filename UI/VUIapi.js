@@ -1,62 +1,88 @@
 (function(){
 
 	//////////////////////////////////////////////
-	// VUIObj
+	// VUIObj (USER AND GUI CONTEXT)
 	//////////////////////////////////////////////
 
 	/**
-	 * Cria uma simples UI de ‡udio
+	 * VUIObj
+	 * 
+	 * //TODO Basic usage:
+	 * 
+	 * Using VUIObj is another way of use of V variable:
+	 * 
+	 * You can call VUIObj or in your scripts $V:
+	 * <code>
+	 * 	\/\/ Same as VUI.init();
+	 * 	$V('init')
+	 * 
+	 *  \/\/ Same as VUI.make(obj, array) followed by connect and play
+	 *  var node = //MyAudiowebkitNODE
+	 *  $V({name: 'mixer'}, ['myModule.json', 'myModule2.json']).connect(node);
+	 *  
+	 *  \/\/load src
+	 *  \/\/var url = 'audio/example.mp3'
+	 *  \/\/$V({name: 'mixer'}, ['myModule.json', 'myModule2.json']).load(url);
+	 *  
+	 *  \/\/ Play node
+	 *  $V('mixer').play();
+	 * 
+	 * 	\/\/ Show GUI
+	 *  $V('mixer').show('GUI', true);
+	 *  
+	 *  \/\/ Close GUI
+	 *  $V('mixer').show('GUI', false);
+	 *  
+	 *  \/\/ Stop node
+	 *  $V('mixer').stop();
+	 *
+	 * </code>
 	 */
-	var VUIObj = function(n){
-		if(n === 'init'){
-			VUI.init();
+	//Forneca dados e crie uma UI mais complexa
+	var VUIObj = function(){
+		
+		//Quando passar um simples argumento string, crie um simples VUIObj
+		if(typeof arguments[0] === 'string' && arguments[1] === undefined){
+			if(arguments[0] === 'init'){
+				return VUI.init();
+			}
 		}
-		if(n === VUI.Consts.Control){
-			return VUInterface(n);
+		else if (typeof arguments[0] === 'object' && typeof arguments[1] === 'Array'){
+			if(arguments[0].hasOwnProperty('name')){
+				VUI.in
+				$.each(arguments[1], function(k, v){
+					
+				});
+			}
 		}
-		if(n === VUI.Consts.Slider){
-			return VUIControlWidget(n, 'slider vertical');
+		else if(typeof arguments[0] === 'string' && typeof arguments[1] === 'function'){
+			
+			var n = arguments[0];
+			var f = arguments[1];
+			var ui = null;
+			
+			if(n === VUI.Consts.Control){
+				ui = VUInterface(n);
+			}
+			if(n === VUI.Consts.Slider){
+				ui = VUIControlWidget(n, 'slider vertical');
+			}
+			if(n === VUI.Consts.Knob){
+				ui = VUIControlWidget(n, 'knob');
+			}
+			return VUI.initUI(n, f, ui);
 		}
-		if(n === VUI.Consts.Knob){
-			return VUIControlWidget(n, 'knob');
+		else if(typeof arguments[0] === 'object' && typeof arguments[1] === 'function'){
+			VUI.createInterface(arguments[0]);
+			var n = arguments[0].name;
+			var f = arguments[1];
+			return VUIObj(n, f);
 		}
 	};
 	
-	//Forneca dados e crie uma UI mais complexa
-	var VUIObj = function(o, f){
-		var name = function(){
-			var n = '';
-			$.each(VUI.interfaces,function(i, e){
-				if(e === o){
-					n = i;
-				}
-			});
-			return n;
-		};
-		
-		var type = function(){
-			return o.type();
-		};
-		
-		var _obj = null;
-		
-		//check for all available controls (VUI.Consts)
-		$.each(VUI.Consts, function(i, e){
-			//Que coisa esquisita
-			if(type() === e && e === 'mixer'){
-				_obj = new VUIMixer(name());
-			}
-			if(type() === e && e === 'eq_31_bands' || e === 'eq_10_bands' || e === 'eq_3_bands'){
-				_obj = new VUIEq(name());
-			}
-		});
-		return _obj;
-	}
-
 	var VUInterface = function(n){
 		var $interface = $('<div/>').attr('id','VUInterface_'+n).addClass(VUI.Consts.INTERFACE);
 		$('<p/>').html('interface_'+n).appendTo($interface);
-		VUI.initUI(n);
 		return $interface;
 	};
 	
@@ -79,7 +105,11 @@
 		});
 		
 		return $mix;
-	};
+	}
+	
+	var VUIEq = function(n){
+		//TODO
+	}
 
 	/**
 	 * Conecta widgets jQuery (VUI) apenas visualvente
@@ -271,5 +301,12 @@
 		});
 	};
 
-	window.$V = VUIObj;
+	VUIObj.load = function(){
+		var dfd = $.Deferred();
+		window.$V = VUIObj;
+		dfd.resolve({
+			sucess:true,
+		});
+		return dfd.promisse();
+	};
 }());

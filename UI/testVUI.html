@@ -1,0 +1,65 @@
+<html>
+<head>
+<title>Test VUI</title>
+<link type="text/css" rel="stylesheet" href='VUI.css'></link>
+<script type="text/javascript"
+	src="//ajax.googleapis.com/ajax/libs/jquery/1.8.2/jquery.min.js"></script>
+<script type="text/javascript" src="VUI.js"></script>
+
+<!-- Some VUI testCode -->
+<script type="text/javascript" src="VUItest.js"></script>
+</head>
+<body>
+	<!-- Se os m—dulos carregarem corretamente, adicione-os na lista -->
+	<div id='tests'>
+		<div id="VUIcontext">
+			Testing audio:
+			<ul class="testlist"></ul>
+		</div>
+		<div id="VUIinterfaces">
+			Testing interfaces:
+			<ul class="testlist"></ul>
+		</div>
+	</div>
+	<script type="text/javascript">
+		//Init VUI webAudiokit AudioContext
+		VUI.init();
+		
+		//make interface with modules: a player, a simple stereo mixer and 3 band filter
+		VUI.define({
+			name: 'mixer',
+			input: 'audio/test.mp3',
+			output: 'modules/stereo_2_channels.json',
+			filter: 'modules/eq_3_bands.json'
+		});
+		
+		//Init test
+		Test.init(VUI);
+		Test.templates([
+		     {test: 'webkitaudiocontext', id: '#VUIcontext', result: 'ul.testlist'},
+		     {test: 'interfaces', id: '#VUIinterface', result: 'ul.testlist'},
+		]);
+		
+		Test.test('notNull', 'webkitaudiocontext');
+		Test.test('notNull', 'audiocontext');
+		Test.test('typeof', 'interfaces', 'object');
+		Test.test('assert', 'interfaces', {
+			'mixer': {
+
+				input: 'audio/test.mp3',
+				
+				output: [
+				      {name: "L",type: "gain",amp: 0},
+				      {name: "R", type: "gain",amp: 0}
+				     ],
+				     
+				filter: [
+				         {name: "low", freq: 200, q: 1}, 
+				         {name: "medium", type: "gain",freq: 800, q: 1},
+				 		 {name: "high", type: "gain", freq: 2000, q: 1}
+				 		]
+			}
+		});	
+	</script>
+</body>
+</html>
