@@ -208,6 +208,27 @@ function init () {
 			loadVideoFile(files[file].name);
 		}
 	}
+
+	setupVivaceMenu('div#banner', {
+		team:[
+		      {name: 'aut0mata', href:'https://github.com/automata'},
+		      {name: 'gabiThume', href: 'https://github.com/GabiThume'},
+		      {name: 'jahpd', href: 'https://github.com/jahpd'}, 
+		      {name: 'hybrid', href: 'http://github.com/'}
+		      ],
+		      about:[
+		             {name: 'src', href: 'https://github.com/automata/vivace'}
+		             ],
+		             help:[
+		                   {name: 'using vivace'},
+		                   {name: 'enabled variables'}
+		                   ],
+		                   ui:[
+		                       {name: 'using vivace ui for mixing'}
+		                       ]
+	})
+
+	setupVivaceEasyMix(files);
 }
 
 var lastVoices = null;
@@ -321,93 +342,75 @@ document.onkeydown=function(e){
 	}
 };
 
-function setupVivaceBanner(c, t, p){
-	var $banner = $('#banner').html('vivace');
-	var $menu = $('#menu').hide();
-	var $team = $('#team').html('team').addClass('ban');
-	var $help = $('#helper').html('help').addClass('ban');
-	var $contribute = $('#contribute').html('contribute').addClass('ban');
-	//menu
-	$banner.click(function(){
-		var menuVisible = $('#menu').is(':visible');
+function setupVivaceMenu(css, o){
+
+	var c = function(){
+		var menuVisible = $(this).children().is(':visible');
 		if(!menuVisible){
-			$menu.show('200');
-		}
-		else{
-			$menu.hide('200');
-		}
-	});
-
-
-	//team
-	$.each(c, function(i, e){
-		var $li = $('<li/>').addClass('ban').hide();
-		var $a = $('<a/>').html(i).attr('id', 'coder_'+i).attr('href', e).addClass('ban');
-		$a.appendTo($li);
-		$li.appendTo($team);
-	});
-	
-	$team.click(function(){
-		var teamVisible = $('#team').children().is(':visible');
-		if(!teamVisible){
-			$('#team').children().show('200');
-		}
-		else{
-			$('#team').children().hide('200');
-		}
-	})
-
-	//help
-	$.each(t, function(i, e){
-		$('<li/>')
-		.html(e.name)
-		.addClass('ban')
-		.appendTo($help)
-		.hide();
-	});
-
-	$help.click(function(){
-		var topicsVisible = $(this).children().is(':visible');
-		if(!topicsVisible){
 			$(this).children().show('200');
 		}
 		else{
 			$(this).children().hide('200');
 		}
-	});
-	
-	//contribute
-	$.each(p, function(i, e){
-		$('<li/>')
-		.html(e.name)
-		.addClass('ban')
-		.appendTo($contribute)
-		.hide();
-	});
+	};
 
-	$contribute.click(function(){
-		var topicsVisible = $(this).children().is(':visible');
-		if(!topicsVisible){
-			$(this).children().show('200');
-		}
-		else{
-			$(this).children().hide('200');
-		}
-	});
+	$vivacemenu = $(css).click(c).addClass('ban');
+
+	$.each(o, function(k, v){
+		var $div = $('<ul/>').html(k).addClass('ban').click(c);
+
+		$.each(v, function(i, e){
+			var href = e['href'] || '#'
+			var $a = $('<a/>').html(e['name']).attr('href', href)
+			$('<li/>').append($a).appendTo($div);
+		})
+		$div.appendTo($vivacemenu).hide();
+	});    
 };
 
-function startBanner(){
-	setupVivaceBanner({
-		aut0mata: 'https://github.com/automata',
-		gabiThume: 'https://github.com/GabiThume',
-		jahpd: 'https://github.com/jahpd'
-	},[
-       {name: 'using vivace'},
-       {name: 'enabled variables'}
-    ],[
-    	{name: 'pull code', topic: 'fork one of the projects in github.com/xxx/vivace'},
-    	{name: 'test code', topic: 'fork one of the projects in github.com/xxx/vivace'},
-    	{name: 'submit currencies', topic: {bitcoin: 'nono', paypal:'nono'}}
-	]);
-}
+var FizzyText = function() {
+	this.L = 0.71;
+	this.R = 0.71;
+	this.high = 0.5;
+	this.medium = 0.5;
+	this.low= 0.5;
+	// Define render logic ...
+};
 
+function setupVivaceEasyMix(files){
+	var FizzyText = function() {
+		this.l = 0.8;
+		this.r= 0.8;
+		this.eq=false;
+		this.high=0.8;
+		this.medium=0.8;
+		this.low=0.8;
+		this.reverb = false;
+		this.reverbTime=0.8;
+		// Define render logic ...
+	};
+
+	var fizzy = new FizzyText();
+	var gui = new dat.GUI();
+
+	$.each(files, function(i, file){
+		var v = gui.addFolder(file.name);
+		var l = v.add(fizzy, 'l', 0, 1).listen();
+		var r = v.add(fizzy, 'r', 0, 1).listen();
+		v.add(fizzy, 'eq');
+		v.add(fizzy, 'high', 0, 1);
+		v.add(fizzy, 'medium', 0, 1);
+		v.add(fizzy, 'low', 0, 1);
+		v.add(fizzy, 'reverb');
+		v.add(fizzy, 'reverbTime', 0.1, 3);
+		
+		l.onChange(function(value){
+			console.log(value);
+		});
+		r.onChange(function(value){
+			console.log(value);
+		});
+		
+	});
+
+}

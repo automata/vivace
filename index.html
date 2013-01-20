@@ -3,8 +3,10 @@
 <title>vivace</title>
 <script src="http://code.jquery.com/jquery-1.8.2.min.js"></script>
 <script src="popcorn.min.js"></script>
+<script src="dat.gui.min.js"></script>
 <script src="vivace.js"></script>
 <script src="vivace_exec.js"></script>
+
 
 <script src="/channel/bcsocket.js"></script>
 <script src="/share/share.js"></script>
@@ -35,6 +37,23 @@ body {
 	color: #AAA;
 }
 
+.ban ul{
+	list-style-type: none;
+	padding-right: 5%;
+}
+
+.ban ul:hover{
+	color: #AAA;
+}
+
+.ban ul li{
+	padding-right: 5%;
+}
+
+.ban ul li a{
+	color: transparent;
+	text-shadow: #555 0px 0px 2px;
+}
 #code {
 	width: 100%;
 	height: 100%;
@@ -124,20 +143,9 @@ c.pos = {1/4}
 
 // more info at http://automata.github.com/vivace
    </textarea>
-  	<div id='menu'>
-		<ul id='team'></ul>
-		<ul id="helper"></ul>
-		<ul id="contribute"></ul>
-	</div>
-	<div id="banner" class="ban"></div>
-	
-	
-		
-	</div>
-	
-	<!-- <div id="banner" onclick="run();">vivace</div> -->
+  	
+	<div id="banner" onclick="run();">vivace</div>
 	<script type="text/javascript">init();</script>
-	<script type="text/javascript">startBanner();</script>
 	
 	<script> 
      var elem = document.getElementById('code');
