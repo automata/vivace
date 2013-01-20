@@ -1,7 +1,0 @@
-{
-	"name": "slider"
-	"result": "<p class=\"result\"\/>"
-	"control": "<div class=\"interface control slider vertical\"\/>"
-	"changer": "<div class=\"interface control slider vertical changer\"\/>
-	"range": [0, 1]	
-}
