@@ -8,6 +8,7 @@ var voices = {};
 
 // our audio context
 var context = new webkitAudioContext();
+context.listener.setPosition(0, 0, 0);
 
 function exec (input) {
   var tree = vivace.parse(input);
@@ -26,6 +27,7 @@ function exec (input) {
       if (definitions[i].is.type === 'chains') {
         // for now, just dealing with audio('id') and video('id')
         if (definitions[i].is.val[0].name.val === 'audio') {
+          
           voices[voiceName].sig = definitions[i].is.val[0].parameters[0].val;
           voices[voiceName].sigType = 'audio';
         } else if (definitions[i].is.val[0].name.val === 'video') {
@@ -67,6 +69,40 @@ function exec (input) {
         }
         voices[voiceName].dur = dur.reverse();
       }
+
+    // gain
+    } else if (definitions[i].attr.val === 'gain') {
+      // [ ]
+      if (definitions[i].is.type === 'values') {
+        var gain = [];
+        for (var j=0; j<definitions[i].is.val.length; j=j+1) {
+          gain.push(definitions[i].is.val[j].val);
+        }
+        voices[voiceName].gain = gain.reverse();
+      }
+    // pan
+    } else if (definitions[i].attr.val === 'pan') {
+      // [ ]
+      if (definitions[i].is.type === 'values') {
+        var pan = [];
+        for (var j=0; j<definitions[i].is.val.length; j=j+1) {
+          pan.push(definitions[i].is.val[j].val);
+        }
+        voices[voiceName].pan = pan.reverse();
+      }
+    // pitch
+    } else if (definitions[i].attr.val === 'pitch') {
+      // [ ]
+      if (definitions[i].is.type === 'values') {
+        var pit = [];
+        for (var j=0; j<definitions[i].is.val.length; j=j+1) {
+          pit.push(definitions[i].is.val[j].val);
+        }
+        voices[voiceName].pitch = pit.reverse();
+      }
+
+
+
     // gdur
     } else if (definitions[i].attr.val === 'gdur') {
       // [ ]
@@ -119,25 +155,37 @@ function loadVideoFile(voiceName) {
   voices[voiceName].sigPop.preload('auto');
 }
 
-function playVoice(voiceName, when, offset, duration) {
+function playVoice(voiceName, when, offset, duration, 
+                   gainValue, frequencyBiquad, panCoords, pitch
+                  ) {
   var source = context.createBufferSource();
   source.buffer = voices[voiceName].buffer;
+  source.playbackRate.value = pitch;
 
-  source.connect(context.destination);
+  var compressor = context.createDynamicsCompressor();
+  var reverb = context.createConvolver();
 
-  // // TODO: here we will use the voices[voiceName].sig dsp graph!!!
-  // var gain = context.createGainNode();
-  // source.connect(gain);
+  // gain
+  var gain = context.createGainNode();
+  gain.gain.value = gainValue;
 
-  // var filter = context.createBiquadFilter();
-  // gain.connect(filter);
+  // biquad
+  var filter = context.createBiquadFilter();
+  filter.type = 0;
+  filter.frequency.value = 480;
 
-  // filter.connect(context.destination);
-  // gain.gain.value = 0.2;
-  // filter.type = 0;
-  // filter.frequency.value = 880;
+  // panner
+  var panner = context.createPanner();
+  panner.setPosition(panCoords[0], panCoords[1], panCoords[2]);
 
-  //source.noteOn(when || context.currentTime);
+  // node connections
+  source.connect(compressor);
+  //source.connect(reverb);
+  compressor.connect(filter);
+  filter.connect(panner);
+  panner.connect(gain);
+  gain.connect(context.destination);
+
   source.noteGrainOn(when || context.currentTime, // at specified time or now
                      offset || 0, // starting at offset or from start
                      duration || source.buffer.duration); // during duration or the whole buffer
@@ -157,12 +205,19 @@ function tick () {
         playVoice(voiceName, // voiceName
                   context.currentTime, // when
                   voices[voiceName].pos[voices[voiceName].posId % voices[voiceName].pos.length], // offset
-                  voices[voiceName].gdur[voices[voiceName].gdurId % voices[voiceName].gdur.length] // grain duration
+                  voices[voiceName].gdur[voices[voiceName].gdurId % voices[voiceName].gdur.length], // grain duration
+                  voices[voiceName].gain[voices[voiceName].gainId % voices[voiceName].gain.length], // gain value
+                  0, // biquad filter frequency
+                  [voices[voiceName].pan[voices[voiceName].panId % voices[voiceName].pan.length], 0, 0], // pan coords
+                  voices[voiceName].pitch[voices[voiceName].pitchId % voices[voiceName].pitch.length] // pitch
                  );
         // update event
         voices[voiceName].durId += 1;
         voices[voiceName].posId += 1;
         voices[voiceName].gdurId += 1;
+        voices[voiceName].gainId += 1;
+        voices[voiceName].panId += 1;
+        voices[voiceName].pitchId += 1;
 
         events[event].nextBeat = (voices[voiceName].dur[voices[voiceName].durId % voices[voiceName].dur.length] * semiBreve) + beats;
       } else if (voices[voiceName].sigType === 'video') {
@@ -252,13 +307,28 @@ function run () {
       if (currentVoices[voiceName].gdur != lastVoices[voiceName].gdur) {
         voices[voiceName].gdur = currentVoices[voiceName].gdur;
       }      
-console.log(voices[voiceName].dur);
+      // let's update gain values
+      if (currentVoices[voiceName].gain != lastVoices[voiceName].gain) {
+        voices[voiceName].gain = currentVoices[voiceName].gain;
+      }      
+      // let's update pan values
+      if (currentVoices[voiceName].pan != lastVoices[voiceName].pan) {
+        voices[voiceName].pan = currentVoices[voiceName].pan;
+      }      
+      // let's update pitch values
+      if (currentVoices[voiceName].pitch != lastVoices[voiceName].pitch) {
+        voices[voiceName].pitch = currentVoices[voiceName].pitch;
+      }      
+
       if (!voices[voiceName].durId && (voices[voiceName].dur!=undefined)) {
         // for every updated voice, put that on event queue
         events.push({'voiceName': voiceName, 'nextBeat': (voices[voiceName].dur[0] * semiBreve) + beats});
         voices[voiceName].durId = 0;
         voices[voiceName].posId = 0;
         voices[voiceName].gdurId = 0;
+        voices[voiceName].gainId = 0;
+        voices[voiceName].panId = 0;
+        voices[voiceName].pitchId = 0;
       }
 
     } else {
@@ -272,6 +342,16 @@ console.log(voices[voiceName].dur);
       if (!currentVoices[voiceName].dur) {
         voices[voiceName].gdur = currentVoices[voiceName].gdur;
       }
+      if (!currentVoices[voiceName].gain) {
+        voices[voiceName].gain = currentVoices[voiceName].gain;
+      }
+      if (!currentVoices[voiceName].pan) {
+        voices[voiceName].pan = currentVoices[voiceName].pan;
+      }
+      if (!currentVoices[voiceName].pitch) {
+        voices[voiceName].pitch = currentVoices[voiceName].pitch;
+      }
+
 
       if (voices[voiceName].dur) {
         // for every updated voice, put that on event queue
@@ -279,6 +359,9 @@ console.log(voices[voiceName].dur);
         voices[voiceName].durId = 0;
         voices[voiceName].posId = 0;
         voices[voiceName].gdurId = 0;
+        voices[voiceName].gainId = 0;
+        voices[voiceName].panId = 0;
+        voices[voiceName].pitchId = 0;
       }
     }
   }
@@ -287,7 +370,8 @@ console.log(voices[voiceName].dur);
   lastVoices = voices;
 }
 
-// key events: CTRL + x
+// key events: CTRL + . (run)
+//             CTRL + / (comment selected region)
 
 var isCtrl = false;
 document.onkeyup=function(e){
@@ -295,9 +379,58 @@ document.onkeyup=function(e){
 }
 document.onkeydown=function(e){
 	if(e.which == 17) isCtrl=true;
-	if(e.which == 88 && isCtrl == true) {
+        // 88 => x
+        // 190 => . (run)
+	if(e.which == 190 && isCtrl == true) {
 	  run();
 		return false;
 	}
+        // 191 => / (comment region)
+	if(e.which == 191 && isCtrl == true) {
+	  comment_region();
+		return false;
+	}
+        // 188 => , (insert template)
+	if(e.which == 188 && isCtrl == true) {
+	  insert_template();
+		return false;
+	}
+
 }
 
+function comment_region() {
+  var textArea = document.getElementById('code');
+
+  var selected = textArea.value.substring(textArea.selectionStart,textArea.selectionEnd);
+  var orig = selected.slice(0);
+
+  var proc = selected.replace(/\/\//g, '');
+  // nao removeu nenhum //, então não tem comentário, comenta!
+  if (proc === orig) {
+    textArea.value = textArea.value.substring(0, textArea.selectionStart) +
+      '//' +
+      selected.replace(/\n/g, '\n//') +
+      textArea.value.substring(textArea.selectionEnd);
+  } else {
+    textArea.value = textArea.value.substring(0, textArea.selectionStart) +
+      selected.replace(/\/\//g, '') +
+      textArea.value.substring(textArea.selectionEnd);
+  }
+  
+  // se já tiver um //, tiramos, senão tiver um //, colocamos
+
+}
+
+function insert_template () {
+  var textArea = document.getElementById('code');
+  var s = textArea.value.substring(textArea.selectionStart,textArea.selectionEnd);
+  var start = textArea.selectionStart;
+  var template = s+".pos = [0]\n"+s+".gdur = [1]\n"+s+".pos = {1}\n"+s+".gain = [.5]\n"+s+".pan = [0]\n"+s+".pitch = [0]\n";
+
+  textArea.value = textArea.value.substring(0, textArea.selectionStart) +
+      template + 
+      textArea.value.substring(textArea.selectionEnd);
+  textArea.selectionStart = start;
+  textArea.selectionEnd = start;
+
+}
