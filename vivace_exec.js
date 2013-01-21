@@ -417,10 +417,11 @@ function run () {
 //
 
 var isCtrl = false;
-// var onkeyup=function(e){
-//   if(e.which == 91 || e.which) 
-//     isCtrl=false;
-// };
+
+document.onkeyup=function(e){
+  if(e.which == 17 || e.which == 91) 
+    isCtrl=false;
+};
 
 document.onkeydown=function(e){
   if (e.which == 17 || e.which == 91) isCtrl=true;
