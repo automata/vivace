@@ -1,0 +1,184 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
+  <head>
+    <title> FREAKCODING MANIFESTO v0.3 </title>
+    <meta http-equiv="Content-Type" content="text/html;charset=utf-8"/>
+    <script src="popcorn.min.js"></script>
+    <script src="vivace.js"></script>
+    <script src="vivace_exec.js"></script>
+<!--
+    <script src="/channel/bcsocket.js"></script>
+    <script src="/share/share.js"></script>
+    <script src="/share/textarea.js"></script>
+-->
+    <style>
+      body {
+        margin: 0;
+        padding: 0;
+        background: #000;
+      }
+
+      #code {
+      width: 100%;
+      height: 100%;
+      color: transparent;
+      background-color: transparent;
+      position: absolute; left: 0px; top: 0px;
+      padding: 24px;
+      padding-top: 42px;
+      padding-bottom: 42px;
+      line-height: 1.1em;
+      font-family: monospace;
+      font-size: 18px;
+      font-weight: bold;
+      visibility: visible;
+      z-index: 1000;
+      /* transition between transparent and semi-transparent black on hover */
+      transition: color  1500ms;
+      -webkit-transition: color  1500ms;
+      -o-transition: color  500ms;
+      -moz-transition: color ox-shadow 500ms;
+      -ms-transition: color  500ms;
+      outline: none;
+      border: none;
+      }
+
+      #code:hover {
+      color: #00ff00;
+      text-shadow: #000 2px 2px 5px;
+
+      /*background-color:rgba(0,0,0,.1);*/
+      }
+
+      #banner {
+      position: absolute;
+      right: 0px;
+      bottom: 0px;
+      padding: 24px;
+      font-family: monospace;
+      font-size: 18px;
+      font-weight: bold;
+      color: transparent;
+      text-shadow: #555 0px 0px 2px;
+      background-color: transparent;
+      z-index: 1001;
+      transition: color  1500ms;
+      -webkit-transition: color  1500ms;
+      -o-transition: color  500ms;
+      -moz-transition: color ox-shadow 500ms;
+      -ms-transition: color  500ms;
+      }
+
+      #banner:hover {
+      color: #000;
+      }
+
+      video {
+        width: 100%;
+        height: 100%;
+        position: absolute;
+        document.getElementById(voiceName).style.zIndex="800";
+      }
+    </style>
+
+  </head>
+
+  <body>
+
+   <textarea id="code" spellcheck="false">
+// CTRL + X to evaluate...
+
+eyes.pos = [1]
+eyes.pos = {1, 1/2}
+
+a.pos = [4]
+a.gdur = [.1]
+a.pos = {1/8,1/16}
+
+b.pos = [3]
+b.gdur = [.5]
+b.pos = {1/2,1/4}
+
+c.pos = [1]
+c.gdur = [.3]
+c.pos = {1/2}
+
+//              __,aaPPPPPPPPaa,__
+//          ,adP"""'          `""Yb,_
+//       ,adP'                     `"Yb,
+//     ,dP'     ,aadPP"""""YYba,_     `"Y,
+//    ,P'    ,aP"'            `""Ya,     "Y,
+//   ,P'    aP'     _________     `"Ya    `Yb,
+//  ,P'    d"    ,adP""""""""Yba,    `Y,    "Y,
+// ,d'   ,d'   ,dP"            `Yb,   `Y,    `Y,
+// d'   ,d'   ,d'    ,dP""Yb,    `Y,   `Y,    `b
+// 8    d'    d'   ,d"      "b,   `Y,   `8,    Y,
+// 8    8     8    d'    _   `Y,   `8    `8    `b
+// 8    8     8    8     8    `8    8     8     8
+// 8    Y,    Y,   `b, ,aP     P    8    ,P     8
+// I,   `Y,   `Ya    """"     d'   ,P    d"    ,P
+// `Y,   `8,    `Ya         ,8"   ,P'   ,P'    d'
+//  `Y,   `Ya,    `Ya,,__,,d"'   ,P'   ,P"    ,P
+//   `Y,    `Ya,     `""""'     ,P'   ,d"    ,P'
+//    `Yb,    `"Ya,_          ,d"    ,P'    ,P'
+//      `Yb,      ""YbaaaaaadP"     ,P'    ,P'
+//        `Yba,                   ,d'    ,dP'
+//           `"Yba,__       __,adP"     dP"
+//               `"""""""""""""'
+
+
+//                              .='  ' .`/,/!(=)Zm.
+//                .._,,._..  ,-`- `,\ ` -` -`\\7//WW.
+//           ,v=~/.-,-\- -!|V-s.)iT-|s|\-.'   `///mK%.
+//         v!`i!-.e]-g`bT/i(/[=.Z/m)K(YNYi..   /-]i44M.
+//       v`/,`|v]-DvLcfZ/eV/iDLN\D/ZK@%8W[Z..   `/d!Z8m
+//      //,c\(2(X/NYNY8]ZZ/bZd\()/\7WY%WKKW)   -'|(][%4.
+//    ,\\i\c(e)WX@WKKZKDKWMZ8(b5/ZK8]Z7%ffVM,   -.Y!bNMi
+//    /-iit5N)KWG%%8%%%%W8%ZWM(8YZvD)XN(@.  [   \]!/GXW[
+//   / ))G8\NMN%W%%%%%%%%%%8KK@WZKYK*ZG5KMi,-   vi[NZGM[
+//  i\!(44Y8K%8%%%**~YZYZ@%%%%%4KWZ/PKN)ZDZ7   c=//WZK%!
+// ,\v\YtMZW8W%%f`,`.t/bNZZK%%W%%ZXb*K(K5DZ   -c\\/KM48
+// -|c5PbM4DDW%f  v./c\[tMY8W%PMW%D@KW)Gbf   -/(=ZZKM8[
+// 2(N8YXWK85@K   -'c|K4/KKK%@  V%@@WD8e~  .//ct)8ZK%8`
+// =)b%]Nd)@KM[  !'\cG!iWYK%%|   !M@KZf    -c\))ZDKW%`
+// YYKWZGNM4/Pb  '-VscP4]b@W%     'Mf`   -L\///KM(%W!
+// !KKW4ZK/W7)Z. '/cttbY)DKW%     -`  .',\v)K(5KW%%f
+// 'W)KWKZZg)Z2/,!/L(-DYYb54%  ,,`, -\-/v(((KK5WW%f
+//  \M4NDDKZZ(e!/\7vNTtZd)8\Mi!\-,-/i-v((tKNGN%W%%
+//  'M8M88(Zd))///((|D\tDY\\KK-`/-i(=)KtNNN@W%%%@%[
+//   !8%@KW5KKN4///s(\Pd!ROBY8/=2(/4ZdzKD%K%%%M8@%%
+//    '%%%W%dGNtPK(c\/2\[Z(ttNYZ2NZW8W8K%%%%YKM%M%%.
+//      *%%W%GW5@/%!e]_tZdY()v)ZXMZW%W%%%*5Y]K%ZK%8[
+//       '*%%%%8%8WK\)[/ZmZ/Zi]!/M%%%%@f\ \Y/NNMK%%!
+//         'VM%%%%W%WN5Z/Gt5/b)((cV@f`  - |cZbMKW%%|
+//            'V*M%%%WZ/ZG\t5((+)L'-,,/  -)X(NWW%%
+//                 `~`MZ/DZGNZG5(((\,    ,t\\Z)KW%@
+//                    'M8K%8GN8\5(5///]i!v\K)85W%%f
+//                      YWWKKKKWZ8G54X/GGMeK@WM8%@
+//                       !M8%8%48WG@KWYbW%WWW%%%@
+//                         VM%WKWK%8K%%8WWWW%%%@`
+//                           ~*%%%%%%W%%%%%%%@~
+//                              ~*MM%%%%%%@f`
+//                                  '''''
+</textarea>
+
+   <div id="banner" onclick="run();">vivace (old)</div>
+
+   <script> init();
+/*
+     var elem = document.getElementById('code');
+     
+     sharejs.open('default', 'text', function(error, doc) {
+     if (error) {
+     console.log(error);
+     } else {
+     elem.disabled = false;
+     doc.attach_textarea(elem);
+     }
+     });
+*/
+   </script>
+
+  </body>
+</html>
