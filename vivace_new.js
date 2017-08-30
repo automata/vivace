@@ -3,23 +3,44 @@
 // where are our audio files?
 var audioFilesDir = './media/';
 
-// store all the voices (main symbol table)
+// Store all the voices (main symbol table)
 var voices = {};
 
-// our audio context
+// Instantiate audio context and start transport timeline
 var context = new AudioContext();
 Tone.setContext(context)
+Tone.Transport.start();
 
 function exec (input) {
   var tree = vivace.parse(input);
 
   var definitions = tree.code.definitions;
+  console.log('definitions', definitions)
 
   // go to all definitions again and update voices details
   var voiceNames=[]
   for (var i=0; i<definitions.length; i=i+1) {
     var voiceName = definitions[i].name.val;
     voiceNames[voiceName]=true;
+
+    if (definitions[i].attr.val === 'notes') {
+      if (definitions[i].is.type === 'values') {
+        var notes = []
+        for (var j=0; j<definitions[i].is.val.length; j++) {
+          notes.push(definitions[i].is.val[j].val)
+        }
+        voices[voiceName].notes = notes.reverse()
+      }
+    }
+    if (definitions[i].attr.val === 'durations') {
+      if (definitions[i].is.type === 'values') {
+        var durations = []
+        for (var j=0; j<definitions[i].is.val.length; j++) {
+          durations.push(definitions[i].is.val[j].val)
+        }
+        voices[voiceName].durations = durations.reverse()
+      }
+    }
 
     // signal
     if (definitions[i].attr.val === 'sig') {
@@ -89,242 +110,93 @@ function exec (input) {
   return [voices,voiceNames];
 }
 
-function loadAudioFile(voiceName) {
-  var request = new XMLHttpRequest();
-  var url = audioFilesDir + voices[voiceName].sig;
-  request.open('GET', url, true);
-  request.responseType = 'arraybuffer';
+/*
+ * Vivace initialization
+ */
 
-  request.onload = function() {
-    context.decodeAudioData(request.response, function(buffer) {
-      voices[voiceName].buffer = buffer;
-    });
-  }
-
-  request.onerror = function() {
-    console.log('error while loading audio file from ' + url);
-  }
-
-  request.send();
+var initVivace = function() {
+  voices['a'] = new Voice(new Tone.Synth(), [], [])
+  voices['b'] = new Voice(new Tone.Synth(), [], [])
+  voices['a'].playInstrument()
+  voices['b'].playInstrument()
 }
 
-function loadVideoFile(voiceName) {
-  vid = document.createElement('video');
-  vid.src = audioFilesDir + voices[voiceName].sig;
-  vid.id = voiceName;
-  //vid.setAttribute('controls', true);
-  //vid.setAttribute('autoplay',true);
-  document.getElementsByTagName('body')[0].appendChild(vid);
-  voices[voiceName].sigPop = Popcorn('#'+voiceName);
-  voices[voiceName].sigPop.preload('auto');
+/*
+ * Voice
+ */
+
+var Voice = function(instrument, notes, dur) {
+  this.notes = notes
+  this.durations = dur
+  this.countNotes = 0
+  this.fvalues = []
+  this.fdur = []
+  this.fcount = 0
+  // Signal chain nodes
+  //this.instrument = new Tone.Synth().toMaster()
+  this.instrument = instrument
+  this.filter = new Tone.Filter({type: 'bandpass', Q: 12})
+  // Signal chain onnections
+  this.instrument.connect(this.filter)
+  this.filter.toMaster()
+}
+Voice.prototype.playInstrument = function() {
+    if (this.notes.length <= 0) return
+    if (this.durations.length <= 0) return
+    var note = this.notes[this.countNotes % this.notes.length]
+    var dur = this.durations[this.countNotes % this.durations.length]
+
+    this.instrument.triggerAttackRelease(note, dur, Tone.now());
+
+    Tone.Transport.scheduleOnce(this.playInstrument.bind(this), "+" + this.durations[this.countNotes++ % this.durations.length])
+}
+Voice.prototype.playFilter = function() {
+    if (this.fvalues.length <= 0) return
+    if (this.fdur.length <= 0) return
+    var value = this.fvalues[this.fcount % this.fvalues.length]
+    var dur = this.fdur[this.fcount % this.fdur.length]
+
+    this.filter.frequency.linearRampToValueAtTime(value, Tone.now());
+    Tone.Transport.scheduleOnce(this.playFilter.bind(this), "+" + this.fdur[this.fcount++ % this.fdur.length])
 }
 
-function playVoice(voiceName, when, offset, duration) {
-  var source = context.createBufferSource();
-  source.buffer = voices[voiceName].buffer;
-
-  source.connect(context.destination);
-
-  // // TODO: here we will use the voices[voiceName].sig dsp graph!!!
-  // var gain = context.createGainNode();
-  // source.connect(gain);
-
-  // var filter = context.createBiquadFilter();
-  // gain.connect(filter);
-
-  // filter.connect(context.destination);
-  // gain.gain.value = 0.2;
-  // filter.type = 0;
-  // filter.frequency.value = 880;
-
-  //source.noteOn(when || context.currentTime);
-  source.start(when || context.currentTime, // at specified time or now
-                     offset || 0, // starting at offset or from start
-                     duration || source.buffer.duration); // during duration or the whole buffer
-}
-
-function playVideo(voiceName, offset) {
-  voices[voiceName].sigPop.play(offset);
-}
-
-function tick () {
-  beats += 1;
-  
-  for (event in events) {
-    if (events[event].nextBeat == beats) {
-      var voiceName = events[event].voiceName;
-      if (voices[voiceName].sigType === 'audio') {
-        playVoice(voiceName, // voiceName
-                  context.currentTime, // when
-                  voices[voiceName].pos[voices[voiceName].posId % voices[voiceName].pos.length], // offset
-                  voices[voiceName].gdur[voices[voiceName].gdurId % voices[voiceName].gdur.length] // grain duration
-                 );
-        // update event
-        voices[voiceName].durId += 1;
-        voices[voiceName].posId += 1;
-        voices[voiceName].gdurId += 1;
-
-        events[event].nextBeat = (voices[voiceName].dur[voices[voiceName].durId % voices[voiceName].dur.length] * semiBreve) + beats;
-      } else if (voices[voiceName].sigType === 'video') {
-        playVideo(voiceName, voices[voiceName].pos[voices[voiceName].posId % voices[voiceName].pos.length]);
-        voices[voiceName].durId += 1;
-        voices[voiceName].posId += 1;
-        events[event].nextBeat = (voices[voiceName].dur[voices[voiceName].durId % voices[voiceName].dur.length] * semiBreve) + beats;
-        document.getElementById(voiceName).style.zIndex="900";
-      }
-    }
-  }
-}
-
-// note: for now, considering fusa as the min unity.
-
-var events = [];
-var beats = 0;
-var bpm = 120; // 120 seminimas per minute
-var minimalUnity = bpm * 4; // we tick at each 960 seminimas (or, 1 semifusa) 
-                            // change 8:semifusa 4:fusa 2:colcheia 1:seminima as the minor unity
-var timeInterval = 60 / minimalUnity * 1000; // so, at each 62.5 ms we tick 
-var semiBreve = 32; // one semibreve is equal to 64 semifusas (hemidemisemiquaver) (or 32 fusas)
-                    // change 64:semifusa 32:fusa 16:colcheia 8:seminima
-var masterClock = setInterval(tick, timeInterval);
-
-// init ///////////////////////////////
-
-// load all audio and video files
-function init () {
-  var files = [/*{name: 'a', fileName: 'art1.wav', type: 'audio'},
-               {name: 'b', fileName: 'art2.wav', type: 'audio'},
-               {name: 'c', fileName: 'ato1.wav', type: 'audio'},
-               {name: 'd', fileName: 'ato2.wav', type: 'audio'},
-{name: 'e', fileName: 'back1.wav', type: 'audio'},
-{name: 'f', fileName: 'back2.wav', type: 'audio'},
-{name: 'g', fileName: 'bass1.wav', type: 'audio'},*/
-{name: 'f', fileName: 'bass2.wav', type: 'audio'},
-{name: 'e', fileName: 'bass3.wav', type: 'audio'},/*
-//{name: 'bass4', fileName: 'bass4.wav', type: 'audio'},
-//{name: 'bass5', fileName: 'bass5.wav', type: 'audio'},
-//{name: 'bass6', fileName: 'bass6.wav', type: 'audio'},
-//{name: 'bass7', fileName: 'bass7.wav', type: 'audio'},
-//{name: 'bass8', fileName: 'bass8.wav', type: 'audio'},
-//{name: 'bass9', fileName: 'bass9.wav', type: 'audio'},
-//{name: 'bass10', fileName: 'bass10.wav', type: 'audio'},
-//{name: 'bass12', fileName: 'bass12.wav', type: 'audio'},*/
-{name: 'a', fileName: 'beat1.wav', type: 'audio'},
-{name: 'b', fileName: 'beat2.wav', type: 'audio'},
-//{name: 'beat3', fileName: 'beat3.wav', type: 'audio'},
-//{name: 'beat4', fileName: 'beat4.wav', type: 'audio'},
-//{name: 'beat5', fileName: 'beat5.wav', type: 'audio'},
-{name: 'c', fileName: 'bob1.wav', type: 'audio'},
-{name: 'd', fileName: 'bro1.wav', type: 'audio'},
-//{name: 'bro2', fileName: 'bro2.wav', type: 'audio'},
-//{name: 'bro3', fileName: 'bro3.wav', type: 'audio'},
-//{name: 'clap1', fileName: 'clap1.wav', type: 'audio'},
-//{name: 'clap2', fileName: 'clap2.wav', type: 'audio'},
-/*{name: 'fx1', fileName: 'fx1.wav', type: 'audio'},
-{name: 'fx2', fileName: 'fx2.wav', type: 'audio'},
-{name: 'fx3', fileName: 'fx3.wav', type: 'audio'},
-{name: 'fx4', fileName: 'fx4.wav', type: 'audio'},
-{name: 'hat1', fileName: 'hat1.wav', type: 'audio'},
-{name: 'hat2', fileName: 'hat2.wav', type: 'audio'},
-{name: 'kick1', fileName: 'kick1.wav', type: 'audio'},
-{name: 'kick2', fileName: 'kick2.wav', type: 'audio'},
-{name: 'snare1', fileName: 'snare1.wav', type: 'audio'},*/
-               //{name: 'eyes', fileName: 'eyes.mp4', type: 'video'},
-//{name: 'v', fileName: 'monster1.mp4', type: 'video'},
-//{name: 'vvv', fileName: 'monster2.mp4', type: 'video'},
-{name: 'vv', fileName: 'avenidaTapa.mp4', type: 'video'}];
-
-  for (file in files) {
-    // create a dict to each voice
-    voices[files[file].name] = {sig: files[file].fileName, 
-                                sigType: files[file].type};
-    if (files[file].type === 'audio') {
-      loadAudioFile(files[file].name);
-    } else if (files[file].type === 'video') {
-      loadVideoFile(files[file].name);
-    }
-  }
-}
-
-var lastVoices = null;
+var previousVoices = []
 
 function run () {
-  var code = document.getElementById('code');
-  var texec=exec(code.value);
-  console.log('TEXEC', texec);
-  var currentVoices = texec[0];
-  var activeVoices = texec[1];
+  var code = document.getElementById('code')
+  var texec = exec(code.value)
+  var currentVoices = texec[0]
+  var activeVoices = texec[1]
 
-  /*
-  for (voiceName in lastVoices){
-      if (!activeVoices[voiceName]){
-          for (e in events) {
-              if(events[e]['voiceName']==voiceName) {
-                  delete events[e];
-                  voices[voiceName].dur=undefined;
-                  voices[voiceName].durId=0;
-                  if (voices[voiceName].sigType=="video"){
-                        document.getElementById(voiceName).style.zIndex="0";
-                        voices[voiceName].sigPop.pause();
-                  }
-              }
-          }
-      }
-  }
+  //console.log('TEXEC', texec);
+  //console.log('active voices', activeVoices)
+  //console.log('previous voices', previousVoices)
 
-  for (voiceName in currentVoices) {
-    if (lastVoices != null) {
-      // let's update durations
-                  console.log(voiceName, currentVoices, lastVoices);
-      if (currentVoices[voiceName].dur != lastVoices[voiceName].dur) {
-                  console.log(voiceName + "dd");
-          if (activeVoices[voiceName]){
-                  console.log(voiceName + "ee");
-                voices[voiceName].dur = currentVoices[voiceName].dur;
-          }
-      }
-      // let's update buffer positions
-      if (currentVoices[voiceName].pos != lastVoices[voiceName].pos) {
-        voices[voiceName].pos = currentVoices[voiceName].pos;
-      }
-      // let's update grain durations
-      if (currentVoices[voiceName].gdur != lastVoices[voiceName].gdur) {
-        voices[voiceName].gdur = currentVoices[voiceName].gdur;
-      }      
-console.log(voices[voiceName].dur);
-      if (!voices[voiceName].durId && (voices[voiceName].dur!=undefined)) {
-        // for every updated voice, put that on event queue
-        events.push({'voiceName': voiceName, 'nextBeat': (voices[voiceName].dur[0] * semiBreve) + beats});
-        voices[voiceName].durId = 0;
-        voices[voiceName].posId = 0;
-        voices[voiceName].gdurId = 0;
-      }
-
-    } else {
-      // so it is the first time we are executing...
-      if (!currentVoices[voiceName].dur) {
-        voices[voiceName].dur = currentVoices[voiceName].dur;
-      }
-      if (!currentVoices[voiceName].pos) {
-        voices[voiceName].pos = currentVoices[voiceName].pos;
-      }
-      if (!currentVoices[voiceName].dur) {
-        voices[voiceName].gdur = currentVoices[voiceName].gdur;
-      }
-
-      if (voices[voiceName].dur) {
-        // for every updated voice, put that on event queue
-        events.push({'voiceName': voiceName, 'nextBeat': (voices[voiceName].dur[0] * semiBreve) + beats});
-        voices[voiceName].durId = 0;
-        voices[voiceName].posId = 0;
-        voices[voiceName].gdurId = 0;
-      }
+  // Stop removed voices
+  for (previousVoice in previousVoices) {
+    if (!activeVoices[previousVoice]) {
+      // If a previously active voice isn't active anymore, stop it
+      voices[previousVoice].notes = []
     }
   }
+  // Start new voices
+  for (activeVoice in activeVoices) {
+    if (!previousVoices[activeVoice]) {
+      // If a current active voice wasn't active before, start it again
+      voices[activeVoice].playInstrument()
+    }
+  }
+  // Update voices that remain active
+  // Do we need this? It seems to be done on exec()
+  // for (activeVoice in activeVoices) {
+  //   console.log('->', activeVoice)
+  //   if (currentVoices[activeVoice]) {
+  //     console.log('-->', currentVoices[activeVoice])
+  //   }
+  // }
 
-  // store the last voice to compare at the next one
-  lastVoices = voices;
-  */
+  // Keep track of active voices
+  previousVoices = activeVoices
 }
 
 // key events: CTRL + x
