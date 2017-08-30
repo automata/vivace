@@ -115,10 +115,18 @@ function exec (input) {
  */
 
 var initVivace = function() {
-  voices['a'] = new Voice(new Tone.Synth(), [], [])
-  voices['b'] = new Voice(new Tone.Synth(), [], [])
-  voices['a'].playInstrument()
-  voices['b'].playInstrument()
+  // FIXME: Have some UI to load voices
+  voices['a'] = new Voice(new Tone.Synth())
+  voices['b'] = new Voice(new Tone.Synth())
+
+  // FIXME: Better way to load/append videos
+  var video = document.createElement("video");
+  video.setAttribute("src", "media/eyes.mp4");
+  video.controls = false;
+  video.autoplay = false;
+  document.body.appendChild(video);
+
+  voices['c'] = new VideoVoice(video)
 }
 
 /*
@@ -126,8 +134,8 @@ var initVivace = function() {
  */
 
 var Voice = function(instrument, notes, dur) {
-  this.notes = notes
-  this.durations = dur
+  this.notes = notes || []
+  this.durations = dur || []
   this.countNotes = 0
   this.fvalues = []
   this.fdur = []
@@ -150,7 +158,58 @@ Voice.prototype.playInstrument = function() {
 
     Tone.Transport.scheduleOnce(this.playInstrument.bind(this), "+" + this.durations[this.countNotes++ % this.durations.length])
 }
+Voice.prototype.stopInstrument = function() {
+  this.notes = []
+  this.fvalues = []
+}
 Voice.prototype.playFilter = function() {
+    if (this.fvalues.length <= 0) return
+    if (this.fdur.length <= 0) return
+    var value = this.fvalues[this.fcount % this.fvalues.length]
+    var dur = this.fdur[this.fcount % this.fdur.length]
+
+    this.filter.frequency.linearRampToValueAtTime(value, Tone.now());
+    Tone.Transport.scheduleOnce(this.playFilter.bind(this), "+" + this.fdur[this.fcount++ % this.fdur.length])
+}
+
+/*
+ * VideoVoice
+ */
+var VideoVoice = function(video, notes, dur) {
+  this.notes = notes || []
+  this.durations = dur || []
+  this.countNotes = 0
+  this.fvalues = []
+  this.fdur = []
+  this.fcount = 0
+  // Signal chain nodes
+  this.instrument = video
+  this.source = context.createMediaElementSource(video)
+  //this.instrument = new Tone.Synth().toMaster()
+  //this.instrument = instrument
+  this.filter = new Tone.Filter({type: 'bandpass', Q: 12})
+  // Signal chain onnections
+  this.source.connect(this.filter)
+  this.filter.toMaster()
+}
+VideoVoice.prototype.playInstrument = function() {
+    if (this.notes.length <= 0) return
+    if (this.durations.length <= 0) return
+    var note = this.notes[this.countNotes % this.notes.length]
+    var dur = this.durations[this.countNotes % this.durations.length]
+
+    this.instrument.play()
+    this.instrument.currentTime = note
+
+    Tone.Transport.scheduleOnce(this.playInstrument.bind(this), "+" + this.durations[this.countNotes++ % this.durations.length])
+}
+VideoVoice.prototype.stopInstrument = function() {
+  this.notes = []
+  this.fvalues = []
+  this.instrument.pause()
+  // FIXME: Use DOM id to hide it with CSS operation
+}
+VideoVoice.prototype.playFilter = function() {
     if (this.fvalues.length <= 0) return
     if (this.fdur.length <= 0) return
     var value = this.fvalues[this.fcount % this.fvalues.length]
@@ -176,7 +235,7 @@ function run () {
   for (previousVoice in previousVoices) {
     if (!activeVoices[previousVoice]) {
       // If a previously active voice isn't active anymore, stop it
-      voices[previousVoice].notes = []
+      voices[previousVoice].stopInstrument()
     }
   }
   // Start new voices
@@ -203,13 +262,13 @@ function run () {
 
 var isCtrl = false;
 document.onkeyup=function(e){
-	if(e.which == 17) isCtrl=false;
+  if(e.which == 17) isCtrl=false;
 }
 document.onkeydown=function(e){
-	if(e.which == 17) isCtrl=true;
-	if(e.which == 88 && isCtrl == true) {
-	  run();
-		return false;
-	}
+  if(e.which == 17) isCtrl=true;
+  if(e.which == 88 && isCtrl == true) {
+    run();
+    return false;
+  }
 }
 
