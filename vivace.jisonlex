@@ -1,6 +1,7 @@
 %%
 \s+                                                  /* skip ws */
 "//".*                                               /* skip comment */
+[0-9]+[a-zA-Z]+                                      return 'ID';
 ([0-9]+"."([0-9]+)?|"."[0-9]+|[0-9]+"/"[0-9]+|[0-9]+)       return 'NUMBER';
 [a-zA-Z][a-zA-Z0-9#]*                                return 'ID';
 "'".*"'"  { yytext = yytext.substr(1,yyleng-2); return 'STRING'; }
