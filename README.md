@@ -74,3 +74,10 @@ And edit file vivace_exec.js, to map variable names to your files:
     var files = [{name: 'a', fileName: 'kick.wav', type: 'audio'},
                  {name: 'b', fileName: 'foo.mp4', type: 'video'}]
 
+# Developing
+
+To change grammar/lexer, change `vivace.jison` and `vivace.jisonlex`,
+respectively, and:
+
+    npm install jison -g
+    jison vivace.jison vivace.jisonlex -o vivace.js
