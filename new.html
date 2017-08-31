@@ -7,6 +7,7 @@
 
     <script src="Tone.min.js"></script>
     <script src="tune.js"></script>
+    <script src="NexusUI.js"></script>
     <script src="vivace.js"></script>
     <script src="vivace_new.js"></script>
 <!--
@@ -67,7 +68,7 @@
       border: 1px #fff solid;
       /*text-shadow: #555 0px 0px 2px;*/
       background-color: #000;
-      z-index: 1001;
+      z-index: 2001;
       transition: color  1500ms;
       -webkit-transition: color  1500ms;
       -o-transition: color  500ms;
@@ -86,6 +87,19 @@
         position: absolute;
         document.getElementById(voiceName).style.zIndex="800";
       }
+
+      #drawer {
+        background-color: #222;
+        color: #fff;
+        position: absolute;
+        top: 0;
+        right: 0;
+        width: 200px;
+        height: 100%;
+        padding: 10px;
+        z-index: 2000;
+        opacity: 0.8;
+      }
     </style>
 
   </head>
@@ -93,11 +107,12 @@
   <body>
 
    <textarea id="code" spellcheck="false">
+a.sig = synth => filter
 a.notes = [g4, d4, f4, a3]
-a.notes = {0.1, 0.2, 0.3, 2}
+a.notes = {4n, 8t}
 
-c.notes = [10, 20, 30, 40]
-c.notes = {0.1, 0.2, 0.3, 2}
+// c.notes = [10, 20, 30, 40]
+// c.notes = {0.1, 0.2, 0.3, 2}
 // a.sig = synth => filter
 // a.notes = [g4, d4, f4, a3]
 // a.notes = {0.1, 0.2, 0.3, 2}
@@ -110,6 +125,8 @@ c.notes = {0.1, 0.2, 0.3, 2}
 </textarea>
 
    <div id="banner" onclick="run();">Vivace</div>
+
+   <div id="drawer"></div>
 
    <script> initVivace();
 /*
