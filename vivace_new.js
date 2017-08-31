@@ -25,34 +25,62 @@ function exec (input) {
 
     if (definitions[i].attr.val === 'notes') {
       if (definitions[i].is.type === 'values') {
-        var notes = []
-        for (var j=0; j<definitions[i].is.val.length; j++) {
-          notes.push(definitions[i].is.val[j].val)
+        if (voices[voiceName]) {
+          var notes = []
+          for (var j=0; j<definitions[i].is.val.length; j++) {
+            notes.push(definitions[i].is.val[j].val)
+          }
+          voices[voiceName].notes = notes.reverse()
         }
-        voices[voiceName].notes = notes.reverse()
+      } else if (definitions[i].is.type === 'durations') {
+        if (voices[voiceName]) {
+          var durations = []
+          for (var j=0; j<definitions[i].is.val.length; j++) {
+            durations.push(definitions[i].is.val[j].val)
+          }
+          voices[voiceName].durations = durations.reverse()
+        }
       }
     }
     if (definitions[i].attr.val === 'durations') {
       if (definitions[i].is.type === 'values') {
-        var durations = []
-        for (var j=0; j<definitions[i].is.val.length; j++) {
-          durations.push(definitions[i].is.val[j].val)
+        if (voices[voiceName]) {
+          var durations = []
+          for (var j=0; j<definitions[i].is.val.length; j++) {
+            durations.push(definitions[i].is.val[j].val)
+          }
+          voices[voiceName].durations = durations.reverse()
         }
-        voices[voiceName].durations = durations.reverse()
+      }
+    }
+    if (definitions[i].attr.val === 'rates') {
+      if (definitions[i].is.type === 'values') {
+        if (voices[voiceName]) {
+          var vals = []
+          for (var j=0; j<definitions[i].is.val.length; j++) {
+            vals.push(definitions[i].is.val[j].val)
+          }
+          voices[voiceName].rates = vals.reverse()
+        }
       }
     }
 
     // signal
     if (definitions[i].attr.val === 'sig') {
       if (definitions[i].is.type === 'chains') {
-        // for now, just dealing with audio('id') and video('id')
-        if (definitions[i].is.val[0].name.val === 'audio') {
-          voices[voiceName].sig = definitions[i].is.val[0].parameters[0].val;
-          voices[voiceName].sigType = 'audio';
-        } else if (definitions[i].is.val[0].name.val === 'video') {
-          voices[voiceName].sig = definitions[i].is.val[0].parameters[0].val;
-          voices[voiceName].sigType = 'video';
+        if (!voices[voiceName]) {
+          voices[voiceName] = new Voice(new Tone.Synth())
+          // TODO: Set initial chain
         }
+        // TODO: Otherwise, if voice exists, see if chain changed, and update
+        // it
+        // if (definitions[i].is.val[0].name.val === 'audio') {
+        //   voices[voiceName].sig = definitions[i].is.val[0].parameters[0].val;
+        //   voices[voiceName].sigType = 'audio';
+        // } else if (definitions[i].is.val[0].name.val === 'video') {
+        //   voices[voiceName].sig = definitions[i].is.val[0].parameters[0].val;
+        //   voices[voiceName].sigType = 'video';
+        // }
       }
     // amp
     } else if (definitions[i].attr.val === 'amp') {
@@ -107,7 +135,7 @@ function exec (input) {
       }
     }
   }
-  return [voices,voiceNames];
+  return [voices, voiceNames];
 }
 
 /*
@@ -116,8 +144,8 @@ function exec (input) {
 
 var initVivace = function() {
   // FIXME: Have some UI to load voices
-  voices['a'] = new Voice(new Tone.Synth())
-  voices['b'] = new Voice(new Tone.Synth())
+  // voices['a'] = new Voice(new Tone.Synth())
+  // voices['b'] = new Voice(new Tone.Synth())
 
   // FIXME: Better way to load/append videos
   var video = document.createElement("video");
@@ -140,6 +168,7 @@ var Voice = function(instrument, notes, dur) {
   this.fvalues = []
   this.fdur = []
   this.fcount = 0
+  this.playing = false
   // Signal chain nodes
   //this.instrument = new Tone.Synth().toMaster()
   this.instrument = instrument
@@ -149,8 +178,10 @@ var Voice = function(instrument, notes, dur) {
   this.filter.toMaster()
 }
 Voice.prototype.playInstrument = function() {
+    this.playing = false
     if (this.notes.length <= 0) return
     if (this.durations.length <= 0) return
+    this.playing = true
     var note = this.notes[this.countNotes % this.notes.length]
     var dur = this.durations[this.countNotes % this.durations.length]
 
@@ -159,6 +190,7 @@ Voice.prototype.playInstrument = function() {
     Tone.Transport.scheduleOnce(this.playInstrument.bind(this), "+" + this.durations[this.countNotes++ % this.durations.length])
 }
 Voice.prototype.stopInstrument = function() {
+  this.playing = false
   this.notes = []
   this.fvalues = []
 }
@@ -177,6 +209,7 @@ Voice.prototype.playFilter = function() {
  */
 var VideoVoice = function(video, notes, dur) {
   this.notes = notes || []
+  this.rates = [1]
   this.durations = dur || []
   this.countNotes = 0
   this.fvalues = []
@@ -197,9 +230,11 @@ VideoVoice.prototype.playInstrument = function() {
     if (this.durations.length <= 0) return
     var note = this.notes[this.countNotes % this.notes.length]
     var dur = this.durations[this.countNotes % this.durations.length]
+    var rate = this.rates[this.countNotes % this.rates.length]
 
     this.instrument.play()
     this.instrument.currentTime = note
+    this.instrument.playbackRate = rate
 
     Tone.Transport.scheduleOnce(this.playInstrument.bind(this), "+" + this.durations[this.countNotes++ % this.durations.length])
 }
@@ -244,6 +279,9 @@ function run () {
       // If a current active voice wasn't active before, start it again
       voices[activeVoice].playInstrument()
     }
+    // Keep playing the active voices
+    if (!voices[activeVoice].playing)
+      voices[activeVoice].playInstrument()
   }
   // Update voices that remain active
   // Do we need this? It seems to be done on exec()
@@ -259,7 +297,6 @@ function run () {
 }
 
 // key events: CTRL + x
-
 var isCtrl = false;
 document.onkeyup=function(e){
   if(e.which == 17) isCtrl=false;
