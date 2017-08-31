@@ -12,14 +12,19 @@ Code
 
 DefinitionList
    : DotExpr ASSIGN List DefinitionList
-     { $$ = $4; 
-       $4.definitions.push({name: $1[0], attr: $1[1], is: $3}); }
+     { $$ = $4;
+       if ($1[2])
+        $4.definitions.push({name: $1[0], attr: $1[1], inner_attr: $1[2], is: $3});
+       else
+        $4.definitions.push({name: $1[0], attr: $1[1], is: $3}); }
    |
      { $$ = {definitions: []}; }
    ;
 
 DotExpr
-   : Id DOT Id
+   : Id DOT Id DOT Id
+     { $$ = [$1, $3, $5]; }
+   | Id DOT Id
      { $$ = [$1, $3]; }
    ;
 
