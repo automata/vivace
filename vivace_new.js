@@ -11,6 +11,12 @@ var context = new AudioContext();
 Tone.setContext(context)
 Tone.Transport.start();
 
+var audioNodeNames = [
+  'synth',
+  'filter',
+  'reverb'
+]
+
 function mapNameToAudioNode(name) {
   switch (name) {
     case 'synth':
@@ -24,6 +30,15 @@ function mapNameToAudioNode(name) {
         instance: new Tone.Filter(),
         signals: [
           'frequency'
+        ]
+      }
+    case 'reverb':
+      return {
+        instance: new Tone.Freeverb(),
+        signals: [
+          'roomSize',
+          'dampening',
+          'wet'
         ]
       }
     default:
@@ -90,7 +105,6 @@ function exec (input) {
       if (definitions[i].is.type === 'chains') {
         if (!voices[voiceName]) {
           // voices[voiceName] = new Voice(new Tone.Synth())
-          // TODO: Set initial chain
           let chain = definitions[i].is.val.map(function (el) {
             return el.name.val
           })
@@ -106,38 +120,73 @@ function exec (input) {
         //   voices[voiceName].sigType = 'video';
         // }
       }
-    // filter???
-      // TODO: Maybe we can iterate on the dictionary maping names into Tonejs
-      // audio nodes and then do this dance automatically
-    } else if (definitions[i].attr.val === 'filter') {
+    // AudioNodes parameters
+    } else if (audioNodeNames.includes(definitions[i].attr.val)) {
       if (definitions[i].inner_attr) {
-        if (definitions[i].inner_attr.val === 'frequency') {
-          if (definitions[i].is.type === 'values') {
-            var vals = [];
-            for (var j=0; j<definitions[i].is.val.length; j=j+1) {
-              vals.push(definitions[i].is.val[j].val);
-            }
-            if (voices[voiceName].signals['filter']['frequency'].values.length == 0) {
-              voices[voiceName].signals['filter']['frequency'].values = vals.reverse()
-              voices[voiceName].playSignal('filter', 'frequency')
-            } else {
-              voices[voiceName].signals['filter']['frequency'].values = vals.reverse()
-            }
-          } else if (definitions[i].is.type === 'durations') {
-            var vals = [];
-            for (var j=0; j<definitions[i].is.val.length; j=j+1) {
-              vals.push(definitions[i].is.val[j].val);
-            }
-            if (voices[voiceName].signals['filter']['frequency'].durations.length == 0) {
-              voices[voiceName].signals['filter']['frequency'].durations = vals.reverse()
-              voices[voiceName].playSignal('filter', 'frequency')
-            } else {
-              voices[voiceName].signals['filter']['frequency'].durations = vals.reverse()
-            }
+        // Command has an inner attribute (e.g. foo.bar.baz = ...)
+        if (definitions[i].is.type === 'values') {
+          var vals = []
+          for (var j=0; j<definitions[i].is.val.length; j++) {
+            vals.push(definitions[i].is.val[j].val)
+          }
+          var attr = definitions[i].attr.val
+          var inner_attr = definitions[i].inner_attr.val
+          if (voices[voiceName].signals[attr][inner_attr].values.length == 0) {
+            console.log('hey', attr, inner_attr, vals)
+            voices[voiceName].signals[attr][inner_attr].values = vals.reverse()
+            voices[voiceName].playSignal(attr, inner_attr)
+          } else {
+            console.log('ho', attr, inner_attr, vals)
+            voices[voiceName].signals[attr][inner_attr].values = vals.reverse()
           }
 
+        } else if (definitions[i].is.type === 'durations') {
+          var vals = []
+          for (var j=0; j<definitions[i].is.val.length; j++) {
+            vals.push(definitions[i].is.val[j].val)
+          }
+          var attr = definitions[i].attr.val
+          var inner_attr = definitions[i].inner_attr.val
+          if (voices[voiceName].signals[attr][inner_attr].durations.length == 0) {
+            voices[voiceName].signals[attr][inner_attr].durations = vals.reverse()
+            voices[voiceName].playSignal(attr, inner_attr)
+          } else {
+            voices[voiceName].signals[attr][inner_attr].durations = vals.reverse()
+          }
         }
       }
+    
+
+    // ;-)
+    // } else if (definitions[i].attr.val === 'filter') {
+    //   if (definitions[i].inner_attr) {
+    //     if (definitions[i].inner_attr.val === 'frequency') {
+    //       if (definitions[i].is.type === 'values') {
+    //         var vals = [];
+    //         for (var j=0; j<definitions[i].is.val.length; j=j+1) {
+    //           vals.push(definitions[i].is.val[j].val);
+    //         }
+    //         if (voices[voiceName].signals['filter']['frequency'].values.length == 0) {
+    //           voices[voiceName].signals['filter']['frequency'].values = vals.reverse()
+    //           voices[voiceName].playSignal('filter', 'frequency')
+    //         } else {
+    //           voices[voiceName].signals['filter']['frequency'].values = vals.reverse()
+    //         }
+    //       } else if (definitions[i].is.type === 'durations') {
+    //         var vals = [];
+    //         for (var j=0; j<definitions[i].is.val.length; j=j+1) {
+    //           vals.push(definitions[i].is.val[j].val);
+    //         }
+    //         if (voices[voiceName].signals['filter']['frequency'].durations.length == 0) {
+    //           voices[voiceName].signals['filter']['frequency'].durations = vals.reverse()
+    //           voices[voiceName].playSignal('filter', 'frequency')
+    //         } else {
+    //           voices[voiceName].signals['filter']['frequency'].durations = vals.reverse()
+    //         }
+    //       }
+
+    //     }
+    //   }
     // pos
     } else if (definitions[i].attr.val === 'pos') {
       // [ ]
@@ -217,8 +266,8 @@ var Voice = function(chain, notes, dur) {
     var node = mapNameToAudioNode(chain[i])
     if (node.instance) this.audioNodes.push(node.instance)
     if (node.signals) {
+      this.signals[chain[i]] = {}
       for (var j=0; j<node.signals.length; j++) {
-        this.signals[chain[i]] = {}
         this.signals[chain[i]][node.signals[j]] = {
           values: [],
           durations: [],
