@@ -11,6 +11,17 @@ var context = new AudioContext();
 Tone.setContext(context)
 Tone.Transport.start();
 
+function mapNameToAudioNode(name) {
+  switch (name) {
+    case 'synth':
+      return new Tone.Synth()
+    case 'filter':
+      return new Tone.Filter()
+    default:
+      return
+  }
+}
+
 function exec (input) {
   var tree = vivace.parse(input);
 
@@ -69,8 +80,12 @@ function exec (input) {
     if (definitions[i].attr.val === 'sig') {
       if (definitions[i].is.type === 'chains') {
         if (!voices[voiceName]) {
-          voices[voiceName] = new Voice(new Tone.Synth())
+          // voices[voiceName] = new Voice(new Tone.Synth())
           // TODO: Set initial chain
+          let chain = definitions[i].is.val.map(function (el) {
+            return el.name.val
+          })
+          voices[voiceName] = new Voice(chain)
         }
         // TODO: Otherwise, if voice exists, see if chain changed, and update
         // it
@@ -161,7 +176,7 @@ var initVivace = function() {
  * Voice
  */
 
-var Voice = function(instrument, notes, dur) {
+var Voice = function(chain, notes, dur) {
   this.notes = notes || []
   this.durations = dur || []
   this.countNotes = 0
@@ -169,13 +184,24 @@ var Voice = function(instrument, notes, dur) {
   this.fdur = []
   this.fcount = 0
   this.playing = false
-  // Signal chain nodes
-  //this.instrument = new Tone.Synth().toMaster()
-  this.instrument = instrument
-  this.filter = new Tone.Filter({type: 'bandpass', Q: 12})
-  // Signal chain onnections
-  this.instrument.connect(this.filter)
-  this.filter.toMaster()
+  // Keep track of list of name of elements in the chain
+  this.chain = chain
+  // Instantiate a Tonejs audio node for each element in chain
+  this.audioNodes = []
+  for (var i=0; i<chain.length; i++) {
+    this.audioNodes.push(mapNameToAudioNode(chain[i]))
+  }
+  // this.instrument = new Tone.Synth().toMaster()
+  // this.instrument = instrument
+  // this.filter = new Tone.Filter({type: 'bandpass', Q: 12})
+  // Connect each node in chain to its next neighbor
+  for (var i=0; i<chain.length-1; i++) {
+    this.audioNodes[i].connect(this.audioNodes[i+1])
+  }
+  // Connect last audio node to master output
+  this.audioNodes[this.audioNodes.length-1].toMaster()
+  // this.instrument.connect(this.filter)
+  // this.filter.toMaster()
 }
 Voice.prototype.playInstrument = function() {
     this.playing = false
