@@ -132,11 +132,9 @@ function exec (input) {
           var attr = definitions[i].attr.val
           var inner_attr = definitions[i].inner_attr.val
           if (voices[voiceName].signals[attr][inner_attr].values.length == 0) {
-            console.log('hey', attr, inner_attr, vals)
             voices[voiceName].signals[attr][inner_attr].values = vals.reverse()
             voices[voiceName].playSignal(attr, inner_attr)
           } else {
-            console.log('ho', attr, inner_attr, vals)
             voices[voiceName].signals[attr][inner_attr].values = vals.reverse()
           }
 
@@ -154,72 +152,6 @@ function exec (input) {
             voices[voiceName].signals[attr][inner_attr].durations = vals.reverse()
           }
         }
-      }
-    
-
-    // ;-)
-    // } else if (definitions[i].attr.val === 'filter') {
-    //   if (definitions[i].inner_attr) {
-    //     if (definitions[i].inner_attr.val === 'frequency') {
-    //       if (definitions[i].is.type === 'values') {
-    //         var vals = [];
-    //         for (var j=0; j<definitions[i].is.val.length; j=j+1) {
-    //           vals.push(definitions[i].is.val[j].val);
-    //         }
-    //         if (voices[voiceName].signals['filter']['frequency'].values.length == 0) {
-    //           voices[voiceName].signals['filter']['frequency'].values = vals.reverse()
-    //           voices[voiceName].playSignal('filter', 'frequency')
-    //         } else {
-    //           voices[voiceName].signals['filter']['frequency'].values = vals.reverse()
-    //         }
-    //       } else if (definitions[i].is.type === 'durations') {
-    //         var vals = [];
-    //         for (var j=0; j<definitions[i].is.val.length; j=j+1) {
-    //           vals.push(definitions[i].is.val[j].val);
-    //         }
-    //         if (voices[voiceName].signals['filter']['frequency'].durations.length == 0) {
-    //           voices[voiceName].signals['filter']['frequency'].durations = vals.reverse()
-    //           voices[voiceName].playSignal('filter', 'frequency')
-    //         } else {
-    //           voices[voiceName].signals['filter']['frequency'].durations = vals.reverse()
-    //         }
-    //       }
-
-    //     }
-    //   }
-    // pos
-    } else if (definitions[i].attr.val === 'pos') {
-      // [ ]
-      if (definitions[i].is.type === 'values') {
-        var pos = [];
-        for (var j=0; j<definitions[i].is.val.length; j=j+1) {
-          pos.push(definitions[i].is.val[j].val);
-        }
-        voices[voiceName].pos = pos.reverse();
-      // { }
-      } else if (definitions[i].is.type === 'durations') {
-        var dur = [];
-        for (var j=0; j<definitions[i].is.val.length; j=j+1) {
-          dur.push(definitions[i].is.val[j].val);
-        }
-        voices[voiceName].dur = dur.reverse();
-      }
-    // gdur
-    } else if (definitions[i].attr.val === 'gdur') {
-      // [ ]
-      if (definitions[i].is.type === 'values') {
-        var gdur = [];
-        for (var j=0; j<definitions[i].is.val.length; j=j+1) {
-          gdur.push(definitions[i].is.val[j].val);
-        }
-        voices[voiceName].gdur = gdur.reverse();
-      // { }
-      } else if (definitions[i].is.type === 'durations') {
-        var dur = [];
-        for (var j=0; j<definitions[i].is.val.length; j=j+1) {
-          dur.push(definitions[i].is.val[j].val);
-        }
-        voices[voiceName].dur = dur.reverse();
       }
     }
   }
