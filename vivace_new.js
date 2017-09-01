@@ -122,34 +122,36 @@ function exec (input) {
       }
     // AudioNodes parameters
     } else if (audioNodeNames.includes(definitions[i].attr.val)) {
-      if (definitions[i].inner_attr) {
-        // Command has an inner attribute (e.g. foo.bar.baz = ...)
-        if (definitions[i].is.type === 'values') {
-          var vals = []
-          for (var j=0; j<definitions[i].is.val.length; j++) {
-            vals.push(definitions[i].is.val[j].val)
-          }
-          var attr = definitions[i].attr.val
-          var inner_attr = definitions[i].inner_attr.val
-          if (voices[voiceName].signals[attr][inner_attr].values.length == 0) {
-            voices[voiceName].signals[attr][inner_attr].values = vals.reverse()
-            voices[voiceName].playSignal(attr, inner_attr)
-          } else {
-            voices[voiceName].signals[attr][inner_attr].values = vals.reverse()
-          }
+      if (voices[voiceName]) {
+        if (definitions[i].inner_attr) {
+          // Command has an inner attribute (e.g. foo.bar.baz = ...)
+          if (definitions[i].is.type === 'values') {
+            var vals = []
+            for (var j=0; j<definitions[i].is.val.length; j++) {
+              vals.push(definitions[i].is.val[j].val)
+            }
+            var attr = definitions[i].attr.val
+            var inner_attr = definitions[i].inner_attr.val
+            if (voices[voiceName].signals[attr][inner_attr].values.length == 0) {
+              voices[voiceName].signals[attr][inner_attr].values = vals.reverse()
+              voices[voiceName].playSignal(attr, inner_attr)
+            } else {
+              voices[voiceName].signals[attr][inner_attr].values = vals.reverse()
+            }
 
-        } else if (definitions[i].is.type === 'durations') {
-          var vals = []
-          for (var j=0; j<definitions[i].is.val.length; j++) {
-            vals.push(definitions[i].is.val[j].val)
-          }
-          var attr = definitions[i].attr.val
-          var inner_attr = definitions[i].inner_attr.val
-          if (voices[voiceName].signals[attr][inner_attr].durations.length == 0) {
-            voices[voiceName].signals[attr][inner_attr].durations = vals.reverse()
-            voices[voiceName].playSignal(attr, inner_attr)
-          } else {
-            voices[voiceName].signals[attr][inner_attr].durations = vals.reverse()
+          } else if (definitions[i].is.type === 'durations') {
+            var vals = []
+            for (var j=0; j<definitions[i].is.val.length; j++) {
+              vals.push(definitions[i].is.val[j].val)
+            }
+            var attr = definitions[i].attr.val
+            var inner_attr = definitions[i].inner_attr.val
+            if (voices[voiceName].signals[attr][inner_attr].durations.length == 0) {
+              voices[voiceName].signals[attr][inner_attr].durations = vals.reverse()
+              voices[voiceName].playSignal(attr, inner_attr)
+            } else {
+              voices[voiceName].signals[attr][inner_attr].durations = vals.reverse()
+            }
           }
         }
       }
