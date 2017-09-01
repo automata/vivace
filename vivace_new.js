@@ -47,12 +47,12 @@ function mapNameToAudioNode(name) {
 }
 
 function exec (input) {
-  var tree = vivace.parse(input);
+  var tree = vivace.parse(input)
+  var definitions = tree.code.definitions
+  console.log('Definitions', definitions)
+  console.log('Voices', voices)
 
-  var definitions = tree.code.definitions;
-  console.log('definitions', definitions)
-
-  // go to all definitions again and update voices details
+  // Go to all definitions again and update voices details
   var voiceNames=[]
   for (var i=0; i<definitions.length; i=i+1) {
     var voiceName = definitions[i].name.val;
@@ -100,8 +100,8 @@ function exec (input) {
       }
     }
 
-    // signal
-    if (definitions[i].attr.val === 'sig') {
+    // Signal
+    if (definitions[i].attr.val === 'signal') {
       if (definitions[i].is.type === 'chains') {
         if (!voices[voiceName]) {
           // voices[voiceName] = new Voice(new Tone.Synth())
@@ -185,13 +185,11 @@ var Voice = function(chain, notes, dur) {
   this.notes = notes || []
   this.durations = dur || []
   this.countNotes = 0
-  this.fvalues = []
-  this.fdur = []
-  this.fcount = 0
   this.playing = false
   // Keep track of list of name of elements in the chain
   this.chain = chain
-  // Instantiate a Tonejs audio node for each element in chain
+  // Instantiate a Tonejs audio node for each element in chain, create object
+  // to hold values/durations/position counter to params and notes/durations
   this.audioNodes = []
   this.signals = {}
   for (var i=0; i<chain.length; i++) {
@@ -210,17 +208,12 @@ var Voice = function(chain, notes, dur) {
     if (node.notes) this.notes[chain[i]] = []
     if (node.durations) this.durations[chain[i]] = []
   }
-  // this.instrument = new Tone.Synth().toMaster()
-  // this.instrument = instrument
-  // this.filter = new Tone.Filter({type: 'bandpass', Q: 12})
   // Connect each node in chain to its next neighbor
   for (var i=0; i<chain.length-1; i++) {
     this.audioNodes[i].connect(this.audioNodes[i+1])
   }
   // Connect last audio node to master output
   this.audioNodes[this.audioNodes.length-1].toMaster()
-  // this.instrument.connect(this.filter)
-  // this.filter.toMaster()
 }
 Voice.prototype.playInstrument = function() {
     this.playing = false
@@ -230,18 +223,17 @@ Voice.prototype.playInstrument = function() {
     var note = this.notes[this.countNotes % this.notes.length]
     var dur = this.durations[this.countNotes % this.durations.length]
 
-    // this.instrument.triggerAttackRelease(note, dur, Tone.now())
     this.audioNodes[0].triggerAttackRelease(note, dur, Tone.now())
 
     Tone.Transport.scheduleOnce(this.playInstrument.bind(this), "+" + this.durations[this.countNotes++ % this.durations.length])
 }
+
 Voice.prototype.stopInstrument = function() {
   this.playing = false
   this.notes = []
   this.fvalues = []
 }
-// TODO: Maybe playSignal can receive what signal as argument and just play
-// it...
+
 Voice.prototype.playSignal = function(nodeName, signalName) {
     var signal = this.signals[nodeName][signalName]
     var values = signal.values
