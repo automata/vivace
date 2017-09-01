@@ -14,9 +14,18 @@ Tone.Transport.start();
 function mapNameToAudioNode(name) {
   switch (name) {
     case 'synth':
-      return new Tone.Synth()
+      return {
+        instance: new Tone.Synth(),
+        notes: [],
+        durations: []
+      }
     case 'filter':
-      return new Tone.Filter()
+      return {
+        instance: new Tone.Filter(),
+        signals: [
+          'frequency'
+        ]
+      }
     default:
       return
   }
@@ -85,7 +94,7 @@ function exec (input) {
           let chain = definitions[i].is.val.map(function (el) {
             return el.name.val
           })
-          voices[voiceName] = new Voice(chain)
+          voices[voiceName] = new Voice(chain.reverse())
         }
         // TODO: Otherwise, if voice exists, see if chain changed, and update
         // it
@@ -97,22 +106,23 @@ function exec (input) {
         //   voices[voiceName].sigType = 'video';
         // }
       }
-    // amp
-    } else if (definitions[i].attr.val === 'amp') {
-      // [ ]
-      if (definitions[i].is.type === 'values') {
-        var amp = [];
-        for (var j=0; j<definitions[i].is.val.length; j=j+1) {
-          amp.push(definitions[i].is.val[j].val);
+    // filter???
+    } else if (definitions[i].attr.val === 'filter') {
+      if (definitions[i].inner_attr) {
+        if (definitions[i].inner_attr.val === 'frequency') {
+          if (definitions[i].is.type === 'values') {
+            var vals = [];
+            for (var j=0; j<definitions[i].is.val.length; j=j+1) {
+              vals.push(definitions[i].is.val[j].val);
+            }
+            if (voices[voiceName].signals['filter']['frequency'].length == 0) {
+              voices[voiceName].signals['filter']['frequency'] = vals.reverse()
+              voices[voiceName].playFilter()
+            } else {
+              voices[voiceName].signals['filter']['frequency'] = vals.reverse()
+            }
+          }
         }
-        voices[voiceName].amp = amp.reverse();
-      // { }
-      } else if (definitions[i].is.type === 'durations') {
-        var dur = [];
-        for (var j=0; j<definitions[i].is.val.length; j=j+1) {
-          dur.push(definitions[i].is.val[j].val);
-        }
-        voices[voiceName].dur = dur.reverse();
       }
     // pos
     } else if (definitions[i].attr.val === 'pos') {
@@ -169,7 +179,7 @@ var initVivace = function() {
   video.autoplay = false;
   document.body.appendChild(video);
 
-  voices['c'] = new VideoVoice(video)
+  voices['v'] = new VideoVoice(video)
 }
 
 /*
@@ -188,8 +198,18 @@ var Voice = function(chain, notes, dur) {
   this.chain = chain
   // Instantiate a Tonejs audio node for each element in chain
   this.audioNodes = []
+  this.signals = {}
   for (var i=0; i<chain.length; i++) {
-    this.audioNodes.push(mapNameToAudioNode(chain[i]))
+    var node = mapNameToAudioNode(chain[i])
+    if (node.instance) this.audioNodes.push(node.instance)
+    if (node.signals) {
+      for (var j=0; j<node.signals.length; j++) {
+        this.signals[chain[i]] = {}
+        this.signals[chain[i]][node.signals[j]] = []
+      }
+    }
+    if (node.notes) this.notes[chain[i]] = []
+    if (node.durations) this.durations[chain[i]] = []
   }
   // this.instrument = new Tone.Synth().toMaster()
   // this.instrument = instrument
@@ -211,7 +231,8 @@ Voice.prototype.playInstrument = function() {
     var note = this.notes[this.countNotes % this.notes.length]
     var dur = this.durations[this.countNotes % this.durations.length]
 
-    this.instrument.triggerAttackRelease(note, dur, Tone.now());
+    // this.instrument.triggerAttackRelease(note, dur, Tone.now())
+    this.audioNodes[0].triggerAttackRelease(note, dur, Tone.now())
 
     Tone.Transport.scheduleOnce(this.playInstrument.bind(this), "+" + this.durations[this.countNotes++ % this.durations.length])
 }
@@ -221,13 +242,16 @@ Voice.prototype.stopInstrument = function() {
   this.fvalues = []
 }
 Voice.prototype.playFilter = function() {
-    if (this.fvalues.length <= 0) return
-    if (this.fdur.length <= 0) return
-    var value = this.fvalues[this.fcount % this.fvalues.length]
-    var dur = this.fdur[this.fcount % this.fdur.length]
+    if (this.signals['filter']['frequency'].length <= 0) return
+    // if (this.fdur.length <= 0) return
+    var value = this.signals['filter']['frequency'][this.fcount % this.signals['filter']['frequency'].length]
+    // var dur = this.fdur[this.fcount % this.fdur.length]
+    var dur = '4n'
 
-    this.filter.frequency.linearRampToValueAtTime(value, Tone.now());
-    Tone.Transport.scheduleOnce(this.playFilter.bind(this), "+" + this.fdur[this.fcount++ % this.fdur.length])
+    this.audioNodes[1].frequency.linearRampToValueAtTime(value, Tone.now());
+    this.fcount++
+    Tone.Transport.scheduleOnce(this.playFilter.bind(this), "+" + dur)
+    // Tone.Transport.scheduleOnce(this.playFilter.bind(this), "+" + this.fdur[this.fcount++ % this.fdur.length])
 }
 
 /*
