@@ -107,26 +107,18 @@
   <body>
 
    <textarea id="code" spellcheck="false">
-a.sig = synth => filter
+a.signal = synth => reverb
 a.notes = [g4, d4, f4, a3]
 a.notes = {4n, 8t}
-
-// c.notes = [10, 20, 30, 40]
-// c.notes = {0.1, 0.2, 0.3, 2}
-// a.sig = synth => filter
-// a.notes = [g4, d4, f4, a3]
-// a.notes = {0.1, 0.2, 0.3, 2}
-// a.filter.frequency = [100, 200]
-// a.filter.frequency = {4n}
-
-// z.sig = sampler(./media/foo.wav) => filter => panner => master
-//        synthfm => reverb => master
-//        video(./media/eyes.mp4) => filter => master
+a.reverb.roomSize = [10, 20]
+a.reverb.roomSize = {4n}
 </textarea>
 
    <div id="banner" onclick="run();">Vivace</div>
 
-   <div id="drawer"></div>
+   <div id="drawer">
+     <div id="dial"></div>
+   </div>
 
    <script> initVivace();
 /*
