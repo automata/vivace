@@ -15,6 +15,7 @@
 - [ ] add all tonejs nodes and make it possible to automate every param
 - [ ] implement operators on sequences
 - [ ] make it work again with client/server (sharejs)
+- [ ] use a better lib to catch keystrokes and use ctrl/meta + enter to evaluate
 
 extra (maybe for 1.1.0):
 - show notes as a plot
