@@ -107,6 +107,8 @@ function exec (input) {
         // }
       }
     // filter???
+      // TODO: Maybe we can iterate on the dictionary maping names into Tonejs
+      // audio nodes and then do this dance automatically
     } else if (definitions[i].attr.val === 'filter') {
       if (definitions[i].inner_attr) {
         if (definitions[i].inner_attr.val === 'frequency') {
@@ -115,13 +117,25 @@ function exec (input) {
             for (var j=0; j<definitions[i].is.val.length; j=j+1) {
               vals.push(definitions[i].is.val[j].val);
             }
-            if (voices[voiceName].signals['filter']['frequency'].length == 0) {
-              voices[voiceName].signals['filter']['frequency'] = vals.reverse()
-              voices[voiceName].playFilter()
+            if (voices[voiceName].signals['filter']['frequency'].values.length == 0) {
+              voices[voiceName].signals['filter']['frequency'].values = vals.reverse()
+              voices[voiceName].playSignal('filter', 'frequency')
             } else {
-              voices[voiceName].signals['filter']['frequency'] = vals.reverse()
+              voices[voiceName].signals['filter']['frequency'].values = vals.reverse()
+            }
+          } else if (definitions[i].is.type === 'durations') {
+            var vals = [];
+            for (var j=0; j<definitions[i].is.val.length; j=j+1) {
+              vals.push(definitions[i].is.val[j].val);
+            }
+            if (voices[voiceName].signals['filter']['frequency'].durations.length == 0) {
+              voices[voiceName].signals['filter']['frequency'].durations = vals.reverse()
+              voices[voiceName].playSignal('filter', 'frequency')
+            } else {
+              voices[voiceName].signals['filter']['frequency'].durations = vals.reverse()
             }
           }
+
         }
       }
     // pos
@@ -205,7 +219,11 @@ var Voice = function(chain, notes, dur) {
     if (node.signals) {
       for (var j=0; j<node.signals.length; j++) {
         this.signals[chain[i]] = {}
-        this.signals[chain[i]][node.signals[j]] = []
+        this.signals[chain[i]][node.signals[j]] = {
+          values: [],
+          durations: [],
+          counter: 0
+        }
       }
     }
     if (node.notes) this.notes[chain[i]] = []
@@ -241,17 +259,22 @@ Voice.prototype.stopInstrument = function() {
   this.notes = []
   this.fvalues = []
 }
-Voice.prototype.playFilter = function() {
-    if (this.signals['filter']['frequency'].length <= 0) return
-    // if (this.fdur.length <= 0) return
-    var value = this.signals['filter']['frequency'][this.fcount % this.signals['filter']['frequency'].length]
-    // var dur = this.fdur[this.fcount % this.fdur.length]
-    var dur = '4n'
-
-    this.audioNodes[1].frequency.linearRampToValueAtTime(value, Tone.now());
-    this.fcount++
-    Tone.Transport.scheduleOnce(this.playFilter.bind(this), "+" + dur)
-    // Tone.Transport.scheduleOnce(this.playFilter.bind(this), "+" + this.fdur[this.fcount++ % this.fdur.length])
+// TODO: Maybe playSignal can receive what signal as argument and just play
+// it...
+Voice.prototype.playSignal = function(nodeName, signalName) {
+    var signal = this.signals[nodeName][signalName]
+    var values = signal.values
+    var durations = signal.durations
+    var counter = signal.counter
+    if (values.length <= 0) return
+    if (durations.length <= 0) return
+    var value = values[counter % values.length]
+    var dur = durations[counter % durations.length]
+    for (var i=0; i<this.chain.length; i++) {
+      if (this.chain[i] === nodeName)
+        this.audioNodes[i][signalName].linearRampToValueAtTime(value, Tone.now());
+    }
+    Tone.Transport.scheduleOnce(this.playSignal.bind(this, nodeName, signalName), "+" + durations[this.signals[nodeName][signalName].counter++ % durations.length])
 }
 
 /*
