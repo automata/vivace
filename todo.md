@@ -16,6 +16,7 @@
 - [ ] implement operators on sequences
 - [ ] make it work again with client/server (sharejs)
 - [ ] use a better lib to catch keystrokes and use ctrl/meta + enter to evaluate
+- [ ] add some sintax to allow scales [i, iii, v] and foo.scale = minor_5 and foo.root = c4 params
 
 extra (maybe for 1.1.0):
 - show notes as a plot
