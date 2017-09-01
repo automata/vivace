@@ -157,7 +157,7 @@ function exec (input) {
       }
     }
   }
-  return [voices, voiceNames];
+  return [voices, voiceNames]
 }
 
 /*
@@ -205,6 +205,39 @@ var Voice = function(chain, notes, dur) {
           durations: [],
           counter: 0
         }
+        // Add UI to drawer at DOM
+        var drawer = document.getElementById("drawer")
+        var voiceEl = document.createElement("div")
+        voiceEl.setAttribute("id", "voice-a")
+        var nameEl = document.createElement("h2")
+        nameEl.innerHTML = node.signals[j]
+        voiceEl.appendChild(nameEl)
+        drawer.appendChild(voiceEl)
+
+        var dialEl = document.createElement("div")
+        var dialId = "a-" + chain[i] + "-" + node.signals[j]
+        dialEl.setAttribute("id", dialId)
+        voiceEl.appendChild(dialEl)
+        // TODO: Define right min/max/step values
+        var dialUI = new Nexus.Dial(dialId,{
+          'size': [50,50],
+          'interaction': 'vertical',
+          'mode': 'relative', // "absolute" or "relative"
+          'min': 0,
+          'max': 1,
+          'step': 0,
+          'value': 0
+        })
+        dialUI.colorize("accent","#fff")
+        dialUI.colorize("fill","#333")
+        dialUI.on("change", function (signal, obj, v) {
+          // Reset durations/values that are running before setting it manually
+          obj.values = []
+          obj.durations = []
+          obj.counter = 0
+          // Set param value
+          signal.value = v
+        }.bind(this, this.audioNodes[i][node.signals[j]], this.signals[chain[i]][node.signals[j]]))
       }
     }
     if (node.notes) this.notes[chain[i]] = []
