@@ -13,15 +13,23 @@ Tone.Transport.start();
 
 var audioNodeNames = [
   'synth',
+  'sampler',
   'filter',
   'reverb'
 ]
 
-function mapNameToAudioNode(name) {
+function mapNameToAudioNode(name, parameters) {
   switch (name) {
     case 'synth':
       return {
         instance: new Tone.Synth(),
+        notes: [],
+        durations: []
+      }
+    case 'sampler':
+      console.log('params', parameters)
+      return {
+        instance: new Tone.Sampler({"c4": parameters[0]}, function () { console.log('hey!!')}),
         notes: [],
         durations: []
       }
@@ -108,7 +116,12 @@ function exec (input) {
           let chain = definitions[i].is.val.map(function (el) {
             return el.name.val
           })
-          voices[voiceName] = new Voice(chain.reverse())
+          let parameters = definitions[i].is.val.map(function (el) {
+            return el.parameters.map(function (par) {
+              return par.val
+            })
+          })
+          voices[voiceName] = new Voice(chain.reverse(), [], [], parameters.reverse())
         }
         // TODO: Otherwise, if voice exists, see if chain changed, and update
         // it
@@ -183,11 +196,12 @@ var initVivace = function() {
  * Voice
  */
 
-var Voice = function(chain, notes, dur) {
+var Voice = function(chain, notes, dur, parameters) {
   this.notes = notes || []
   this.durations = dur || []
   this.countNotes = 0
   this.playing = false
+  this.parameters = parameters
   // Keep track of list of name of elements in the chain
   this.chain = chain
   // Instantiate a Tonejs audio node for each element in chain, create object
@@ -195,7 +209,8 @@ var Voice = function(chain, notes, dur) {
   this.audioNodes = []
   this.signals = {}
   for (var i=0; i<chain.length; i++) {
-    var node = mapNameToAudioNode(chain[i])
+    console.log(chain[i], '-', this.parameters[i], parameters)
+    var node = mapNameToAudioNode(chain[i], this.parameters[i])
     if (node.instance) this.audioNodes.push(node.instance)
     if (node.signals) {
       this.signals[chain[i]] = {}
@@ -215,6 +230,8 @@ var Voice = function(chain, notes, dur) {
         drawer.appendChild(voiceEl)
 
         var dialEl = document.createElement("div")
+        // TODO: Create high level element for voice, stop hardcoding voice
+        // name
         var dialId = "a-" + chain[i] + "-" + node.signals[j]
         dialEl.setAttribute("id", dialId)
         voiceEl.appendChild(dialEl)
