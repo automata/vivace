@@ -9,7 +9,7 @@ the [Web
  [Tone.js](http://tonejs.github.io) is the framework of choice to handle
  audio processing and event scheduling synced with Web Audio API's internal clock.
 
-The main features of *Vivace*:
+*Vivace* aims to be easy to learn and use by providing a set of features:
 - Simple syntax and grammar rules
 - Runs on every popular browser, so newcomers to live coding can start
   practicing it right way
@@ -17,11 +17,11 @@ The main features of *Vivace*:
   the standards
 - Mixes audio and video capabilities making it a Swiss knife for live playing
   of multimedia
-- Full control of audio nodes by language instructions or UI
+- Full control of audio nodes and their parameters by language instructions or UI
 
 [Try vivace](http://vivacelang.herokuapp.com).
 
-# OK, but what is live coding?
+## OK, but what is live coding?
 
 [Live coding](http://toplap.org) is an alternative way to compose and
 play music (or other media) in real-time.  The performer/composer
