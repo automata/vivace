@@ -4,10 +4,10 @@
 the [Web
  Audio
  API](https://dvcs.w3.org/hg/audio/raw-file/tip/webaudio/specification.html)
- for process audio and the HTML5 video tag to play videos. The
- language parser is built using the awesome [Jison](http://jison.org) and
+ for audio processing and the HTML5 Video video control. The
+ language parser and lexer are built using [Jison](http://jison.org) and
  [Tone.js](http://tonejs.github.io) is the framework of choice to handle
- synths, filters and event scheduling synced with Web Audio API's clock.
+ audio processing and event scheduling synced with Web Audio API's internal clock.
 
 The main features of *Vivace*:
 - Simple syntax and grammar rules
