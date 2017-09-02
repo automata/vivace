@@ -4,7 +4,7 @@
 the [Web
  Audio
  API](https://dvcs.w3.org/hg/audio/raw-file/tip/webaudio/specification.html)
- for audio processing and the HTML5 Video video control. The
+ for audio processing and HTML5 Video for video displaying and control. The
  language parser and lexer are built using [Jison](http://jison.org) and
  [Tone.js](http://tonejs.github.io) is the framework of choice to handle
  audio processing and event scheduling synced with Web Audio API's internal clock.
