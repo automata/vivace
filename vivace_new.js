@@ -1,6 +1,3 @@
-//var parser = require("./vivace").parser;
-
-// where are our audio files?
 var audioFilesDir = './media/';
 
 // Store all the voices (main symbol table)
@@ -188,6 +185,8 @@ function exec (input) {
  */
 
 var initVivace = function() {
+  var textArea = document.getElementById("code")
+  textArea.value = welcomeMessage
   // FIXME: Have some UI to load voices
   // voices['a'] = new Voice(new Tone.Synth())
   // voices['b'] = new Voice(new Tone.Synth())

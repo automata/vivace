@@ -8,6 +8,7 @@
     <script src="Tone.min.js"></script>
     <script src="tune.js"></script>
     <script src="NexusUI.js"></script>
+    <script src="welcomeMessage.js"></script>
     <script src="vivace.js"></script>
     <script src="vivace_new.js"></script>
 <!--
@@ -100,24 +101,29 @@
         z-index: 2000;
         opacity: 0.8;
       }
+      #voice-a {
+        background-color: #222;
+        float: left;
+        margin: 2px;
+        padding: 2px;
+      }
+      #voice-a h2 {
+        font-family: "Roboto Mono";
+        font-weight: 100;
+        font-size: 12pt;
+        text-align: center;
+      }
     </style>
 
   </head>
 
   <body>
 
-   <textarea id="code" spellcheck="false">
-a.signal = synth => reverb
-a.notes = [g4, d4, f4, a3]
-a.notes = {4n, 8t}
-a.reverb.roomSize = [10, 20]
-a.reverb.roomSize = {4n}
-</textarea>
+   <textarea id="code" spellcheck="false"></textarea>
 
    <div id="banner" onclick="run();">Vivace</div>
 
    <div id="drawer">
-     <div id="dial"></div>
    </div>
 
    <script> initVivace();
