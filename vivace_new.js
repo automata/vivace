@@ -76,7 +76,7 @@ function exec (input) {
     var voiceName = definitions[i].name.val;
     voiceNames[voiceName]=true;
 
-    if (definitions[i].attr.val === 'notes') {
+    if (definitions[i].attr.val === 'notes' || definitions[i].attr.val === 'n' || definitions[i].attr.val === 'p' || definitions[i].attr.val === 'pos') {
       if (definitions[i].is.type === 'values') {
         if (voices[voiceName]) {
           var notes = []
