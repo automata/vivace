@@ -170,7 +170,7 @@ function exec (input) {
               return par.val
             })
           })
-          voices[voiceName] = new Voice(chain.reverse(), [], [], parameters.reverse())
+          voices[voiceName] = new Voice(voiceName, chain.reverse(), [], [], parameters.reverse())
         }
         // TODO: Otherwise, if voice exists, see if chain changed, and update
         // it
@@ -236,16 +236,13 @@ var initVivace = function() {
  * Voice
  */
 
-var Voice = function(chain, notes, dur, parameters) {
+var Voice = function(name, chain, notes, dur, parameters) {
+  this.name = name
   this.notes = notes || []
   this.durations = dur || []
   this.countNotes = 0
   this.playing = false
-  this.root = null
   this.tune = new Tune()
-  // Sets a default scale
-  this.scale = 'minor_5'
-  this.tune.loadScale(this.scale)
   // Store "constructor" parameters given for chain nodes like sampler or
   // video, e.g. video('foo.mp4')
   this.parameters = parameters
@@ -259,11 +256,27 @@ var Voice = function(chain, notes, dur, parameters) {
   // audioNodes
   this.videoNodes = []
   this.signals = {}
+
+  // Add UI to drawer at DOM
+  var drawer = document.getElementById("drawer")
+
+  var voiceEl = document.createElement("div")
+  voiceEl.setAttribute("id", "voice-" + this.name)
+  voiceEl.setAttribute("class", "voice")
+  drawer.appendChild(voiceEl)
+
+  var voiceNameEl = document.createElement("h1")
+  voiceNameEl.innerHTML = this.name
+  voiceEl.appendChild(voiceNameEl)
+
   for (var i=0; i<chain.length; i++) {
     var node = mapNameToAudioNode(chain[i], this.parameters[i])
     if (node.instance) this.audioNodes.push(node.instance)
     if (node.video) this.videoNodes.push(node.video)
     if (node.signals) {
+      var signalsEl = document.createElement("div")
+      signalsEl.setAttribute("class", "signal")
+
       this.signals[chain[i]] = {}
       for (var j=0; j<node.signals.length; j++) {
         this.signals[chain[i]][node.signals[j]] = {
@@ -271,21 +284,16 @@ var Voice = function(chain, notes, dur, parameters) {
           durations: [],
           counter: 0
         }
-        // Add UI to drawer at DOM
-        var drawer = document.getElementById("drawer")
-        var voiceEl = document.createElement("div")
-        voiceEl.setAttribute("id", "voice-a")
         var nameEl = document.createElement("h2")
         nameEl.innerHTML = node.signals[j]
-        voiceEl.appendChild(nameEl)
-        drawer.appendChild(voiceEl)
+        signalsEl.appendChild(nameEl)
+        voiceEl.appendChild(signalsEl)
 
         var dialEl = document.createElement("div")
-        // TODO: Create high level element for voice, stop hardcoding voice
-        // name
-        var dialId = "a-" + chain[i] + "-" + node.signals[j]
+        var dialId = this.name + "-" + chain[i] + "-" + node.signals[j]
         dialEl.setAttribute("id", dialId)
-        voiceEl.appendChild(dialEl)
+        dialEl.setAttribute("class", "dial")
+        signalsEl.appendChild(dialEl)
         // TODO: Define right min/max/step values
         var dialUI = new Nexus.Dial(dialId,{
           'size': [50,50],
