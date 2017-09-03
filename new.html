@@ -97,17 +97,19 @@
         position: absolute;
         top: 0;
         right: 0;
-        width: 200px;
+        width: 0;
         height: 100%;
         padding: 0;
         z-index: 2000;
         opacity: 0.8;
-        overflow: scroll;
+        overflow-y: scroll;
+        overflow-x: hidden;
+        transition: 0.5s;
       }
       .voice {
         background-color: #000;
         float: left;
-        width: 100%;
+        width: 250px;
         padding: 0;
         margin-bottom: 10px;
       }
@@ -143,7 +145,7 @@
 
    <textarea id="code" spellcheck="false"></textarea>
 
-   <div id="banner" onclick="run();">Vivace</div>
+   <div id="banner" onclick="toggleDrawer()">Vivace</div>
 
    <div id="drawer">
    </div>

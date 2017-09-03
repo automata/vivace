@@ -415,6 +415,15 @@ function run () {
   previousVoices = activeVoices
 }
 
+var drawerOpen = false
+function toggleDrawer() {
+  if (drawerOpen)
+    document.getElementById("drawer").style.width = "0"
+  else
+    document.getElementById("drawer").style.width = "250px"
+  drawerOpen = !drawerOpen
+}
+
 // key events: CTRL + x
 var isCtrl = false;
 document.onkeyup=function(e){
