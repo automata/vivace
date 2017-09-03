@@ -9,15 +9,19 @@
   - [x] use tempo notation for durations
   - [x] define audio chain
   - [x] play params (automation)
-- [ ] implement chain manipulation
-- [ ] add UI to each param, on chain creation/manipulation https://nexus-js.github.io/ui/api/#intro
-- [ ] make it smooth to insert/delete a video and sampler
+- [x] implement chain manipulation
+- [x] add UI to each param, on chain creation/manipulation https://nexus-js.github.io/ui/api/#intro
+- [x] make it smooth to insert/delete a video and sampler
 - [ ] add all tonejs nodes and make it possible to automate every param
 - [ ] implement operators on sequences
 - [ ] make it work again with client/server (sharejs)
 - [ ] use a better lib to catch keystrokes and use ctrl/meta + enter to evaluate
 - [ ] add some sintax to allow scales [i, iii, v] and foo.scale = minor_5 and foo.root = c4 params
 - [ ] use more compact notation like [g4, e4, f4] @ [4n, 8n] ... [values/notes] @ [durations]
+- [ ] add global start/stop UI
+- [ ] fix UI and style it better
+- [ ] collapse drawer
+- [ ] add test units
 
 extra (maybe for 1.1.0):
 - show notes as a plot
@@ -29,6 +33,14 @@ extra (maybe for 1.1.0):
 - make it possible to create larger arcs (e.g. group voices horizontally along time/repeat)
 
 expected syntax:
-    a.sig = synth => reverb
-    a.synth = [g4, d4, f4, a3] @ [4n, 8t]
+    a.signal = synth => reverb => panner
+    a.notes = [g4, d4, f4, a3] @ [4n, 8t]
     a.reverb.roomSize = [10, 20] @ [4n]
+
+    b.signal = audio('foo.wav') => lowpass
+    b.notes = [100, 200] @ [4n]
+
+    c.signal = fmsynth => filter
+    c.scale = 'minor_5'
+    c.root = a2
+    c.notes = [II, III, V] @ [8t]
