@@ -185,20 +185,9 @@ function exec (input) {
  */
 
 var initVivace = function() {
+  // Just sets the welcoming message
   var textArea = document.getElementById("code")
   textArea.value = welcomeMessage
-  // FIXME: Have some UI to load voices
-  // voices['a'] = new Voice(new Tone.Synth())
-  // voices['b'] = new Voice(new Tone.Synth())
-
-  // FIXME: Better way to load/append videos
-  // var video = document.createElement("video");
-  // video.setAttribute("src", "media/eyes.mp4");
-  // video.controls = false;
-  // video.autoplay = false;
-  // document.body.appendChild(video);
-
-  // voices['v'] = new VideoVoice(video)
 }
 
 /*
@@ -216,6 +205,9 @@ var Voice = function(chain, notes, dur, parameters) {
   // Instantiate a Tonejs audio node for each element in chain, create object
   // to hold values/durations/position counter to params and notes/durations
   this.audioNodes = []
+  // Store video DOM objets when there are some, so we can control it (audio
+  // stream from video nodes are stored just like normal audio nodes and
+  // audioNodes
   this.videoNodes = []
   this.signals = {}
   for (var i=0; i<chain.length; i++) {
@@ -277,6 +269,7 @@ var Voice = function(chain, notes, dur, parameters) {
   // Connect last audio node to master output
   this.audioNodes[this.audioNodes.length-1].toMaster()
 }
+
 Voice.prototype.playInstrument = function() {
     this.playing = false
     if (this.notes.length <= 0) return
@@ -322,56 +315,6 @@ Voice.prototype.playSignal = function(nodeName, signalName) {
     Tone.Transport.scheduleOnce(this.playSignal.bind(this, nodeName, signalName), "+" + durations[this.signals[nodeName][signalName].counter++ % durations.length])
 }
 
-/*
- * VideoVoice
- */
-var VideoVoice = function(video, notes, dur) {
-  this.notes = notes || []
-  this.rates = [1]
-  this.durations = dur || []
-  this.countNotes = 0
-  this.fvalues = []
-  this.fdur = []
-  this.fcount = 0
-  // Signal chain nodes
-  this.instrument = video
-  this.source = context.createMediaElementSource(video)
-  //this.instrument = new Tone.Synth().toMaster()
-  //this.instrument = instrument
-  this.filter = new Tone.Filter({type: 'bandpass', Q: 12})
-  // Signal chain onnections
-  this.source.connect(this.filter)
-  this.filter.toMaster()
-}
-VideoVoice.prototype.playInstrument = function() {
-    if (this.notes.length <= 0) return
-    if (this.durations.length <= 0) return
-    var note = this.notes[this.countNotes % this.notes.length]
-    var dur = this.durations[this.countNotes % this.durations.length]
-    var rate = this.rates[this.countNotes % this.rates.length]
-
-    this.instrument.play()
-    this.instrument.currentTime = note
-    this.instrument.playbackRate = rate
-
-    Tone.Transport.scheduleOnce(this.playInstrument.bind(this), "+" + this.durations[this.countNotes++ % this.durations.length])
-}
-VideoVoice.prototype.stopInstrument = function() {
-  this.notes = []
-  this.fvalues = []
-  this.instrument.pause()
-  // FIXME: Use DOM id to hide it with CSS operation
-}
-VideoVoice.prototype.playFilter = function() {
-    if (this.fvalues.length <= 0) return
-    if (this.fdur.length <= 0) return
-    var value = this.fvalues[this.fcount % this.fvalues.length]
-    var dur = this.fdur[this.fcount % this.fdur.length]
-
-    this.filter.frequency.linearRampToValueAtTime(value, Tone.now());
-    Tone.Transport.scheduleOnce(this.playFilter.bind(this), "+" + this.fdur[this.fcount++ % this.fdur.length])
-}
-
 var previousVoices = []
 
 function run () {
@@ -379,10 +322,6 @@ function run () {
   var texec = exec(code.value)
   var currentVoices = texec[0]
   var activeVoices = texec[1]
-
-  //console.log('TEXEC', texec);
-  //console.log('active voices', activeVoices)
-  //console.log('previous voices', previousVoices)
 
   // Stop removed voices
   for (previousVoice in previousVoices) {
