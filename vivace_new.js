@@ -26,7 +26,7 @@ function mapNameToAudioNode(name, parameters) {
       }
     case 'sampler':
       return {
-        instance: new Tone.Sampler({"c4": parameters[0]}, function () { console.log('hey!!')}),
+        instance: new Tone.Sampler({"c4": parameters[0]}),
         notes: [],
         durations: []
       }
