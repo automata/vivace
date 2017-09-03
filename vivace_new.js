@@ -116,7 +116,7 @@ function exec (input) {
     }
 
     // Signal
-    if (definitions[i].attr.val === 'signal' || definitions[i].attr.val === 'sig' || definitions[i].attr.val === 's') {
+    if (definitions[i].attr.val === 'signal' || definitions[i].attr.val === 'sig' || definitions[i].attr.val === 's' || definitions[i].attr.val === 'chain' || definitions[i].attr.val === 'c') {
       if (definitions[i].is.type === 'chains') {
         if (!voices[voiceName]) {
           // voices[voiceName] = new Voice(new Tone.Synth())
