@@ -16,12 +16,13 @@
 - [ ] implement operators on sequences
 - [ ] make it work again with client/server (sharejs)
 - [ ] use a better lib to catch keystrokes and use ctrl/meta + enter to evaluate
-- [ ] add some sintax to allow scales [i, iii, v] and foo.scale = minor_5 and foo.root = c4 params
+- [x] add some sintax to allow scales [i, iii, v] and foo.scale = minor_5 and foo.root = c4 params
 - [ ] use more compact notation like [g4, e4, f4] @ [4n, 8n] ... [values/notes] @ [durations]
 - [ ] add global start/stop UI
 - [ ] fix UI and style it better
 - [ ] collapse drawer
 - [ ] add test units
+- [ ] fix evaluation bug
 
 extra (maybe for 1.1.0):
 - show notes as a plot
