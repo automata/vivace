@@ -138,7 +138,6 @@ function exec (input) {
       if (definitions[i].is.type === 'chains') {
         if (voices[voiceName]) {
           voices[voiceName].scale = definitions[i].is.val[0].name.val
-          console.log('scale!!', definitions[i].is.val[0].name.val)
           if (voices[voiceName].tune)
             voices[voiceName].tune.loadScale(voices[voiceName].scale)
         }
