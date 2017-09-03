@@ -95,12 +95,29 @@ do that using __values__ and __durations__ lists:
   delimited by `[` and `]` and their values can be numbers (for frequencies in Hz, or seconds for
   video positions, etc),
   musical notes in `note octave` format like `c4` or `g2`, and even degrees into
-  a music scale like `II, III, IV`.
+  a music scale like `ii, iii, iv`.
 
 - __Durations__ are lists
   delimited by `{` and `}` and their values can be numbers (for seconds) and time
   expressions relative to BPM and time signatures like `1m` (one whole measure), `4n` (one quarter note)
   or `8t` (an eighth note).
+
+## Using scales
+
+Instead of specifying individual notes, it's posible to define a scale for a
+voice and then use degrees to play notes into the scale:
+
+    a.sig = synth
+    a.scale = young-lm_piano   // Loads LaMonte Young's Well-Tempered Piano scale
+    a.root = c4
+    a.notes = [i, iii, v]
+    a.notes = {4n}
+
+It's convenient to specify the root of the scale to make degrees relative to
+it. Scale degrees should be specified using Roman numbers (e.g. i, ii, iii, etc).
+
+*Vivace* uses [TuneJS](https://github.com/abbernie/tune) to handle scales. For a complete list of available
+scales, please [check this Web page](http://abbernie.github.io/tune/scales.html).
 
 ## Controling videos
 
