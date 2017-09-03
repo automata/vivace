@@ -72,8 +72,8 @@ __audio nodes__ you want to chain together:
 In this example you are creating a monophonic synthesizer, plugging it to a
 filter and then to a reverb. You can try other chains like:
 
-    a.signal = sampler('./media/bass.wav') => reverb
-    b.signal = video('./media/eyes.mp4')
+    a.signal = sampler('media/bass.wav') => reverb
+    b.signal = video('media/eyes.mp4') => filter
 
 Note that some audio nodes in a chain can have parameters like the name of an
 audio file to be used on `sampler`.
@@ -89,17 +89,36 @@ change its values:
     a.filter.frequency = {4n, 8n}
 
 In this example we are changing the `frequency` of the `filter` audio node. We
-do that using __values__ and __durations__ lists.
-  
-__Values__ are lists
-delimited by `[` and `]` and their values can be numbers (for frequencies in Hz, or seconds, etc),
-musical notes in `note octave` format like `c4` or `g2`, and even degrees into
-a music scale like `II, III, IV`.
+do that using __values__ and __durations__ lists:
 
-__Durations__ are lists
-delimited by `{` and `}` and their values can be numbers (for seconds) and time
-expressions relative to BPM and time signatures like `1m` (one whole measure), `4n` (one quarter note)
-or `8t` (an eighth note).
+- __Values__ are lists
+  delimited by `[` and `]` and their values can be numbers (for frequencies in Hz, or seconds for
+  video positions, etc),
+  musical notes in `note octave` format like `c4` or `g2`, and even degrees into
+  a music scale like `II, III, IV`.
+
+- __Durations__ are lists
+  delimited by `{` and `}` and their values can be numbers (for seconds) and time
+  expressions relative to BPM and time signatures like `1m` (one whole measure), `4n` (one quarter note)
+  or `8t` (an eighth note).
+
+## Controling videos
+
+Videos can be manipulated by defining __video__ as a node into a signal chain:
+
+    foo.signal = video('media/eyes.mp4')
+    foo.pos = [10, 20]
+    foo.pos = {8n}
+
+Videos accept __pos__ as a default parameter which specifies at what position
+(in seconds) video should start playing. It also expects a duration list,
+specifying the duration of it. Video playing is synced with Web Audio API's
+internal clock, so both audio and video playing are in sync.
+
+It is possible to route audio stream from videos through audio chains like we
+do with any audio node. Just route it with the chain operator `=>`:
+
+    foo.signal = video('media/eyes.mp4') => reverb => filter
 
 ## UI
 
