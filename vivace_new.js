@@ -14,6 +14,7 @@ Tone.Transport.start();
 var audioNodeNames = [
   'synth',
   'sampler',
+  'video',
   'filter',
   'reverb'
 ]
@@ -27,11 +28,20 @@ function mapNameToAudioNode(name, parameters) {
         durations: []
       }
     case 'sampler':
-      console.log('params', parameters)
       return {
         instance: new Tone.Sampler({"c4": parameters[0]}, function () { console.log('hey!!')}),
         notes: [],
         durations: []
+      }
+    case 'video':
+      var video = document.createElement("video")
+      video.setAttribute("src", parameters[0])
+      video.controls = false
+      video.autoplay = false
+      document.body.appendChild(video)
+      return {
+        instance: context.createMediaElementSource(video),
+        video: video
       }
     case 'filter':
       return {
@@ -183,13 +193,13 @@ var initVivace = function() {
   // voices['b'] = new Voice(new Tone.Synth())
 
   // FIXME: Better way to load/append videos
-  var video = document.createElement("video");
-  video.setAttribute("src", "media/eyes.mp4");
-  video.controls = false;
-  video.autoplay = false;
-  document.body.appendChild(video);
+  // var video = document.createElement("video");
+  // video.setAttribute("src", "media/eyes.mp4");
+  // video.controls = false;
+  // video.autoplay = false;
+  // document.body.appendChild(video);
 
-  voices['v'] = new VideoVoice(video)
+  // voices['v'] = new VideoVoice(video)
 }
 
 /*
@@ -207,11 +217,12 @@ var Voice = function(chain, notes, dur, parameters) {
   // Instantiate a Tonejs audio node for each element in chain, create object
   // to hold values/durations/position counter to params and notes/durations
   this.audioNodes = []
+  this.videoNodes = []
   this.signals = {}
   for (var i=0; i<chain.length; i++) {
-    console.log(chain[i], '-', this.parameters[i], parameters)
     var node = mapNameToAudioNode(chain[i], this.parameters[i])
     if (node.instance) this.audioNodes.push(node.instance)
+    if (node.video) this.videoNodes.push(node.video)
     if (node.signals) {
       this.signals[chain[i]] = {}
       for (var j=0; j<node.signals.length; j++) {
@@ -275,7 +286,13 @@ Voice.prototype.playInstrument = function() {
     var note = this.notes[this.countNotes % this.notes.length]
     var dur = this.durations[this.countNotes % this.durations.length]
 
-    this.audioNodes[0].triggerAttackRelease(note, dur, Tone.now())
+    if (this.chain[0] === 'video') {
+      this.videoNodes[0].play()
+      this.videoNodes[0].currentTime = note
+      // this.instrument.playbackRate = rate
+    } else {
+      this.audioNodes[0].triggerAttackRelease(note, dur, Tone.now())
+    }
 
     Tone.Transport.scheduleOnce(this.playInstrument.bind(this), "+" + this.durations[this.countNotes++ % this.durations.length])
 }
@@ -283,7 +300,11 @@ Voice.prototype.playInstrument = function() {
 Voice.prototype.stopInstrument = function() {
   this.playing = false
   this.notes = []
-  this.fvalues = []
+  this.durations = []
+  if (this.chain[0] === 'video') {
+      // FIXME: Use DOM id to hide it with CSS operation
+     this.videoNodes[0].pause()
+  }
 }
 
 Voice.prototype.playSignal = function(nodeName, signalName) {
