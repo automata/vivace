@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<meta charset="UTF-8">
+<title></title>
+
+    <script src="Tone.min.js"></script>
+    <script src="tune.js"></script>
+<body>
+
+</body>
+
+
+<script>
+var VideoVoice = function(video, notes, dur) {
+  this.notes = notes
+  this.durations = dur
+  this.countNotes = 0
+  this.fvalues = []
+  this.fdur = []
+  this.fcount = 0
+  // Signal chain nodes
+  this.instrument = video
+  this.source = context.createMediaElementSource(video)
+  //this.instrument = new Tone.Synth().toMaster()
+  //this.instrument = instrument
+  this.filter = new Tone.Filter({type: 'bandpass', Q: 12})
+  // Signal chain onnections
+  this.source.connect(this.filter)
+  this.filter.toMaster()
+}
+VideoVoice.prototype.playInstrument = function() {
+    if (this.notes.length <= 0) return
+    if (this.durations.length <= 0) return
+    var note = this.notes[this.countNotes % this.notes.length]
+    var dur = this.durations[this.countNotes % this.durations.length]
+
+    // this.instrument.triggerAttackRelease(note, dur, Tone.now());
+    this.instrument.currentTime = note
+
+    Tone.Transport.scheduleOnce(this.playInstrument.bind(this), "+" + this.durations[this.countNotes++ % this.durations.length])
+}
+VideoVoice.prototype.playFilter = function() {
+    if (this.fvalues.length <= 0) return
+    if (this.fdur.length <= 0) return
+    var value = this.fvalues[this.fcount % this.fvalues.length]
+    var dur = this.fdur[this.fcount % this.fdur.length]
+
+    this.filter.frequency.linearRampToValueAtTime(value, Tone.now());
+    Tone.Transport.scheduleOnce(this.playFilter.bind(this), "+" + this.fdur[this.fcount++ % this.fdur.length])
+}
+
+var Voice = function(instrument, notes, dur) {
+  this.notes = notes
+  this.durations = dur
+  this.countNotes = 0
+  this.fvalues = []
+  this.fdur = []
+  this.fcount = 0
+  // Signal chain nodes
+  //this.instrument = new Tone.Synth().toMaster()
+  this.instrument = instrument
+  this.filter = new Tone.Filter({type: 'bandpass', Q: 12})
+  // Signal chain onnections
+  this.instrument.connect(this.filter)
+  this.filter.toMaster()
+}
+Voice.prototype.playInstrument = function() {
+    if (this.notes.length <= 0) return
+    if (this.durations.length <= 0) return
+    var note = this.notes[this.countNotes % this.notes.length]
+    var dur = this.durations[this.countNotes % this.durations.length]
+
+    this.instrument.triggerAttackRelease(note, dur, Tone.now());
+
+    Tone.Transport.scheduleOnce(this.playInstrument.bind(this), "+" + this.durations[this.countNotes++ % this.durations.length])
+}
+Voice.prototype.playFilter = function() {
+    if (this.fvalues.length <= 0) return
+    if (this.fdur.length <= 0) return
+    var value = this.fvalues[this.fcount % this.fvalues.length]
+    var dur = this.fdur[this.fcount % this.fdur.length]
+
+    this.filter.frequency.linearRampToValueAtTime(value, Tone.now());
+    Tone.Transport.scheduleOnce(this.playFilter.bind(this), "+" + this.fdur[this.fcount++ % this.fdur.length])
+}
+
+var context = new AudioContext();
+Tone.setContext(context)
+Tone.Transport.start();
+
+var tune = new Tune();
+tune.loadScale('minor_5');
+// tune.note(0)
+// tune.tonicize(220)
+
+var a = new Voice(new Tone.Synth(), ["c4", "g4"], ["1m"])
+var b = new Voice(new Tone.Synth(), ["d2", "e2"], ["4n"])
+
+var video = document.createElement("video");
+video.setAttribute("src", "media/eyes.mp4");
+video.controls = true;
+video.autoplay = false;
+document.body.appendChild(video);
+var c = new VideoVoice(video, [10, 20], ["1m"])
+
+
+/*
+var seqNote = new Tone.Sequence(function (time, note) {
+  synth.triggerAttackRelease(note, "8n", time);
+}, ["C4", "E4", "G4", "A4"], "4n");
+var seqDistortion = new Tone.Sequence(function (time, note) {
+   filt.frequency.linearRampToValueAtTime(note, time)
+}, [100, 800], "8n");
+
+var part = new Tone.Part(function(time, value){
+  //the value is an object which contains both the note and the duration
+  synth.triggerAttackRelease(value.note, value.duration, time);
+}, [{"time" : 0, "note" : "C3", "duration": "2n"}, 
+     {"time" : "0:2", "note" : "C4", "duration": "2n"}
+]);
+*/
+//part.loop = true
+//part.start()
+//seqNote.start();
+//seqDistortion.start();
+/*
+var durations = ["1m", "2m"]
+var notes = ["C4", "E4", "G4"]
+var count = 0
+var foo = function () {
+  // console.log('hey', count, durations)
+  var note = notes[count % notes.length]
+  var dur = durations[count % durations.length]
+  synth.triggerAttackRelease(note, dur, Tone.now());
+  Tone.Transport.scheduleOnce(foo, "+" + durations[count++ % durations.length])
+}
+foo()
+
+var durations2 = ["1m", "2m"]
+var notes2 = ["C4", "E4", "G4"]
+var count2 = 0
+var foo2 = function () {
+  // console.log('hey', count, durations)
+  var note = notes2[count2 % notes2.length]
+  var dur = durations2[count2 % durations2.length]
+  synth2.triggerAttackRelease(note, dur, Tone.now());
+  Tone.Transport.schedule(foo2, "+" + durations2[count2++ % durations2.length])
+}
+foo2()
+*/
+
+// a.sig = audio('foo.wav')
+// a.notes = [c4, e4, g4, a4] [4n]
+// a.filt.freq = [100, 800] [8n]
+
+</script>

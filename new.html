@@ -1,0 +1,169 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
+  <head>
+    <title> Vivace </title>
+    <meta http-equiv="Content-Type" content="text/html;charset=utf-8"/>
+
+    <script src="Tone.min.js"></script>
+    <script src="tune.js"></script>
+    <script src="NexusUI.js"></script>
+    <script src="welcomeMessage.js"></script>
+    <script src="vivace.js"></script>
+    <script src="vivace_new.js"></script>
+<!--
+    <script src="/channel/bcsocket.js"></script>
+    <script src="/share/share.js"></script>
+    <script src="/share/textarea.js"></script>
+-->
+    <link href="https://fonts.googleapis.com/css?family=Roboto+Mono:100,300,400" rel="stylesheet">
+
+    <style>
+      body {
+        margin: 0;
+        padding: 0;
+        background: #000;
+      }
+
+      #code {
+        width: 100%;
+        height: 100%;
+        color: transparent;
+        background-color: transparent;
+        position: absolute; left: 0px; top: 0px;
+        padding: 24px;
+        padding-top: 42px;
+        padding-bottom: 42px;
+        line-height: 1.2em;
+        font-family: 'Roboto Mono', monospace;
+        font-weight: 100;
+        font-size: 18px;
+        visibility: visible;
+        z-index: 1000;
+        /* transition between transparent and semi-transparent black on hover */
+        transition: color  1500ms;
+        -webkit-transition: color  1500ms;
+        -o-transition: color  500ms;
+        -moz-transition: color ox-shadow 500ms;
+        -ms-transition: color  500ms;
+        outline: none;
+        border: none;
+        overflow: scroll;
+      }
+
+      #code:hover {
+        color: #fff;
+        text-shadow: #000 1px 1px 0px;
+      /*background-color:rgba(0,0,0,.1);*/
+      }
+
+      #banner {
+      position: absolute;
+      right: 0px;
+      bottom: 0px;
+      padding: 5px;
+      margin: 10px;
+      font-family: 'Roboto Mono', monospace;
+      font-weight: 100;
+      font-size: 18px;
+      color: #fff;
+      border: 1px #fff solid;
+      /*text-shadow: #555 0px 0px 2px;*/
+      background-color: #000;
+      z-index: 2001;
+      transition: color  1500ms;
+      -webkit-transition: color  1500ms;
+      -o-transition: color  500ms;
+      -moz-transition: color ox-shadow 500ms;
+      -ms-transition: color  500ms;
+      }
+
+      #banner:hover {
+        color: #000;
+        background-color: #fff;
+      }
+
+      video {
+        width: 100%;
+        height: 100%;
+        position: absolute;
+        overflow: hidden;
+      }
+
+      #drawer {
+        background-color: #000;
+        border-left: #fff 1px solid;
+        color: #fff;
+        position: absolute;
+        top: 0;
+        right: 0;
+        width: 0;
+        height: 100%;
+        padding: 0;
+        z-index: 2000;
+        opacity: 0.8;
+        overflow-y: scroll;
+        overflow-x: hidden;
+        transition: 0.5s;
+      }
+      .voice {
+        background-color: #000;
+        float: left;
+        width: 250px;
+        padding: 0;
+        margin-bottom: 10px;
+      }
+      .voice h1 {
+        font-family: "Roboto Mono";
+        font-weight: 300;
+        font-size: 12pt;
+        padding-left: 5px;
+        margin: 0;
+        background-color: #fff;
+        color: #000;
+      }
+      .signal {
+        background-color: #000;
+        float: left;
+        margin: 2px;
+        padding: 0;
+      }
+      .signal h2 {
+        font-family: "Roboto Mono";
+        font-weight: 100;
+        font-size: 12pt;
+        text-align: center;
+      }
+      .dial {
+        padding-left: 10px;
+      }
+    </style>
+
+  </head>
+
+  <body>
+
+   <textarea id="code" spellcheck="false"></textarea>
+
+   <div id="banner" onclick="toggleDrawer()">Vivace</div>
+
+   <div id="drawer">
+   </div>
+
+   <script> initVivace();
+/*
+     var elem = document.getElementById('code');
+     
+     sharejs.open('default', 'text', function(error, doc) {
+     if (error) {
+     console.log(error);
+     } else {
+     elem.disabled = false;
+     doc.attach_textarea(elem);
+     }
+     });
+*/
+   </script>
+
+  </body>
+</html>
