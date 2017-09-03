@@ -1,5 +1,7 @@
 # Introduction
 
+![Vivace](vivace_shot.png)
+
 *Vivace* is a live coding DSL (Domain Specific Language) that runs on top of
 the [Web
  Audio
@@ -138,6 +140,9 @@ do with any audio node. Just route it with the chain operator `=>`:
     foo.signal = video('media/eyes.mp4') => reverb => filter
 
 ## UI
+
+To toggle UI controls, click on the *Vivace* banner on bottom right of the
+screen. Click again whenever you want to hide it.
 
 Everytime you create a new __voice__, a UI panel with controllers will be
 created on *Vivace*'s drawer (the panel on the right).
