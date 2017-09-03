@@ -276,6 +276,7 @@ var Voice = function(name, chain, notes, dur, parameters) {
     if (node.signals) {
       var signalsEl = document.createElement("div")
       signalsEl.setAttribute("class", "signal")
+      voiceEl.appendChild(signalsEl)
 
       this.signals[chain[i]] = {}
       for (var j=0; j<node.signals.length; j++) {
@@ -284,16 +285,20 @@ var Voice = function(name, chain, notes, dur, parameters) {
           durations: [],
           counter: 0
         }
+        var signalEl = document.createElement("div")
+        signalEl.setAttribute("class", "signal")
+        signalsEl.appendChild(signalEl)
+
         var nameEl = document.createElement("h2")
         nameEl.innerHTML = node.signals[j]
-        signalsEl.appendChild(nameEl)
-        voiceEl.appendChild(signalsEl)
+        signalEl.appendChild(nameEl)
 
         var dialEl = document.createElement("div")
         var dialId = this.name + "-" + chain[i] + "-" + node.signals[j]
         dialEl.setAttribute("id", dialId)
         dialEl.setAttribute("class", "dial")
-        signalsEl.appendChild(dialEl)
+        signalEl.appendChild(dialEl)
+
         // TODO: Define right min/max/step values
         var dialUI = new Nexus.Dial(dialId,{
           'size': [50,50],
