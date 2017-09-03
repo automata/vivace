@@ -16,6 +16,16 @@ var audioNodeNames = [
   'reverb'
 ]
 
+var scaleDegrees = [ 'i', 'ii', 'iii', 'iv', 'v', 'vi', 'vii', 'viii', 'ix', 'x', 'xi' ]
+
+function degreeToNumber(degree) {
+  for (var i=0; i<scaleDegrees.length; i++) {
+    if (scaleDegrees[i] === degree)
+      return i
+  }
+  return degree
+}
+
 function mapNameToAudioNode(name, parameters) {
   switch (name) {
     case 'synth':
@@ -78,7 +88,15 @@ function exec (input) {
         if (voices[voiceName]) {
           var notes = []
           for (var j=0; j<definitions[i].is.val.length; j++) {
-            notes.push(definitions[i].is.val[j].val)
+            var note = definitions[i].is.val[j].val
+            if (scaleDegrees.includes(note)) {
+              if (voices[voiceName].tune && voices[voiceName].scale) {
+                console.log('note', degreeToNumber(note), voices[voiceName].tune.note(degreeToNumber(note)))
+                notes.push(voices[voiceName].tune.note(degreeToNumber(note)))
+              }
+            } else {
+              notes.push(definitions[i].is.val[j].val)
+            }
           }
           voices[voiceName].notes = notes.reverse()
         }
@@ -111,6 +129,31 @@ function exec (input) {
             vals.push(definitions[i].is.val[j].val)
           }
           voices[voiceName].rates = vals.reverse()
+        }
+      }
+    }
+    // A kind of a hack to consider scale and root as chains, but only to use
+    // the supposed node names as scale and root values ;-)
+    if (definitions[i].attr.val === 'scale') {
+      if (definitions[i].is.type === 'chains') {
+        if (voices[voiceName]) {
+          voices[voiceName].scale = definitions[i].is.val[0].name.val
+          console.log('scale!!', definitions[i].is.val[0].name.val)
+          if (voices[voiceName].tune)
+            voices[voiceName].tune.loadScale(voices[voiceName].scale)
+        }
+      }
+    }
+    if (definitions[i].attr.val === 'root') {
+      if (definitions[i].is.type === 'chains') {
+        if (voices[voiceName]) {
+          var vals = []
+          for (var j=0; j<definitions[i].is.val.length; j++) {
+            vals.push(definitions[i].is.val[j].val)
+          }
+          voices[voiceName].root = Tone.Frequency(definitions[i].is.val[0].name.val)
+          if (voices[voiceName].tune)
+            voices[voiceName].tune.tonicize(voices[voiceName].root)
         }
       }
     }
@@ -199,6 +242,13 @@ var Voice = function(chain, notes, dur, parameters) {
   this.durations = dur || []
   this.countNotes = 0
   this.playing = false
+  this.root = null
+  this.tune = new Tune()
+  // Sets a default scale
+  this.scale = 'minor_5'
+  this.tune.loadScale(this.scale)
+  // Store "constructor" parameters given for chain nodes like sampler or
+  // video, e.g. video('foo.mp4')
   this.parameters = parameters
   // Keep track of list of name of elements in the chain
   this.chain = chain
