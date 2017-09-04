@@ -15,15 +15,16 @@
 - [x] fix UI and style it better
 - [x] add some sintax to allow scales [i, iii, v] and foo.scale = minor_5 and foo.root = c4 params
 - [x] collapse drawer
+- [x] merge and update gh-pages
 - [ ] add all tonejs nodes and make it possible to automate every param
 - [ ] implement operators on sequences
 - [ ] make it work again with client/server (sharejs)
 - [ ] use a better lib to catch keystrokes and use ctrl/meta + enter to evaluate
 - [ ] use more compact notation like [g4, e4, f4] @ [4n, 8n] ... [values/notes] @ [durations]
+- [ ] use numbers on notes to subtones and such
 - [ ] add global start/stop UI
 - [ ] add unit tests
 - [ ] fix evaluation bug
-- [ ] merge and update gh-pages
 - [ ] add syntax highlight (codemirror?)
 
 extra (maybe for 1.1.0):
