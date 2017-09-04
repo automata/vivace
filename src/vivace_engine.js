@@ -73,7 +73,7 @@ function mapNameToAudioNode(name, parameters) {
 
 function exec (input) {
   var tree = vivace.parse(input)
-  var definitions = tree.code.definitions
+  var definitions = tree.code.definitions.reverse()
   console.log('Definitions', definitions)
   console.log('Voices', voices)
 
