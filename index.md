@@ -1,6 +1,4 @@
-# Introduction
-
-![Vivace](./docs/vivace_shot.png)
+![Vivace](./docs/vivace_shot.jpg)
 
 *Vivace* is a live coding DSL (Domain Specific Language) that runs on top of
 the [Web
@@ -20,8 +18,6 @@ the [Web
 - Mixes audio and video capabilities making it a Swiss knife for live playing
   of multimedia
 - Full control of audio nodes and their parameters by language instructions or UI
-
-[Try vivace](http://automata.github.io/vivace/run).
 
 ## OK, but what is live coding?
 
