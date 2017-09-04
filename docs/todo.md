@@ -1,3 +1,4 @@
+for 0.1.0:
 - [x] investigate tone.js https://tonejs.github.io/docs/#Sequence
 - [x] redo video playback/control without popcorn
 - [x] make it possible to route video audio through audio chains
@@ -16,6 +17,9 @@
 - [x] add some sintax to allow scales [i, iii, v] and foo.scale = minor_5 and foo.root = c4 params
 - [x] collapse drawer
 - [x] merge and update gh-pages
+- [x] fix evaluation bug
+
+for 0.1.1:
 - [ ] add all tonejs nodes and make it possible to automate every param
 - [ ] implement operators on sequences
 - [ ] make it work again with client/server (sharejs)
@@ -24,10 +28,9 @@
 - [ ] use numbers on notes to subtones and such
 - [ ] add global start/stop UI
 - [ ] add unit tests
-- [ ] fix evaluation bug
 - [ ] add syntax highlight (codemirror?)
 
-extra (maybe for 1.1.0):
+for 0.2.0:
 - show notes as a plot
 - show node chain as a plot
 - make it possible to drag and drop audio files
