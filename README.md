@@ -1,6 +1,6 @@
 # Introduction
 
-![Vivace](vivace_shot.png)
+![Vivace](docs/vivace_shot.png)
 
 *Vivace* is a live coding DSL (Domain Specific Language) that runs on top of
 the [Web
