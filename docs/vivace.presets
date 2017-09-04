@@ -1,0 +1,125 @@
+// os presets sao separados por 4 '/' ou mais ('////...')
+
+// este primeiro campo eh jogado fora, pode anotar qualquer coisa aqui...
+
+///////////////// 1
+
+// percussoes, carminha
+v.pos = [21,30]
+v.pos = {1/2}
+////////////////// 2
+b.pos = [2] // posicao no arquivo em segundos
+
+b.gdur= [.1] // duracao no arquivo em segundos
+
+b.pos = {1/2,1/2,1/4,1/4,1/4,1/4} // sequencia de ataques ciclicos em fracoes da batida (1)
+/////
+b.pos = [2]
+b.gdur= [.5,.5]
+b.pos = {1/4,1/4}
+///////////////
+v.pos = [2,3,1]
+v.pos = {1/2}
+
+a.pos=[0]
+a.gdur=[.1]
+a.pos={1/8}
+
+b.pos={1/8,1/16,1/16,1/16,1/16,1/32,1/32,1/32,1/32}
+b.pos=[5,0]
+b.gdur=[.02,.01]
+
+
+/////////////////////
+
+
+// norminha enterrando, tenso
+
+v.pos = [720,723,725,100]
+v.pos = {1/2}
+   
+a.pos = [0]
+a.pos = {1/2}
+a.gdur = [.01]
+
+c.pos = [0]
+c.pos = {1/4}
+c.gdur = [.01]
+
+b.pos={1/8,1/16,1/16,1/16,1/16,1/32,1/32,1/32,1/32}
+b.pos=[5,0]
+b.gdur=[.012,.01]
+
+//////////////////////
+
+v.pos = [2,3,1] // v.pos = [3]
+v.pos = {1/2}
+
+a.pos = [0]
+a.pos = {1/2}
+a.gdur = [.1]
+
+c.pos = [0]
+c.pos = {1/4}
+c.gdur = [.1]
+
+b.pos={1/8,1/16,1/16,1/16,1/16,1/32,1/32,1/32,1/32}
+b.pos=[5,0]
+b.gdur=[.02,.01]
+
+
+/////////////////////
+
+
+// norminha enterrando, tenso
+
+v.pos = [720,723,725,100]
+v.pos = {1/2}
+   
+a.pos = [0]
+a.pos = {1/2}
+a.gdur = [.01]
+
+c.pos = [0]
+c.pos = {1/4}
+c.gdur = [.01]
+
+b.pos={1/8,1/16,1/16,1/16,1/16,1/32,1/32,1/32,1/32}
+b.pos=[5,0]
+b.gdur=[.012,.01]
+
+//////////////
+
+// vivace 0.0.4
+// ~~~~~~~~~~
+// edit the code below and type ctrl+x
+// 
+// video from https://www.youtube.com/watch?v=ySMtB5nWxPs
+// by Mike & Josh Shorts 
+
+// video positions in seconds:
+eyes.pos = [1, 1, 2, 3, 5, 8, 13, 21, 34, 55, 89]
+
+// durations in ratios of tempo
+eyes.pos = {1/2, 1/2, 1, 1/3, 1/8, 1}
+eyes.gdur = [.05, 1, 2, 3, 4, 5]
+
+// audio file positions in seconds:
+a.pos = [2, 4, 7, 9, .1, .2, .3]
+// durations of audio grains in seconds:
+a.gdur = [.005]
+// durations in ratios of tempo
+a.pos = {1/2}
+
+b.pos = [5, 2, 3, 1]
+b.gdur = [.012, .01, 5, 0.1]
+b.pos = {1/8, 1/16, 1/16, 1/16, 1/16, 1/32, 1/32, 1/32, 1/32}
+
+c.pos = [0, 5, 1, 7, 2, 10, 3, 14]
+c.gdur = [.001, 0.02, 3]
+c.pos = {1/4}
+
+// you got the idea right? have fun ;-)
+
+// more info at http://automata.github.com/vivace
+   
