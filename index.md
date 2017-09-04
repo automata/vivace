@@ -21,7 +21,7 @@ the [Web
   of multimedia
 - Full control of audio nodes and their parameters by language instructions or UI
 
-[Try vivace](http://automata.github.io/vivace/new.html).
+[Try vivace](http://automata.github.io/vivace/run).
 
 ## OK, but what is live coding?
 
