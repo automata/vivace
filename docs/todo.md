@@ -21,16 +21,16 @@ for 0.1.0:
 
 for 0.1.1:
 - [x] use a better lib to catch keystrokes and use ctrl/meta + enter to evaluate
+- [x] add syntax highlight (codemirror?)
+- [ ] use numbers on notes to subtones and such
 - [ ] add all tonejs nodes and make it possible to automate every param
 - [ ] implement operators on sequences
-- [ ] make it work again with client/server (sharejs)
 - [ ] use more compact notation like [g4, e4, f4] @ [4n, 8n] ... [values/notes] @ [durations]
-- [ ] use numbers on notes to subtones and such
 - [ ] add global start/stop UI
-- [ ] add unit tests
-- [ ] add syntax highlight (codemirror?)
+- [ ] make it work again with client/server (sharejs)
 
 for 0.2.0:
+- [ ] add unit tests
 - show notes as a plot
 - show node chain as a plot
 - make it possible to drag and drop audio files
