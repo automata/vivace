@@ -415,7 +415,12 @@ function run () {
   previousVoices = activeVoices
 }
 
+/*
+ * Drawer handling
+ */
+
 var drawerOpen = false
+
 function toggleDrawer() {
   if (drawerOpen)
     document.getElementById("drawer").style.width = "0"
@@ -424,16 +429,30 @@ function toggleDrawer() {
   drawerOpen = !drawerOpen
 }
 
-// key events: CTRL + x
-var isCtrl = false;
-document.onkeyup=function(e){
-  if(e.which == 17) isCtrl=false;
-}
-document.onkeydown=function(e){
-  if(e.which == 17) isCtrl=true;
-  if(e.which == 88 && isCtrl == true) {
-    run();
-    return false;
-  }
-}
+/*
+ * Keystrokes handling
+ */
 
+keyboardJS.bind('command + enter', function(e) {
+  run()
+})
+keyboardJS.bind('ctrl + enter', function(e) {
+  run()
+})
+keyboardJS.bind('alt + enter', function(e) {
+  run()
+})
+
+keyboardJS.bind('command + .', function(e) {
+  // TODO: Implement stop all
+})
+
+keyboardJS.bind('command + ]', function(e) {
+  toggleDrawer()
+})
+keyboardJS.bind('ctrl + ]', function(e) {
+  toggleDrawer()
+})
+keyboardJS.bind('alt + ]', function(e) {
+  toggleDrawer()
+})
