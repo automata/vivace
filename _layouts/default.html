@@ -8,11 +8,18 @@
 
     <link rel="stylesheet" href="{{ '/assets/css/style.css?v=' | append: site.github.build_revision | relative_url }}">
     <style>
-header li {
-  width: 100%;
-  float:left;
-  height:40px;
-}
+      header li {
+        width: 100%;
+        float:left;
+        height:40px;
+      }
+      header ul:hover {
+        background: #e4e4e4;
+      }
+
+      header ul a {
+        line-height: 2;
+      }
     </style>
     <meta name="viewport" content="width=device-width">
     <!--[if lt IE 9]>
