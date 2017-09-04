@@ -52,8 +52,9 @@ of lists: __values__ and __durations__. In this case, the list of values `[d4,
 e4, c4]` will be played in order every one measure, defined by the list of
 durations `[1m]`.
 
-Try to type the example above and press `CTRL+x` to evaluate it. Also, try to
-change the values and press `CTRL+x` again and again. That's the essence of
+Try to type the example above and press `Ctrl + Enter` (`Cmd + Enter` or `Alt + Enter`
+also works) to evaluate it. Also, try to
+change the values and press `Ctrl + Enter` again and again. That's the essence of
 live coding: you're manipulating media on-the-fly.
 
 ## Voices
@@ -142,7 +143,8 @@ do with any audio node. Just route it with the chain operator `=>`:
 ## UI
 
 To toggle UI controls, click on the *Vivace* banner on bottom right of the
-screen. Click again whenever you want to hide it.
+screen or press `Ctrl + ]` (`Cmd + ]` and `Alt + ]` also works).
+Click (or press `Ctrl + ]`) again whenever you want to hide/show it.
 
 Everytime you create a new __voice__, a UI panel with controllers will be
 created on *Vivace*'s drawer (the panel on the right).
