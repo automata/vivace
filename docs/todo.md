@@ -20,10 +20,10 @@ for 0.1.0:
 - [x] fix evaluation bug
 
 for 0.1.1:
+- [x] use a better lib to catch keystrokes and use ctrl/meta + enter to evaluate
 - [ ] add all tonejs nodes and make it possible to automate every param
 - [ ] implement operators on sequences
 - [ ] make it work again with client/server (sharejs)
-- [ ] use a better lib to catch keystrokes and use ctrl/meta + enter to evaluate
 - [ ] use more compact notation like [g4, e4, f4] @ [4n, 8n] ... [values/notes] @ [durations]
 - [ ] use numbers on notes to subtones and such
 - [ ] add global start/stop UI
