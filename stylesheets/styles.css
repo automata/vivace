@@ -125,20 +125,23 @@ header ul {
 }
 
 header li {
-  width:89px;
+  width: 100%;
   float:left;
-  border-right:1px solid #d2d2d2;
   height:40px;
 }
 
 header ul a {
-  line-height:1;
+  line-height:2;
   font-size:11px;
   color:#999;
   display:block;
   text-align:center;
   padding-top:6px;
   height:40px;
+}
+
+header ul:hover {
+  background-color: #fff
 }
 
 strong {
