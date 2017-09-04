@@ -1,5 +1,7 @@
 var audioFilesDir = './media/';
 
+var editor = null
+
 // Store all the voices (main symbol table)
 var voices = {};
 
@@ -230,6 +232,17 @@ var initVivace = function() {
   // Just sets the welcoming message
   var textArea = document.getElementById("code")
   textArea.value = welcomeMessage
+
+  // Overwrite default CM keymap to prevent conflict with Vivace's
+  CodeMirror.keyMap.default["Cmd-]"] = null
+
+  // Setup Code Mirror on text area
+  editor = CodeMirror.fromTextArea(textArea, {
+    mode: 'javascript',
+    theme: 'abcdef',
+    lineNumbers: true,
+    scrollbarStyle: null
+  })
 }
 
 /*
@@ -380,8 +393,8 @@ Voice.prototype.playSignal = function(nodeName, signalName) {
 var previousVoices = []
 
 function run () {
-  var code = document.getElementById('code')
-  var texec = exec(code.value)
+  var code = editor.getValue()
+  var texec = exec(code)
   var currentVoices = texec[0]
   var activeVoices = texec[1]
 
