@@ -85,7 +85,7 @@ function exec (input) {
     var voiceName = definitions[i].name.val;
     voiceNames[voiceName]=true;
 
-    if (definitions[i].attr.val === 'notes' || definitions[i].attr.val === 'n' || definitions[i].attr.val === 'p' || definitions[i].attr.val === 'pos') {
+    if (definitions[i].attr.val === 'notes' || definitions[i].attr.val === 'n') {
       if (definitions[i].is.type === 'values') {
         if (voices[voiceName]) {
           var notes = []
@@ -93,17 +93,23 @@ function exec (input) {
             var note = definitions[i].is.val[j].val
             if (scaleDegrees.includes(note)) {
               // The list includes scale degrees
-              if (voices[voiceName].tune && voices[voiceName].scale) {
-                console.log('note', degreeToNumber(note), voices[voiceName].tune.note(degreeToNumber(note)))
-                notes.push(voices[voiceName].tune.note(degreeToNumber(note)))
+              if (voices[voiceName].scale) {
+                notes.push(voices[voiceName].scale.get(degreeToNumber(note)).scientific())
               }
             } else if (note >= 0 && note < 13) {
-              // Calculate the actual note based on interval semitones
-              var semitones = parseInt(note)
-              var interval = teoria.Interval().fromSemitones(semitones)
-              var root = teoria.note(voices[voiceName].rootNote)
-              var transposed = root.transposeNew(interval)
-              notes.push(transposed.scientific())
+              // The list includes some kind of indexes, maybe semitones? maybe
+              // still degrees?
+              if (voices[voiceName].scale) {
+                // If there's an scale already set, use it as degrees
+                notes.push(voices[voiceName].scale.get(degreeToNumber(note)).scientific())
+              } else {
+                // Otherwise, calculate the actual note based on interval semitones
+                var semitones = parseInt(note)
+                var interval = teoria.Interval().fromSemitones(semitones)
+                var root = teoria.note(voices[voiceName].rootNote)
+                var transposed = root.transposeNew(interval)
+                notes.push(transposed.scientific())
+              }
             } else {
               notes.push(definitions[i].is.val[j].val)
             }
@@ -120,6 +126,27 @@ function exec (input) {
         }
       }
     }
+    if (definitions[i].attr.val === 'p' || definitions[i].attr.val === 'pos') {
+      if (definitions[i].is.type === 'values') {
+        if (voices[voiceName]) {
+          var notes = []
+          for (var j=0; j<definitions[i].is.val.length; j++) {
+            var note = definitions[i].is.val[j].val
+            notes.push(definitions[i].is.val[j].val)
+          }
+          voices[voiceName].notes = notes.reverse()
+        }
+      } else if (definitions[i].is.type === 'durations') {
+        if (voices[voiceName]) {
+          var durations = []
+          for (var j=0; j<definitions[i].is.val.length; j++) {
+            durations.push(definitions[i].is.val[j].val)
+          }
+          voices[voiceName].durations = durations.reverse()
+        }
+      }
+    }
+
     if (definitions[i].attr.val === 'durations') {
       if (definitions[i].is.type === 'values') {
         if (voices[voiceName]) {
@@ -147,9 +174,8 @@ function exec (input) {
     if (definitions[i].attr.val === 'scale') {
       if (definitions[i].is.type === 'chains') {
         if (voices[voiceName]) {
-          voices[voiceName].scale = definitions[i].is.val[0].name.val
-          if (voices[voiceName].tune)
-            voices[voiceName].tune.loadScale(voices[voiceName].scale)
+          voices[voiceName].scaleName = definitions[i].is.val[0].name.val
+          voices[voiceName].scale = teoria.scale(voices[voiceName].rootNote, voices[voiceName].scaleName)
         }
       }
     }
@@ -162,8 +188,6 @@ function exec (input) {
           }
           voices[voiceName].root = Tone.Frequency(definitions[i].is.val[0].name.val)
           voices[voiceName].rootNote = definitions[i].is.val[0].name.val
-          if (voices[voiceName].tune)
-            voices[voiceName].tune.tonicize(voices[voiceName].root)
         }
       }
     }
@@ -264,7 +288,6 @@ var Voice = function(name, chain, notes, dur, parameters) {
   this.durations = dur || []
   this.countNotes = 0
   this.playing = false
-  this.tune = new Tune()
   // Store "constructor" parameters given for chain nodes like sampler or
   // video, e.g. video('foo.mp4')
   this.parameters = parameters
