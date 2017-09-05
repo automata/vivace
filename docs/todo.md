@@ -24,14 +24,14 @@ for 0.1.1:
 - [x] add syntax highlight (codemirror?)
 - [x] use numbers on notes to subtones and such
 - [x] add all tonejs nodes and make it possible to automate every param
+- [x] add global start/stop UI
 - [ ] implement operators on sequences
 - [ ] use more compact notation like [g4, e4, f4] @ [4n, 8n] ... [values/notes] @ [durations]
-- [ ] add global start/stop UI
-- [ ] make it work again with client/server (sharejs)
 
 for 0.2.0:
 - [ ] add unit tests
 - [ ] add more audio units
+- [ ] make it work again with client/server (sharejs)
 - show notes as a plot
 - show node chain as a plot
 - make it possible to drag and drop audio files
