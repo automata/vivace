@@ -92,10 +92,18 @@ function exec (input) {
           for (var j=0; j<definitions[i].is.val.length; j++) {
             var note = definitions[i].is.val[j].val
             if (scaleDegrees.includes(note)) {
+              // The list includes scale degrees
               if (voices[voiceName].tune && voices[voiceName].scale) {
                 console.log('note', degreeToNumber(note), voices[voiceName].tune.note(degreeToNumber(note)))
                 notes.push(voices[voiceName].tune.note(degreeToNumber(note)))
               }
+            } else if (note >= 0 && note < 13) {
+              // Calculate the actual note based on interval semitones
+              var semitones = parseInt(note)
+              var interval = teoria.Interval().fromSemitones(semitones)
+              var root = teoria.note(voices[voiceName].rootNote)
+              var transposed = root.transposeNew(interval)
+              notes.push(transposed.scientific())
             } else {
               notes.push(definitions[i].is.val[j].val)
             }
@@ -153,6 +161,7 @@ function exec (input) {
             vals.push(definitions[i].is.val[j].val)
           }
           voices[voiceName].root = Tone.Frequency(definitions[i].is.val[0].name.val)
+          voices[voiceName].rootNote = definitions[i].is.val[0].name.val
           if (voices[voiceName].tune)
             voices[voiceName].tune.tonicize(voices[voiceName].root)
         }
