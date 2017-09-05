@@ -29,7 +29,8 @@ var audioNodeNames = [
   'chorus',
   'tremolo',
   'vibrato',
-  'delay'
+  'delay',
+  'panner'
 ]
 
 var scaleDegrees = [ 'i', 'ii', 'iii', 'iv', 'v', 'vi', 'vii', 'viii', 'ix', 'x', 'xi' ]
@@ -175,6 +176,13 @@ function mapNameToAudioNode(name, parameters) {
           'delayTime',
           'feedback',
           'wet'
+        ]
+      }
+    case 'panner':
+      return {
+        instance: new Tone.Panner(0),
+        signals: [
+          'pan'
         ]
       }
 
