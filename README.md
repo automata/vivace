@@ -1,5 +1,3 @@
-# Introduction
-
 ![Vivace](docs/vivace_shot.png)
 
 *Vivace* is a live coding DSL (Domain Specific Language) that runs on top of
@@ -20,8 +18,6 @@ the [Web
 - Mixes audio and video capabilities making it a Swiss knife for live playing
   of multimedia
 - Full control of audio nodes and their parameters by language instructions or UI
-
-[Try vivace](http://vivacelang.herokuapp.com).
 
 ## OK, but what is live coding?
 
@@ -111,16 +107,53 @@ Instead of specifying individual notes, it's posible to define a scale for a
 voice and then use degrees to play notes into the scale:
 
     a.sig = synth
-    a.scale = young-lm_piano   // Loads LaMonte Young's Well-Tempered Piano scale
     a.root = c4
+    a.scale = minor
     a.notes = [i, iii, v]
     a.notes = {4n}
 
 It's convenient to specify the root of the scale to make degrees relative to
-it. Scale degrees should be specified using Roman numbers (e.g. i, ii, iii, etc).
+it. Scale degrees can be specified using Roman numbers (e.g. i, ii, iii, etc)
+or integers:
 
-*Vivace* uses [TuneJS](https://github.com/abbernie/tune) to handle scales. For a complete list of available
-scales, please [check this Web page](http://abbernie.github.io/tune/scales.html).
+    a.sig = synth
+    a.root = e4
+    a.scale = minor
+    a.notes = [1, 3, 5]
+    a.notes = {4n}
+
+If only a __root__ note is specified without an __scale__, the list of notes
+becomes a __list of semitones__ defining a sequence of intervals from the
+__root__ note. For example, the following voice has as notes the 0, 1 and 2
+semitones of distance from __E4__ note, or in other words, this voice will play
+the unison, minor second and major second intervals of __E4__:
+
+    a.sig = synth
+    a.root = e4
+    a.notes = [0, 1, 2]
+    a.notes = {4n}
+
+*Vivace* uses [Teoria.js](https://github.com/saebekassebil/teoria) to handle scales. Those are the supported scales:
+
+- chromatic
+- harmonicchromatic
+- major
+- minor
+- melodicminor
+- harmonicminor
+- doubleharmonic
+- majorpentatonic
+- minorpentatonic
+- blues
+- aeolian
+- dorian
+- ionian
+- locrian
+- lydian
+- mixolydian
+- phrygian
+- flamenco
+- wholetone
 
 ## Controling videos
 
