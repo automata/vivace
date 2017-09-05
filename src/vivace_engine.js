@@ -84,7 +84,7 @@ function mapNameToAudioNode(name, parameters) {
       }
     case 'sampler':
       return {
-        instance: new Tone.Sampler({"c4": parameters[0]}),
+        instance: new Tone.Sampler({"c4": parameters[0]}, function () { console.log('loaded!')}),
         notes: [],
         durations: []
       }
@@ -317,7 +317,12 @@ Voice.prototype.playInstrument = function() {
       this.videoNodes[0].currentTime = note
       // this.instrument.playbackRate = rate
     } else if (this.chain[0] === 'metal' || this.chain[0] === 'noise') {
+      // Metal and noise are a bit different than other synths
       this.audioNodes[0].triggerAttackRelease(dur, Tone.now())
+    } else if (this.chain[0] === 'sampler') {
+      // Play only if audio source is loaded
+      if (this.audioNodes[0].loaded)
+        this.audioNodes[0].triggerAttackRelease(note, dur, Tone.now())
     } else {
       this.audioNodes[0].triggerAttackRelease(note, dur, Tone.now())
     }
