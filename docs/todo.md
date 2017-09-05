@@ -25,10 +25,10 @@ for 0.1.1:
 - [x] use numbers on notes to subtones and such
 - [x] add all tonejs nodes and make it possible to automate every param
 - [x] add global start/stop UI
-- [ ] implement operators on sequences
-- [ ] use more compact notation like [g4, e4, f4] @ [4n, 8n] ... [values/notes] @ [durations]
 
 for 0.2.0:
+- [ ] use more compact notation like [g4, e4, f4] @ [4n, 8n] ... [values/notes] @ [durations]
+- [ ] implement operators on sequences
 - [ ] add unit tests
 - [ ] add more audio units
 - [ ] make it work again with client/server (sharejs)
