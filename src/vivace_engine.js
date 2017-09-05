@@ -288,6 +288,9 @@ var Voice = function(name, chain, notes, dur, parameters) {
   this.durations = dur || []
   this.countNotes = 0
   this.playing = false
+  // Use a default root note
+  this.rootNote = 'c5'
+  this.root = teoria.note(this.ootNote)
   // Store "constructor" parameters given for chain nodes like sampler or
   // video, e.g. video('foo.mp4')
   this.parameters = parameters
