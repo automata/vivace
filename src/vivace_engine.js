@@ -12,10 +12,24 @@ Tone.Transport.start();
 
 var audioNodeNames = [
   'synth',
+  'fm',
+  'metal',
+  'membrane',
+  'noise',
+  'pluck',
+
   'sampler',
   'video',
+
   'filter',
-  'reverb'
+  'reverb',
+  'autowah',
+  'bitcrusher',
+  'chebyshev',
+  'chorus',
+  'tremolo',
+  'vibrato',
+  'delay'
 ]
 
 var scaleDegrees = [ 'i', 'ii', 'iii', 'iv', 'v', 'vi', 'vii', 'viii', 'ix', 'x', 'xi' ]
@@ -36,6 +50,41 @@ function mapNameToAudioNode(name, parameters) {
         notes: [],
         durations: []
       }
+    case 'fm':
+      return {
+        instance: new Tone.FMSynth(),
+        notes: [],
+        durations: [],
+        signals: [
+          'modulationIndex'
+        ]
+      }
+    case 'membrane':
+      return {
+        instance: new Tone.MembraneSynth(),
+        notes: [],
+        durations: []
+      }
+    case 'metal':
+      return {
+        instance: new Tone.MetalSynth(),
+        notes: [],
+        durations: []
+      }
+    case 'noise':
+      return {
+        instance: new Tone.NoiseSynth(),
+        notes: [],
+        durations: []
+      }
+    case 'pluck':
+      return {
+        instance: new Tone.PluckSynth(),
+        notes: [],
+        durations: []
+      }
+
+
     case 'sampler':
       return {
         instance: new Tone.Sampler({"c4": parameters[0]}),
@@ -68,6 +117,67 @@ function mapNameToAudioNode(name, parameters) {
           'wet'
         ]
       }
+    case 'autowah':
+      return {
+        instance: new Tone.AutoWah(50, 6, -30),
+        signals: [
+          'gain',
+          'Q',
+          'wet'
+        ]
+      }
+    case 'bitcrusher':
+      return {
+        instance: new Tone.BitCrusher(4),
+        signals: [
+          'bits',
+          'wet'
+        ]
+      }
+    case 'chebyshev':
+      return {
+        instance: new Tone.Chebyshev(50),
+        signals: [
+          'wet'
+        ]
+      }
+    case 'chorus':
+      return {
+        instance: new Tone.Chorus(4, 2.5, 0.5),
+        signals: [
+          'frequency',
+          'feedback',
+          'wet'
+        ]
+      }
+    case 'tremolo':
+      return {
+        instance: new Tone.Tremolo(9, 0.75),
+        signals: [
+          'frequency',
+          'depth',
+          'wet'
+        ]
+      }
+    case 'vibrato':
+      return {
+        instance: new Tone.Vibrato(),
+        signals: [
+          'frequency',
+          'depth',
+          'wet'
+        ]
+      }
+    case 'delay':
+      return {
+        instance: new Tone.PingPongDelay('4n', 0.2),
+        signals: [
+          'delayTime',
+          'feedback',
+          'wet'
+        ]
+      }
+
     default:
       return
   }
@@ -392,6 +502,8 @@ Voice.prototype.playInstrument = function() {
       this.videoNodes[0].play()
       this.videoNodes[0].currentTime = note
       // this.instrument.playbackRate = rate
+    } else if (this.chain[0] === 'metal' || this.chain[0] === 'noise') {
+      this.audioNodes[0].triggerAttackRelease(dur, Tone.now())
     } else {
       this.audioNodes[0].triggerAttackRelease(note, dur, Tone.now())
     }
