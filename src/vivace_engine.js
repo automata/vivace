@@ -584,6 +584,29 @@ function run () {
 }
 
 /*
+ * Reset Vivace's voices
+ */
+
+function reset () {
+  // Go through all the voices and stop/clean their audio chains
+  var voiceNames = Object.keys(voices)
+  for (var i=0; i<voiceNames.length; i++) {
+    voices[voiceNames[i]].notes = []
+    voices[voiceNames[i]].durations = []
+    voices[voiceNames[i]].stopInstrument()
+    if (voiceNames[i].chain) {
+      if (voiceNames[i].chain[0] !== 'video') {
+        voices[voiceNames[i]].audioNodes.forEach(function (audioNode) {
+          audioNode.dispose()
+        })
+      }
+    }
+  }
+  // Reset voices main table
+  voices = {}
+}
+
+/*
  * Drawer handling
  */
 
@@ -612,7 +635,15 @@ keyboardJS.bind('alt + enter', function(e) {
 })
 
 keyboardJS.bind('command + .', function(e) {
-  // TODO: Implement stop all
+  reset()
+})
+
+keyboardJS.bind('ctrl + .', function(e) {
+  reset()
+})
+
+keyboardJS.bind('alt + .', function(e) {
+  reset()
 })
 
 keyboardJS.bind('command + ]', function(e) {
