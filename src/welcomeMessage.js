@@ -1,13 +1,14 @@
 var welcomeMessage = "\
 // Welcome to Vivace!\
 \n// \
-\n// Press CTRL+x to evaluate the following code, change values into lists \
-\n// and keep pressing CTRL+x to change audio/video on-the-fly. \
-\n// \
-\n// Each voice has a name, a signal/chain that defines its timbre and a \
+\n// Press Ctrl + Enter (or Cmd + Enter, or Alt + Enter) to evaluate \
+\n// the following code. Change values into lists and keep pressing Ctrl + Enter\
+\n// to change audio/video on-the-fly. \
+\n\n// Each voice has a name, a signal/chain that defines its timbre and a \
 \n// list of values/notes/durations to automate audio/video node parameters. \
-\n// \
-\n// The following source code defines a simple monophonic synthesizer and \
+\n// Press Ctrl + ] (or Cmd + ], or Alt + ]) to toggle the drawer on the right.\
+\n// There you can control voice parameters by hand.\
+\n\n// The following source code defines a simple monophonic synthesizer and \
 \n// plugs it to a reverb filter: \
 \n\
 \na.signal = synth => reverb \
